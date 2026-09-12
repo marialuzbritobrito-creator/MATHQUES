@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MATHQUEST - A Gamificação da Matemática</title>
+  <title>MATHQUEST - Gamificação em Tempo Real</title>
   
-  <!-- Fonte Retro Pixelada e Altamente Legível: VT323 -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   
-  <!-- Firebase Compatibility SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -29,7 +27,7 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 15px;
+      padding: 0 0 20px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -37,38 +35,23 @@
       font-size: 20px;
     }
 
-    /* Cabeçalho Fixo com Logo e Mascote Pixel Art */
-    .top-header {
+    /* BANNER DA LOGO QUE TAMPA O TOPO */
+    .banner-container {
       width: 100%;
       max-width: 950px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      margin-bottom: 12px;
-      border-bottom: 3px solid var(--user-theme-color);
-      flex-wrap: wrap;
-      gap: 10px;
+      background-color: #161b22;
+      border-bottom: 4px solid var(--user-theme-color);
+      text-align: center;
+      overflow: hidden;
+      margin-bottom: 15px;
     }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-img {
-      max-height: 48px;
-      width: auto;
+    .banner-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
       image-rendering: pixelated;
-    }
-
-    .app-title {
-      font-size: 32px;
-      color: var(--user-theme-color);
-      margin: 0;
-      text-shadow: 2px 2px #000;
-      letter-spacing: 2px;
     }
 
     .app-container {
@@ -77,17 +60,49 @@
       background-color: var(--card-bg);
       border: 3px solid var(--user-theme-color);
       border-radius: 8px;
-      padding: 24px;
+      padding: 20px;
       box-shadow: 0 0 25px rgba(0, 255, 102, 0.2);
+    }
+
+    /* SISTEMA DE ABAS LADO A LADO */
+    .nav-tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 15px;
+      background: #21262d;
+      color: #8b949e;
+      border: 2px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      font-size: 20px;
+      text-align: center;
+      white-space: nowrap;
+      margin: 0;
+      box-shadow: none;
+    }
+
+    .tab-btn.active {
+      background: var(--user-theme-color);
+      color: #000;
+      font-weight: bold;
+      border-color: var(--user-theme-color);
     }
 
     .screen { display: none; }
     .screen.active { display: block; }
 
     label {
-      font-size: 22px;
+      font-size: 20px;
       display: block;
-      margin-top: 12px;
+      margin-top: 10px;
       color: var(--user-theme-color);
     }
 
@@ -99,12 +114,7 @@
       border-radius: 6px;
       background-color: #0d1117;
       color: #fff;
-      font-size: 22px;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--user-theme-color);
+      font-size: 20px;
     }
 
     button {
@@ -115,300 +125,236 @@
       cursor: pointer;
       text-transform: uppercase;
       box-shadow: 3px 3px 0px #000;
-      transition: all 0.1s;
-      margin-top: 12px;
-      font-size: 24px;
-      min-height: 48px;
+      margin-top: 10px;
+      min-height: 44px;
     }
 
-    button:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0px #000;
-    }
-
-    .btn-secondary {
-      background-color: #21262d;
-      color: #fff;
-      border-color: var(--border-color);
-    }
+    button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
+    .btn-secondary { background-color: #21262d; color: #fff; border-color: var(--border-color); }
 
     .avatar-preview {
-      width: 80px;
-      height: 80px;
+      width: 80px; height: 80px;
       border: 3px solid var(--user-theme-color);
-      border-radius: 50%;
-      object-fit: cover;
-      display: block;
-      margin: 10px auto;
+      border-radius: 50%; object-fit: cover;
+      display: block; margin: 10px auto;
       image-rendering: pixelated;
-    }
-
-    .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      background: #21262d;
-      padding: 15px;
-      border-radius: 8px;
-      border: 2px solid var(--user-theme-color);
-      margin-bottom: 20px;
-    }
-
-    .profile-card img {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      border: 2px solid var(--user-theme-color);
-      object-fit: cover;
     }
 
     .area-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-      margin-top: 15px;
-      max-height: 380px;
-      overflow-y: auto;
-      padding-right: 5px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px; margin-top: 15px;
+      max-height: 350px; overflow-y: auto;
     }
 
     .area-card {
-      background: #21262d;
-      border: 2px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
+      background: #21262d; border: 2px solid var(--border-color);
+      border-radius: 6px; padding: 10px; text-align: center; cursor: pointer;
     }
 
-    .area-card:hover {
-      border-color: var(--user-theme-color);
-      background-color: #1a232e;
-      transform: translateY(-2px);
-    }
+    .area-card:hover { border-color: var(--user-theme-color); }
 
-    .area-card-title {
-      font-size: 22px;
-      color: var(--user-theme-color);
-      margin-bottom: 4px;
-    }
-
-    .area-card-count {
-      font-size: 18px;
-      color: #8b949e;
-    }
-
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 2px solid var(--border-color); padding: 8px; text-align: center; font-size: 20px; }
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 2px solid var(--border-color); padding: 8px; text-align: center; }
     th { background-color: #21262d; color: var(--user-theme-color); }
 
-    .quiz-option-btn {
-      background-color: #21262d;
-      text-align: left;
+    /* ANIMAÇÃO DE SUBIDA NO RANKING */
+    .ranking-row-updated {
+      animation: highlightRow 1.5s ease-out;
+    }
+
+    @keyframes highlightRow {
+      0% { background-color: rgba(0, 255, 102, 0.5); }
+      100% { background-color: transparent; }
+    }
+
+    /* ESTILO GOOGLE FORMS PARA O PROFESSOR */
+    .forms-card {
+      background: #21262d;
       border: 2px solid var(--border-color);
-      color: #fff;
-    }
-
-    .quiz-option-btn:hover {
-      border-color: var(--user-theme-color);
-      background-color: #1f2937;
-    }
-
-    .explanation-box {
-      background-color: #1f2937;
-      border-left: 5px solid var(--user-theme-color);
-      padding: 15px;
+      border-left: 6px solid var(--user-theme-color);
       border-radius: 6px;
-      margin-top: 15px;
-      font-size: 22px;
-      line-height: 1.4;
+      padding: 15px;
+      margin-bottom: 15px;
+      position: relative;
     }
 
-    .badge-status {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 22px;
-      font-weight: bold;
-    }
-    .status-correct { background-color: #00ff66; color: #000; }
-    .status-incorrect { background-color: #ff0055; color: #fff; }
-
-    .pixel-art-icon {
-      width: 32px;
-      height: 32px;
-      vertical-align: middle;
-      image-rendering: pixelated;
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
     }
 
-    /* RESPONSIVIDADE CELULAR, TABLET E COMPUTADOR */
+    .radio-check {
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      accent-color: var(--user-theme-color);
+    }
+
+    .btn-add-question {
+      background-color: #0088ff;
+      color: #fff;
+      font-size: 28px;
+      line-height: 20px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      margin: 15px auto;
+      display: block;
+    }
+
     @media (max-width: 600px) {
-      body { padding: 8px; font-size: 18px; }
-      .app-container { padding: 14px; }
-      .top-header { flex-direction: column; align-items: flex-start; }
-      .app-title { font-size: 26px; }
-      .profile-card { flex-direction: column; text-align: center; }
-      .area-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); max-height: 300px; }
-      .area-card-title { font-size: 18px; }
-      .area-card-count { font-size: 15px; }
-      th, td { padding: 5px; font-size: 16px; }
-      input, select, textarea, button { font-size: 18px; }
+      .banner-img { height: 110px; }
+      .app-container { padding: 10px; }
+      .tab-btn { font-size: 16px; padding: 8px 10px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="top-header">
-    <div class="logo-container">
-      <img src="mt.png" alt="MATHQUEST Logo" class="logo-img" onerror="this.style.display='none';">
-      <svg class="pixel-art-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="2" width="6" height="2" fill="#00ff66"/>
-        <rect x="4" y="4" width="8" height="2" fill="#ff0055"/>
-        <rect x="5" y="6" width="6" height="4" fill="#ffffff"/>
-        <rect x="6" y="7" width="1" height="1" fill="#000"/>
-        <rect x="9" y="7" width="1" height="1" fill="#000"/>
-        <rect x="4" y="10" width="8" height="5" fill="#0088ff"/>
-      </svg>
-      <h1 class="app-title">MATHQUEST</h1>
-    </div>
-    <span style="font-size:18px; color:#8b949e;">v3.0 Retro Edition</span>
+  <!-- BANNER DA LOGO MT.PNG FIXO NO TOPO DO FORMULÁRIO -->
+  <div class="banner-container">
+    <img src="mt.png" alt="MATHQUEST BANNER" class="banner-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'200\' width=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%23161b22\'/><text x=\'50%\' y=\'50%\' fill=\'%2300ff66\' font-size=\'40\' font-family=\'monospace\' dominant-baseline=\'middle\' text-anchor=\'middle\'>MATHQUEST FORMULÁRIO</text></svg>'">
   </div>
 
   <div class="app-container">
 
-    <!-- TELA 1: REGISTRO DO ALUNO -->
+    <!-- REGISTRO/LOGIN DO ALUNO -->
     <div id="screen-login" class="screen active">
-      <h2 style="margin-top:0; text-align:center; color: var(--user-theme-color);">🎮 PRESS START - REGISTRO DE JOGADOR</h2>
-      
-      <label>Seu Nickname / Apelido:</label>
-      <input type="text" id="player-name" placeholder="Ex: MathMaster99">
+      <h2 style="margin-top:0; text-align:center; color: var(--user-theme-color);">🎮 ENTRAR NO MATHQUEST</h2>
+      <label>Seu Apelido:</label>
+      <input type="text" id="player-name" placeholder="Ex: MathMaster">
 
-      <label>Escolha a Cor do Seu Perfil:</label>
+      <label>Escolha a Cor do Seu Tema:</label>
       <input type="color" id="player-color" value="#00ff66">
 
-      <label>Foto ou Avatar do Jogador:</label>
+      <label>Foto de Perfil:</label>
       <input type="file" id="player-photo" accept="image/*">
-      <img id="preview-img" class="avatar-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='65' height='65' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23161b22'/><rect x='4' y='3' width='8' height='6' fill='%2300ff66'/><rect x='3' y='9' width='10' height='6' fill='%23ff0055'/></svg>" alt="Avatar Pixel">
+      <img id="preview-img" class="avatar-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='65' height='65'><rect width='65' height='65' fill='%23161b22'/></svg>">
 
-      <button onclick="registerStudent()">SALVAR E ENTRAR NO JOGO</button>
+      <button onclick="registerStudent()">ENTRAR E SALVAR PERFIL</button>
       <button class="btn-secondary" onclick="showScreen('screen-prof-login')">🔒 Área do Professor</button>
     </div>
 
-    <!-- TELA 2: LOGIN DO PROFESSOR -->
+    <!-- LOGIN DO PROFESSOR -->
     <div id="screen-prof-login" class="screen">
       <h2 style="margin-top:0; color: var(--user-theme-color);">🔑 ACESSO DOCENTE</h2>
-      <label>Senha de Acesso do Professor:</label>
+      <label>Senha do Professor:</label>
       <input type="password" id="prof-pass" placeholder="Digite a senha...">
       <button onclick="loginProfessor()">ENTRAR NO PAINEL</button>
       <button class="btn-secondary" onclick="showScreen('screen-login')">VOLTAR</button>
     </div>
 
-    <!-- TELA 3: ÁREA DO ALUNO -->
+    <!-- PAINEL DO ALUNO -->
     <div id="screen-student-dash" class="screen">
-      <div class="profile-card">
-        <img id="student-display-photo" src="" alt="Perfil">
-        <div>
-          <span style="font-size: 18px; color: #8b949e;">JOGADOR ATIVO</span>
-          <h2 id="student-display-name" style="margin: 0; color: var(--user-theme-color);"></h2>
-          <span id="student-score-display" style="font-size: 22px; font-weight: bold; color: #ff0055;">0 PTS</span>
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchStudentTab('tab-quizzes', this)">📚 QUIZZES</button>
+        <button class="tab-btn" onclick="switchStudentTab('tab-ranking', this)">🏆 RANKING EM TEMPO REAL</button>
+        <button class="tab-btn" onclick="switchStudentTab('tab-profile', this)">👤 MEU PERFIL</button>
+      </div>
+
+      <!-- ABA 1: FAZER QUIZZES -->
+      <div id="tab-quizzes" class="tab-content">
+        <h3 style="margin-top:0; color: var(--user-theme-color);">ESCOLHA UM QUIZ DO PROFESSOR OU UMA ÁREA:</h3>
+        <div id="prof-quizzes-container"></div>
+        <div id="area-grid-container" class="area-grid"></div>
+      </div>
+
+      <!-- ABA 2: RANKING ATUALIZADO EM TEMPO REAL -->
+      <div id="tab-ranking" class="tab-content" style="display:none;">
+        <h3 style="margin-top:0; color: var(--user-theme-color);">⚡ RANKING EM TEMPO REAL (ACERTOS / PONTOS)</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>POS</th><th>ALUNO</th><th>ACERTOS</th><th>PONTOS</th></tr>
+            </thead>
+            <tbody id="student-ranking-body"></tbody>
+          </table>
         </div>
       </div>
 
-      <h2 style="margin: 10px 0 0 0; color: var(--user-theme-color);">📚 LISTA DE ÁREAS DA MATEMÁTICA:</h2>
-      <p style="margin: 0 0 10px 0; font-size:18px; color:#8b949e;">Clique em uma área para abrir o quiz correspondente!</p>
-      
-      <div id="area-grid-container" class="area-grid"></div>
+      <!-- ABA 3: PERFIL EDITÁVEL A QUALQUER HORA -->
+      <div id="tab-profile" class="tab-content" style="display:none;">
+        <h3 style="margin-top:0; color: var(--user-theme-color);">✏️ EDITAR MEU PERFIL</h3>
+        <img id="edit-display-photo" class="avatar-preview" src="">
+        <label>Seu Apelido:</label>
+        <input type="text" id="edit-player-name" disabled>
 
-      <button class="btn-secondary" onclick="logoutStudent()" style="margin-top: 20px;">Trocar de Perfil / Sair</button>
+        <label>Alterar Cor do Tema:</label>
+        <input type="color" id="edit-player-color">
 
-      <h3 style="margin-top: 25px; color: var(--user-theme-color);">🏆 RANKING GERAL DE JOGADORES</h3>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>POS</th>
-              <th>JOGADOR</th>
-              <th>PONTOS</th>
-            </tr>
-          </thead>
-          <tbody id="ranking-body"></tbody>
-        </table>
+        <label>Alterar Foto:</label>
+        <input type="file" id="edit-player-photo" accept="image/*">
+
+        <button onclick="saveProfileChanges()">SALVAR ALTERAÇÕES</button>
+        <button class="btn-secondary" onclick="logoutStudent()">SAIR DA CONTA</button>
       </div>
     </div>
 
-    <!-- TELA 4: QUIZ E RESOLUÇÃO -->
+    <!-- TELA DA APLICAÇÃO DO QUIZ -->
     <div id="screen-quiz" class="screen">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <span id="quiz-area-badge" style="color: var(--user-theme-color); font-size:22px;"></span>
-        <span id="quiz-counter-badge" style="color: #8b949e; font-size:20px;"></span>
-      </div>
-
-      <h3 id="quiz-question-title" style="font-size: 26px; margin: 15px 0;"></h3>
-      
+      <span id="quiz-area-badge" style="color: var(--user-theme-color); font-size:22px;"></span>
+      <h3 id="quiz-question-title" style="font-size: 26px;"></h3>
       <div id="quiz-options-container"></div>
-
-      <div id="quiz-feedback" style="display:none;">
-        <div id="feedback-badge" class="badge-status"></div>
-        
-        <div class="explanation-box">
-          <strong style="color:var(--user-theme-color);">📖 EXPLICAÇÃO E RESOLUÇÃO PASSO A PASSO:</strong>
-          <p id="feedback-explanation" style="margin: 10px 0 0 0; white-space: pre-line;"></p>
-        </div>
-
-        <button id="next-question-btn" onclick="nextQuestionInQuiz()" style="margin-top: 15px;">PRÓXIMA PERGUNTA ➔</button>
+      <div id="quiz-feedback" style="display:none; margin-top: 15px;">
+        <div id="feedback-badge"></div>
+        <p id="feedback-explanation" style="background:#21262d; padding:10px; border-radius:4px;"></p>
+        <button onclick="nextQuestionInQuiz()">PRÓXIMA ➔</button>
       </div>
     </div>
 
-    <!-- TELA 5: PAINEL DO PROFESSOR (CRIAÇÃO ILIMITADA) -->
+    <!-- PAINEL DO PROFESSOR -->
     <div id="screen-prof-dash" class="screen">
-      <h2 style="margin-top:0; color: var(--user-theme-color);">🛠️ PAINEL DE CRIAÇÃO E IDENTIFICAÇÃO DE QUIZ</h2>
-      <p style="font-size: 18px; color: #8b949e;">Envie quantas questões quiser para qualquer área. Elas serão salvas no banco de dados.</p>
-
-      <label>1. Identificação da Área / Tema do Quiz:</label>
-      <select id="new-q-area"></select>
-
-      <label>2. Tipo de Questão:</label>
-      <select id="new-q-type" onchange="toggleQuestionTypeUI()">
-        <option value="multiple">Múltipla Escolha (4 Opções)</option>
-        <option value="tf">Verdadeiro ou Falso (V / F)</option>
-      </select>
-
-      <label>3. Enunciado / Pergunta:</label>
-      <textarea id="new-q-title" rows="2" placeholder="Digite a pergunta do quiz..."></textarea>
-
-      <div id="ui-multiple-options">
-        <label>Opção A (CORRETA):</label>
-        <input type="text" id="new-q-opt-correct" placeholder="Resposta correta...">
-
-        <label>Opção B (Incorreta):</label>
-        <input type="text" id="new-q-opt2" placeholder="Alternativa incorreta 1...">
-
-        <label>Opção C (Incorreta):</label>
-        <input type="text" id="new-q-opt3" placeholder="Alternativa incorreta 2...">
-
-        <label>Opção D (Incorreta):</label>
-        <input type="text" id="new-q-opt4" placeholder="Alternativa incorreta 3...">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchProfTab('tab-generator', this)">📝 GERADOR DE QUIZ</button>
+        <button class="tab-btn" onclick="switchProfTab('tab-accesses', this)">👥 ALUNOS CADASTRADOS</button>
+        <button class="tab-btn" onclick="switchProfTab('tab-prof-ranking', this)">🏆 RANKING GERAL</button>
       </div>
 
-      <div id="ui-tf-options" style="display:none;">
-        <label>Resposta Correta para V/F:</label>
-        <select id="new-q-tf-correct">
-          <option value="Verdadeiro">Verdadeiro</option>
-          <option value="Falso">Falso</option>
-        </select>
+      <!-- ABA 1: GERADOR DE QUIZ ESTILO GOOGLE FORMS -->
+      <div id="tab-generator" class="tab-content">
+        <label>Título do Formulário / Quiz do Professor:</label>
+        <input type="text" id="forms-title" placeholder="Ex: Avaliação de Álgebra - 1º Bimestre">
+
+        <label>Selecione a Área da Matemática:</label>
+        <select id="forms-area"></select>
+
+        <div id="forms-questions-container"></div>
+
+        <button type="button" class="btn-add-question" onclick="addQuestionCardForms()" title="Adicionar Pergunta">+</button>
+
+        <button onclick="saveFullQuizForms()" style="background-color: var(--user-theme-color); font-size: 22px;">SALVAR E PUBLICAR QUIZ 🚀</button>
+        <button class="btn-secondary" onclick="showScreen('screen-login')">SAIR</button>
       </div>
 
-      <label>4. Explicação / Passo a Passo (Opcional):</label>
-      <textarea id="new-q-explanation" rows="2" placeholder="Digite a explicação da resposta..."></textarea>
+      <!-- ABA 2: LISTA DE ACESSOS -->
+      <div id="tab-accesses" class="tab-content" style="display:none;">
+        <h3 style="margin-top:0; color: var(--user-theme-color);">👥 LISTA DE ALUNOS PARTICIPANTES</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>FOTO</th><th>NOME / APELIDO</th><th>TOTAL ACERTOS</th><th>PONTUAÇÃO</th></tr>
+            </thead>
+            <tbody id="prof-accesses-body"></tbody>
+          </table>
+        </div>
+      </div>
 
-      <button onclick="sendQuizToFirebase()">ENVIAR QUIZ PARA A ÁREA DOS ALUNOS 🚀</button>
-      <button class="btn-secondary" onclick="showScreen('screen-login')">SAIR DO PAINEL</button>
+      <!-- ABA 3: RANKING NO PAINEL DO PROFESSOR -->
+      <div id="tab-prof-ranking" class="tab-content" style="display:none;">
+        <h3 style="margin-top:0; color: var(--user-theme-color);">🏆 RANKING GERAL EM TEMPO REAL</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>POS</th><th>ALUNO</th><th>DESEMPENHO</th></tr>
+            </thead>
+            <tbody id="prof-ranking-body"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -421,8 +367,7 @@
       projectId: "mathques",
       storageBucket: "mathques.firebasestorage.app",
       messagingSenderId: "413245852392",
-      appId: "1:413245852392:web:fd9affbddda2f34eed975d",
-      measurementId: "G-NJ9D8QV749"
+      appId: "1:413245852392:web:fd9affbddda2f34eed975d"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -437,251 +382,8 @@
       "Progressão Aritmética (PA)", "Progressão Geométrica (PG)"
     ];
 
-    // BANCO PRÉ-CARREGADO COM EXACTAMENTE 10 PERGUNTAS COMPLETAS POR ÁREA
-    const defaultQuizzesDatabase = {
-      "Álgebra": [
-        { title: "1. Resolva 3x + 15 = 45.", options: ["x = 10", "x = 15", "x = 8", "x = 12"], correct: "x = 10", explanation: "3x = 45 - 15 => 3x = 30 => x = 10." },
-        { title: "2. Na equação 2x - 8 = 10, o valor de x é 9.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "2x = 18 => x = 9." },
-        { title: "3. Fatore x² - 9.", options: ["(x - 3)(x + 3)", "(x - 3)²", "(x + 3)²", "x(x - 9)"], correct: "(x - 3)(x + 3)", explanation: "Diferença de quadrados: a² - b² = (a - b)(a + b)." },
-        { title: "4. Qual é o valor de x em 5x = 35?", options: ["x = 7", "x = 6", "x = 5", "x = 8"], correct: "x = 7", explanation: "x = 35 / 5 = 7." },
-        { title: "5. A expressão (a + b)² é igual a a² + 2ab + b².", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Trinômio quadrado perfeito." },
-        { title: "6. Simplifique a expressão 4x + 2x - 3x.", options: ["3x", "4x", "2x", "5x"], correct: "3x", explanation: "(4 + 2 - 3)x = 3x." },
-        { title: "7. Se x = 4, qual o valor de 2x²?", options: ["32", "16", "64", "24"], correct: "32", explanation: "2 * (4)² = 2 * 16 = 32." },
-        { title: "8. O grau do polinômio P(x) = x³ + 2x² - 5 é 3.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "O maior expoente da variável é 3." },
-        { title: "9. Resolva x / 4 = 12.", options: ["x = 48", "x = 3", "x = 16", "x = 36"], correct: "x = 48", explanation: "x = 12 * 4 = 48." },
-        { title: "10. Qual a solução de -2x = -14?", options: ["x = 7", "x = -7", "x = 12", "x = -12"], correct: "x = 7", explanation: "x = -14 / -2 = 7." }
-      ],
-      "Aritmética Básica": [
-        { title: "1. Quanto é 12 × 8?", options: ["96", "84", "108", "92"], correct: "96", explanation: "Multiplicação direta: 12 * 8 = 96." },
-        { title: "2. O número 17 é primo.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "17 só possui dois divisores: 1 e 17." },
-        { title: "3. Qual é o MMC entre 4 e 6?", options: ["12", "24", "10", "8"], correct: "12", explanation: "Múltiplos comuns: 12 é o menor divisor comum." },
-        { title: "4. Quanto é 144 / 12?", options: ["12", "14", "10", "11"], correct: "12", explanation: "12 * 12 = 144." },
-        { title: "5. O resultado de 5 + 3 × 2 é 16.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Multiplicação primeiro: 3 * 2 = 6; 5 + 6 = 11." },
-        { title: "6. Qual o MDC de 18 e 24?", options: ["6", "12", "3", "8"], correct: "6", explanation: "Maior divisor que divide ambos os números é 6." },
-        { title: "7. Quanto é 7³?", options: ["343", "49", "21", "243"], correct: "343", explanation: "7 * 7 * 7 = 343." },
-        { title: "8. A raiz quadrada de 81 é 9.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "9 * 9 = 81." },
-        { title: "9. Qual é o valor de 15% de 200?", options: ["30", "20", "15", "40"], correct: "30", explanation: "0.15 * 200 = 30." },
-        { title: "10. Quanto é 1000 - 457?", options: ["543", "553", "547", "643"], correct: "543", explanation: "1000 - 457 = 543." }
-      ],
-      "Geometria Plana": [
-        { title: "1. Área do triângulo (b=10, h=6):", options: ["30 cm²", "60 cm²", "15 cm²", "45 cm²"], correct: "30 cm²", explanation: "(10 * 6) / 2 = 30." },
-        { title: "2. A soma dos ângulos internos de um triângulo é 180°.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra fundamental dos triângulos." },
-        { title: "3. Perímetro de um quadrado com lado 5 cm:", options: ["20 cm", "25 cm", "10 cm", "15 cm"], correct: "20 cm", explanation: "4 * 5 = 20 cm." },
-        { title: "4. Área de um círculo de raio 3 cm (considere π=3):", options: ["27 cm²", "18 cm²", "9 cm²", "36 cm²"], correct: "27 cm²", explanation: "π * r² = 3 * 9 = 27." },
-        { title: "5. Um hexágono regular possui 6 lados iguais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de hexágono." },
-        { title: "6. Qual a área de um retângulo de 8m por 4m?", options: ["32 m²", "24 m²", "16 m²", "64 m²"], correct: "32 m²", explanation: "8 * 4 = 32." },
-        { title: "7. Um triângulo equilátero tem todos os lados iguais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de equilátero." },
-        { title: "8. Quantas diagonais tem um quadrado?", options: ["2", "4", "1", "0"], correct: "2", explanation: "Um quadrilátero tem 2 diagonais." },
-        { title: "9. A soma dos ângulos internos de um quadrilátero é:", options: ["360°", "180°", "540°", "720°"], correct: "360°", explanation: "(4-2)*180 = 360°." },
-        { title: "10. Um ângulo de 90° é chamado de:", options: ["Ângulo Reto", "Ângulo Agudo", "Ângulo Obtuso", "Ângulo Raso"], correct: "Ângulo Reto", explanation: "Definição de ângulo reto." }
-      ],
-      "Geometria Espacial": [
-        { title: "1. Volume de um cubo de lado 3cm:", options: ["27 cm³", "9 cm³", "18 cm³", "36 cm³"], correct: "27 cm³", explanation: "V = L³ = 3³ = 27." },
-        { title: "2. Uma esfera possui vértices.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Superfície curva contínua sem vértices." },
-        { title: "3. Quantas faces tem um paralelepípedo?", options: ["6", "8", "12", "4"], correct: "6", explanation: "Possui 6 faces retangulares." },
-        { title: "4. Um cilindro possui 2 bases circulares.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Bases superior e inferior circulares." },
-        { title: "5. Volume de um paralelepípedo (2x3x4):", options: ["24 cm³", "12 cm³", "18 cm³", "48 cm³"], correct: "24 cm³", explanation: "2 * 3 * 4 = 24." },
-        { title: "6. Quantos vértices tem um cubo?", options: ["8", "6", "12", "16"], correct: "8", explanation: "Um cubo possui 8 vértices." },
-        { title: "7. Uma pirâmide de base quadrada tem 5 vértices.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "4 na base e 1 no topo." },
-        { title: "8. Quantas arestas tem um cubo?", options: ["12", "8", "6", "10"], correct: "12", explanation: "Um cubo possui 12 arestas." },
-        { title: "9. Fórmula do volume do cilindro:", options: ["π * r² * h", "2 * π * r", "π * r * h", "4/3 * π * r³"], correct: "π * r² * h", explanation: "Área da base × altura." },
-        { title: "10. Um cone tem base circular.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Base circular com um vértice no topo." }
-      ],
-      "Geometria Analítica": [
-        { title: "1. Distância entre os pontos (0,0) e (3,4):", options: ["5", "7", "1", "25"], correct: "5", explanation: "√(3² + 4²) = √(9+16) = 5." },
-        { title: "2. O ponto (0,0) é a origem do plano cartesiano.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Cruzamento dos eixos X e Y." },
-        { title: "3. Coeficiente angular de y = 2x + 3:", options: ["2", "3", "-2", "1"], correct: "2", explanation: "O termo 'm' em y = mx + b é 2." },
-        { title: "4. O ponto (2, -3) fica no 4º quadrante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "X positivo e Y negativo fica no 4º quadrante." },
-        { title: "5. Ponto médio entre (2,4) e (6,8):", options: ["(4,6)", "(3,5)", "(4,4)", "(8,12)"], correct: "(4,6)", explanation: "((2+6)/2, (4+8)/2) = (4,6)." },
-        { title: "6. Equação da reta paralela ao eixo X:", options: ["y = k", "x = k", "y = x", "y = -x"], correct: "y = k", explanation: "Mantém valor constante em Y." },
-        { title: "7. Duas retas são perpendiculares se m1 * m2 = -1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Condição de perpendicularidade." },
-        { title: "8. A equação x² + y² = 9 representa uma circunferência.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Circunferência centrada na origem com raio 3." },
-        { title: "9. Raio da circunferência x² + y² = 16:", options: ["4", "16", "8", "2"], correct: "4", explanation: "√16 = 4." },
-        { title: "10. No ponto (5,2), o valor das abcissas é 5.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "X = Abcissa = 5." }
-      ],
-      "Trigonometria": [
-        { title: "1. Seno de 30° é equal a:", options: ["0.5", "1", "0", "0.866"], correct: "0.5", explanation: "sen(30°) = 1/2 = 0.5." },
-        { title: "2. cos²(x) + sen²(x) = 1 é a relação fundamental.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Identidade trigonométrica fundamental." },
-        { title: "3. Tangente de 45° é:", options: ["1", "0", "0.5", "√3"], correct: "1", explanation: "sen(45°)/cos(45°) = 1." },
-        { title: "4. O cosseno de 0° é 0.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "cos(0°) = 1." },
-        { title: "5. Em um triângulo retângulo, sen(X) é:", options: ["Cateto Oposto / Hipotenusa", "Cateto Adj / Hipotenusa", "Cateto Op / Cateto Adj", "Hipotenusa / Cateto Op"], correct: "Cateto Oposto / Hipotenusa", explanation: "Definição de seno." },
-        { title: "6. cosseno de 60° é:", options: ["0.5", "0.866", "1", "0"], correct: "0.5", explanation: "cos(60°) = 1/2 = 0.5." },
-        { title: "7. A conversão de 180° em radianos é π rad.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "180° equivale a π radianos." },
-        { title: "8. Secante é o inverso do cosseno.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "sec(x) = 1/cos(x)." },
-        { title: "9. Tangente é igual a Cateto Oposto / Cateto Adjacente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de tangente." },
-        { title: "10. O valor de sen(90°) é:", options: ["1", "0", "-1", "0.5"], correct: "1", explanation: "sen(90°) = 1." }
-      ],
-      "Estatística": [
-        { title: "1. Média dos números 2, 4, 6, 8:", options: ["5", "6", "4", "20"], correct: "5", explanation: "(2+4+6+8)/4 = 20/4 = 5." },
-        { title: "2. Moda é o valor de maior frequência no conjunto.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Conceito estatístico de moda." },
-        { title: "3. Mediana de [1, 3, 5, 7, 9]:", options: ["5", "3", "7", "1"], correct: "5", explanation: "O valor central é 5." },
-        { title: "4. A amplitude é a diferença entre o maior e menor valor.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Maior elemento - menor elemento." },
-        { title: "5. Moda do conjunto [2, 3, 3, 5, 7]:", options: ["3", "2", "5", "7"], correct: "3", explanation: "Aparece 2 vezes." },
-        { title: "6. A média aritmética simples divide pelo total de elementos.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Soma / N." },
-        { title: "7. Variância mede a dispersão dos dados.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Média dos desvios ao quadrado." },
-        { title: "8. O desvio padrão é a raiz quadrada da variância.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de desvio padrão." },
-        { title: "9. Média de 10 e 20:", options: ["15", "10", "20", "30"], correct: "15", explanation: "(10+20)/2 = 15." },
-        { title: "10. Em um gráfico de setores, o total equivale a 360°.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Um círculo completo representa 100%." }
-      ],
-      "Probabilidade": [
-        { title: "1. Probabilidade de tirar cara ao lançar uma moeda:", options: ["50%", "25%", "100%", "75%"], correct: "50%", explanation: "1/2 = 50%." },
-        { title: "2. A probabilidade varia entre 0 e 1 (0% a 100%).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade dos eventos probilísticos." },
-        { title: "3. Probabilidade de tirar 6 em um dado comum:", options: ["1/6", "1/2", "1/3", "6/6"], correct: "1/6", explanation: "1 caso favorável em 6." },
-        { title: "4. Evento impossível tem probabilidade igual a 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "P = 0." },
-        { title: "5. Probabilidade de tirar número par em um dado:", options: ["50%", "30%", "60%", "16%"], correct: "50%", explanation: "3 pares / 6 lados = 50%." },
-        { title: "6. A soma de todas as probabilidades de um espaço amostral é 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Total é igual a 100% (1)." },
-        { title: "7. Em um baralho de 52 cartas, a chance de tirar um ás é 4/52.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Existem 4 ases em 52 cartas." },
-        { title: "8. Evento certo tem probabilidade 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "P = 100% (1)." },
-        { title: "9. Duas moedas juntas. Chance de duas caras:", options: ["1/4", "1/2", "3/4", "1/8"], correct: "1/4", explanation: "1/2 * 1/2 = 1/4." },
-        { title: "10. Probabilidade é Casos Favoráveis / Casos Possíveis.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Fórmula clássica de Laplace." }
-      ],
-      "Cálculo Diferencial": [
-        { title: "1. A derivada de f(x) = x² é:", options: ["2x", "x", "2", "x²"], correct: "2x", explanation: "Regra do tombo: 2 * x¹." },
-        { title: "2. A derivada de uma constante é igual a zero.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Taxa de variação constante é 0." },
-        { title: "3. Derivada de f(x) = 5x:", options: ["5", "x", "5x", "0"], correct: "5", explanation: "f'(x) = 5." },
-        { title: "4. A derivada mede a taxa de variação instantânea.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Inclinção da reta tangente." },
-        { title: "5. Derivada de f(x) = x³:", options: ["3x²", "x²", "3x", "x³"], correct: "3x²", explanation: "3 * x²." },
-        { title: "6. Derivada de e^x é igual a e^x.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade da função exponencial natural." },
-        { title: "7. Derivada de sen(x):", options: ["cos(x)", "-cos(x)", "sen(x)", "tan(x)"], correct: "cos(x)", explanation: "Derivada do seno." },
-        { title: "8. Ponto de máximo/mínimo ocorre onde f'(x) = 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Pontos críticos." },
-        { title: "9. Derivada de cos(x) é -sen(x).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Derivada de cosseno." },
-        { title: "10. Derivada de 4x³:", options: ["12x²", "4x²", "12x", "3x²"], correct: "12x²", explanation: "4 * 3x² = 12x²." }
-      ],
-      "Cálculo Integral": [
-        { title: "1. A integral indefinida de 2x dx é:", options: ["x² + C", "2x² + C", "x + C", "2 + C"], correct: "x² + C", explanation: "Antiderivada de 2x." },
-        { title: "2. O Teorema Fundamental do Cálculo conecta derivada e integral.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Operações inversas." },
-        { title: "3. Integral de 1 dx é:", options: ["x + C", "1 + C", "0", "x²"], correct: "x + C", explanation: "Antiderivada da constante 1." },
-        { title: "4. A integral definida representa a área sob uma curva.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Interpretação geométrica da integral." },
-        { title: "5. Integral de x dx:", options: ["x²/2 + C", "x² + C", "2x + C", "x + C"], correct: "x²/2 + C", explanation: "Regra da potência: x² / 2." },
-        { title: "6. A constante '+ C' é adicionada em integrais indefinidas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Representa a família de antiderivadas." },
-        { title: "7. Integral de e^x dx é e^x + C.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "A antiderivada de e^x é ela mesma." },
-        { title: "8. Integral de 0 dx:", options: ["C", "0", "x", "1"], correct: "C", explanation: "Derivada de uma constante é 0." },
-        { title: "9. Integral definida tem limites de integração.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Calculada entre limites [a, b]." },
-        { title: "10. Integral de cos(x) dx:", options: ["sen(x) + C", "-sen(x) + C", "cos(x) + C", "tan(x) + C"], correct: "sen(x) + C", explanation: "Derivada de sen(x) é cos(x)." }
-      ],
-      "Matemática Financeira": [
-        { title: "1. Fórmula dos Juros Simples:", options: ["J = C * i * t", "J = C * (1+i)^t", "J = C / i", "J = C + i"], correct: "J = C * i * t", explanation: "Capital * Taxa * Tempo." },
-        { title: "2. Nos Juros Compostos, os juros incidem sobre o montante acumulado.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Juros sobre juros." },
-        { title: "3. Capital R$ 1000, taxa 10% a.a. em 2 anos (Juros Simples):", options: ["R$ 200", "R$ 100", "R$ 210", "R$ 1200"], correct: "R$ 200", explanation: "1000 * 0.10 * 2 = 200." },
-        { title: "4. Montante (M) é a soma do Capital (C) com os Juros (J).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "M = C + J." },
-        { title: "5. Qual a taxa mensal equivalente a 12% ao ano em Juros Simples?", options: ["1%", "2%", "0.5%", "12%"], correct: "1%", explanation: "12% / 12 meses = 1%." },
-        { title: "6. Inflação reduz o poder de compra da moeda.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Conceito de economia e finanças." },
-        { title: "7. O que significa a sigla CBD no mercado financeiro?", options: ["Certificado de Depósito Bancário", "Crédito Direto Bancário", "Conta Digital Bancária", "Caixa Direta de Bônus"], correct: "Certificado de Depósito Bancário", explanation: "Título de renda fixa." },
-        { title: "8. A taxa SELIC é a taxa básica de juros da economia brasileira.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definida pelo COPOM." },
-        { title: "9. Lucro é calculado por Receita total - Custo total.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "L = R - C." },
-        { title: "10. Um desconto sucessivo de 10% e 10% é igual a 20%.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Equivale a um desconto real de 19%." }
-      ],
-      "Raciocínio Lógico": [
-        { title: "1. Se todo A é B, e todo B é C, então todo A é C.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Silogismo válido." },
-        { title: "2. A negação de 'Tudo é preto' é 'Nada é preto'.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "A negação correta é 'Pelo menos algo não é preto'." },
-        { title: "3. Qual número completa a sequência: 2, 4, 8, 16, __?", options: ["32", "24", "20", "64"], correct: "32", explanation: "Multiplica por 2 a cada passo." },
-        { title: "4. Na tabela verdade, A ∧ B só é V se ambos forem V.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Operador lógico E (conjunção)." },
-        { title: "5. Se amanhã chover, irei ao cinema. Hoje não choveu. Logo:", options: ["Nada se conclui sobre hoje", "Fui ao cinema", "Não fui ao cinema", "Choveu ontem"], correct: "Nada se conclui sobre hoje", explanation: "A premissa é sobre o dia de amanhã." },
-        { title: "6. Operador 'OU' (disjunção) é Falso apenas se ambos forem Falsos.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade da disjunção." },
-        { title: "7. Próximo elemento: 1, 1, 2, 3, 5, 8, __?", options: ["13", "11", "10", "12"], correct: "13", explanation: "Sequência de Fibonacci (5+8=13)." },
-        { title: "8. Uma proposição pode ser verdadeira e falsa ao mesmo tempo.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Princípio da não-contradição." },
-        { title: "9. A negação de p → q é p ∧ ~q.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra da negação da condicional." },
-        { title: "10. Se P é V e Q é F, a condicional P → Q é Falsa.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "V → F resulta em Falso." }
-      ],
-      "Teoria dos Números": [
-        { title: "1. O único número primo par é o 2.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Todos os outros pares são divisíveis por 2." },
-        { title: "2. Qual o menor número primo positivo?", options: ["2", "1", "0", "3"], correct: "2", explanation: "1 não é considerado primo." },
-        { title: "3. O número 15 é um número composto.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Divisível por 1, 3, 5 e 15." },
-        { title: "4. O número 0 é divisível por qualquer inteiro não nulo.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "0 / n = 0." },
-        { title: "5. Números coprimos têm MDC igual a 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de primos entre si." },
-        { title: "6. Quantos divisores positivos tem o número 6?", options: ["4", "2", "3", "6"], correct: "4", explanation: "Divisores: 1, 2, 3, 6." },
-        { title: "7. Um número é divisível por 3 se a soma de seus algarismos for múltipla de 3.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Critério de divisibilidade por 3." },
-        { title: "8. O número 1 é um número primo.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "1 tem apenas 1 divisor." },
-        { title: "9. Todo número terminado em 0 ou 5 é divisível por 5.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Critério de divisibilidade por 5." },
-        { title: "10. O produto de dois números ímpares é sempre um número:", options: ["Ímpar", "Par", "Primo", "Negativo"], correct: "Ímpar", explanation: "Ímpar * Ímpar = Ímpar." }
-      ],
-      "Equações do 1º e 2º Grau": [
-        { title: "1. Valor de Delta (Δ) na equação x² - 5x + 6 = 0:", options: ["1", "25", "24", "0"], correct: "1", explanation: "Δ = b² - 4ac = 25 - 24 = 1." },
-        { title: "2. Se Δ < 0, a equação do 2º grau não possui raízes reais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Raízes complexas." },
-        { title: "3. Raízes de x² - 5x + 6 = 0:", options: ["2 e 3", "1 e 6", "-2 e -3", "0 e 5"], correct: "2 e 3", explanation: "(x-2)(x-3) = 0." },
-        { title: "4. Fórmula de Bhaskara calcula raízes do 2º grau.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "x = (-b ± √Δ) / 2a." },
-        { title: "5. Solução de 4x - 8 = 0:", options: ["x = 2", "x = 4", "x = -2", "x = 0"], correct: "x = 2", explanation: "4x = 8 => x = 2." },
-        { title: "6. Se Δ = 0, a equação tem duas raízes reais e iguais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Raiz dupla." },
-        { title: "7. Soma das raízes de x² - 7x + 10 = 0 (S = -b/a):", options: ["7", "-7", "10", "-10"], correct: "7", explanation: "S = -(-7)/1 = 7." },
-        { title: "8. Produto das raízes de x² - 7x + 10 = 0 (P = c/a):", options: ["10", "7", "-10", "1"], correct: "10", explanation: "P = 10/1 = 10." },
-        { title: "9. Equação incompleta x² - 9 = 0 tem raízes 3 e -3.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "x² = 9 => x = ±3." },
-        { title: "10. Resolva 2x + 5 = 15.", options: ["x = 5", "x = 10", "x = 2", "x = 7"], correct: "x = 5", explanation: "2x = 10 => x = 5." }
-      ],
-      "Porcentagem e Proporção": [
-        { title: "1. 20% de R$ 500 é igual a:", options: ["R$ 100", "R$ 50", "R$ 150", "R$ 200"], correct: "R$ 100", explanation: "0.20 * 500 = 100." },
-        { title: "2. Se 2 pedreiros fazem um muro em 4 dias, 4 pedreiros fazem em:", options: ["2 dias", "8 dias", "1 dia", "4 dias"], correct: "2 dias", explanation: "Regra de 3 inversamente proporcional." },
-        { title: "3. A fração 1/4 representa 25%.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "1 / 4 = 0.25 = 25%." },
-        { title: "4. Quanto é 50% de 50%?", options: ["25%", "50%", "10%", "100%"], correct: "25%", explanation: "0.5 * 0.5 = 0.25 = 25%." },
-        { title: "5. A razão entre 10 e 20 é 1/2.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "10/20 = 1/2." },
-        { title: "6. Aumento de 10% em um produto de R$ 80 resulta em:", options: ["R$ 88", "R$ 90", "R$ 82", "R$ 85"], correct: "R$ 88", explanation: "80 + 8 = 88." },
-        { title: "7. Proporção é a igualdade entre duas razões.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição matemática." },
-        { title: "8. 100% de um valor é o próprio valor.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "100/100 = 1." },
-        { title: "9. Se x/2 = 6/4, o valor de x é:", options: ["3", "4", "6", "2"], correct: "3", explanation: "4x = 12 => x = 3." },
-        { title: "10. Converter 0.05 em porcentagem:", options: ["5%", "50%", "0.5%", "500%"], correct: "5%", explanation: "0.05 * 100 = 5%." }
-      ],
-      "Matrizes e Determinantes": [
-        { title: "1. O determinante da matriz identidade de ordem 2 é 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Det(I) = 1." },
-        { title: "2. Determinante da matriz [[2,0],[0,3]]:", options: ["6", "5", "0", "1"], correct: "6", explanation: "2*3 - 0*0 = 6." },
-        { title: "3. Uma matriz 3x2 possui 3 linhas e 2 colunas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "M x N representa Linhas x Colunas." },
-        { title: "4. Matriz transposta troca linhas por colunas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de matriz transposta." },
-        { title: "5. Determinante da matriz [[1,2],[3,4]]:", options: ["-2", "2", "10", "4"], correct: "-2", explanation: "1*4 - 2*3 = 4 - 6 = -2." },
-        { title: "6. Matriz quadrada tem o mesmo número de linhas e colunas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Linhas = Colunas." },
-        { title: "7. Matriz nula tem todos os elementos iguais a 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de matriz nula." },
-        { title: "8. Só é possível somar matrizes de mesma dimensão.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra para adição de matrizes." },
-        { title: "9. Na matriz identidade, os elementos fora da diagonal principal são 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade da matriz identidade." },
-        { title: "10. Se Det(A) = 0, a matriz A não possui inversa.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Matriz não invertível (singular)." }
-      ],
-      "Funções Matemáticas": [
-        { title: "1. O gráfico de uma função do 1º grau é uma reta.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "f(x) = ax + b representa uma reta." },
-        { title: "2. O gráfico de f(x) = x² é uma parábola.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Função quadrática gera parábola." },
-        { title: "3. Se f(x) = 2x + 1, qual o valor de f(3)?", options: ["7", "6", "8", "5"], correct: "7", explanation: "f(3) = 2*3 + 1 = 7." },
-        { title: "4. O domínio é o conjunto de valores de entrada (x).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de domínio." },
-        { title: "5. Em f(x) = -x² + 4, a parábola tem concavidade para baixo.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Coeficiente 'a' negativo." },
-        { title: "6. Função injetora associa elementos distintos a imagens distintas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de injeção." },
-        { title: "7. Raiz da função f(x) = 3x - 9:", options: ["3", "9", "-3", "0"], correct: "3", explanation: "3x - 9 = 0 => x = 3." },
-        { title: "8. A função f(x) = 2^x é uma função exponencial.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Variável no expoente." },
-        { title: "9. Se f(x) = x³, f(-2) é equal a:", options: ["-8", "8", "-6", "4"], correct: "-8", explanation: "(-2)³ = -8." },
-        { title: "10. Imagem é o conjunto dos valores de saída (y).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de conjunto imagem." }
-      ],
-      "Análise Combinatória": [
-        { title: "1. Quanto é 4! (fatorial de 4)?", options: ["24", "12", "16", "10"], correct: "24", explanation: "4 * 3 * 2 * 1 = 24." },
-        { title: "2. O valor de 0! é igual a 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Por definição, 0! = 1." },
-        { title: "3. Quantos arranjos simples de 3 elementos tomados 2 a 2 (A3,2)?", options: ["6", "3", "9", "2"], correct: "6", explanation: "3 * 2 = 6." },
-        { title: "4. Em combinações simples, a ordem dos elementos importa.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Na combinação a ordem NÃO importa." },
-        { title: "5. De quantas maneiras 3 pessoas podem se sentar em uma fila?", options: ["6", "3", "9", "12"], correct: "6", explanation: "P3 = 3! = 6." },
-        { title: "6. O valor de 5! é 120.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "5 * 4 * 3 * 2 * 1 = 120." },
-        { title: "7. Permutação de n elementos é dada por n!.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Pn = n!." },
-        { title: "8. Quantas comissões de 2 pessoas formamos com 4 candidatos?", options: ["6", "12", "8", "4"], correct: "6", explanation: "C(4,2) = (4*3)/2 = 6." },
-        { title: "9. O Princípio Fundamental da Contagem multiplica as opções.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra do produto." },
-        { title: "10. Quanto é 3! + 2!?", options: ["8", "12", "5", "10"], correct: "8", explanation: "6 + 2 = 8." }
-      ],
-      "Progressão Aritmética (PA)": [
-        { title: "1. Razão da PA (2, 5, 8, 11...):", options: ["3", "2", "5", "4"], correct: "3", explanation: "5 - 2 = 3." },
-        { title: "2. Em uma PA, a diferença entre termos consecutivos é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de PA." },
-        { title: "3. 10º termo da PA (1, 3, 5, 7...):", options: ["19", "20", "21", "18"], correct: "19", explanation: "a10 = 1 + 9*2 = 19." },
-        { title: "4. Fórmula do termo geral da PA é an = a1 + (n-1)*r.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Fórmula padrão do termo geral." },
-        { title: "5. Se a1 = 5 e r = 4, o segundo termo é:", options: ["9", "20", "1", "10"], correct: "9", explanation: "5 + 4 = 9." },
-        { title: "6. Soma dos 3 primeiros termos da PA (2, 4, 6...):", options: ["12", "10", "14", "8"], correct: "12", explanation: "2 + 4 + 6 = 12." },
-        { title: "7. PA com razão negativa é chamada de decrescente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Termos diminuem." },
-        { title: "8. Se r = 0, a PA é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Todos os termos são iguais." },
-        { title: "9. Qual o 5º termo da PA (10, 20, 30...)?", options: ["50", "40", "60", "70"], correct: "50", explanation: "10 + 4*10 = 50." },
-        { title: "10. Fórmula da soma da PA: Sn = (a1 + an)*n / 2.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Soma de Gauss." }
-      ],
-      "Progressão Geométrica (PG)": [
-        { title: "1. Razão da PG (2, 6, 18, 54...):", options: ["3", "4", "2", "6"], correct: "3", explanation: "6 / 2 = 3." },
-        { title: "2. Em uma PG, a divisão entre termos consecutivos é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de razão (q)." },
-        { title: "3. 4º termo da PG (1, 2, 4...):", options: ["8", "6", "16", "12"], correct: "8", explanation: "1 * 2³ = 8." },
-        { title: "4. Fórmula do termo geral da PG é an = a1 * q^(n-1).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Fórmula padrão do termo geral." },
-        { title: "5. Se a1 = 3 e q = 2, o 3º termo é:", options: ["12", "6", "18", "24"], correct: "12", explanation: "3 * 2² = 12." },
-        { title: "6. PG com razão q > 1 e termos positivos é crescente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Termos aumentam." },
-        { title: "7. Produto dos termos de uma PG cresce exponencialmente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Multiplicação sucessiva." },
-        { title: "8. Se q = 1, a PG é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Termos são multiplicados por 1." },
-        { title: "9. Qual o 3º termo da PG (5, 15, 45...)?", options: ["45", "30", "135", "90"], correct: "45", explanation: "3º termo é 45." },
-        { title: "10. PG alternante ocorre quando a razão q é negativa.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Sinais se alternam (+ e -)." }
-      ]
-    };
-
     let currentUser = null;
+    let questionCardCount = 0;
     let currentQuizList = [];
     let currentQuizIndex = 0;
 
@@ -691,13 +393,12 @@
     });
 
     function populateAreaSelects() {
-      const selectProf = document.getElementById('new-q-area');
-      selectProf.innerHTML = '';
-      areasMatematica.forEach(area => {
+      const select = document.getElementById('forms-area');
+      select.innerHTML = '';
+      areasMatematica.forEach(a => {
         let opt = document.createElement('option');
-        opt.value = area;
-        opt.innerText = area;
-        selectProf.appendChild(opt);
+        opt.value = a; opt.innerText = a;
+        select.appendChild(opt);
       });
     }
 
@@ -706,8 +407,8 @@
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
         applyUserTheme(currentUser.color);
-        updateStudentDashUI();
-        listenToRanking();
+        loadStudentProfileUI();
+        listenToRealtimeData();
         renderAreaCards();
         showScreen('screen-student-dash');
       }
@@ -717,103 +418,280 @@
       document.documentElement.style.setProperty('--user-theme-color', color || '#00ff66');
     }
 
-    document.getElementById('player-photo').addEventListener('change', e => {
-      const reader = new FileReader();
-      reader.onload = () => document.getElementById('preview-img').src = reader.result;
-      if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-    });
-
-    document.getElementById('player-color').addEventListener('input', e => {
-      applyUserTheme(e.target.value);
-    });
-
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
+    /* SISTEMA DE ABAS LADO A LADO */
+    function switchStudentTab(tabId, btn) {
+      document.querySelectorAll('#screen-student-dash .tab-content').forEach(c => c.style.display = 'none');
+      document.querySelectorAll('#screen-student-dash .tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).style.display = 'block';
+      btn.classList.add('active');
+    }
+
+    function switchProfTab(tabId, btn) {
+      document.querySelectorAll('#screen-prof-dash .tab-content').forEach(c => c.style.display = 'none');
+      document.querySelectorAll('#screen-prof-dash .tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).style.display = 'block';
+      btn.classList.add('active');
+    }
+
+    /* ATUALIZAÇÃO DO RANKING EM TEMPO REAL */
+    function listenToRealtimeData() {
+      db.ref('students').on('value', snapshot => {
+        const sBody = document.getElementById('student-ranking-body');
+        const pRankBody = document.getElementById('prof-ranking-body');
+        const pAccBody = document.getElementById('prof-accesses-body');
+        
+        sBody.innerHTML = ''; pRankBody.innerHTML = ''; pAccBody.innerHTML = '';
+
+        let players = [];
+        snapshot.forEach(c => players.push(c.val()));
+        
+        // ORDENA EM TEMPO REAL PELOS ACERTOS / PONTOS
+        players.sort((a,b) => (b.score||0) - (a.score||0));
+
+        players.forEach((p, i) => {
+          let pos = i + 1;
+          let medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : `${pos}º`;
+          let correctAnswers = Math.floor((p.score || 0) / 10);
+
+          let rowHtml = `<tr class="ranking-row-updated">
+            <td><strong>${medal}</strong></td>
+            <td style="color:${p.color}; font-weight:bold;">${p.name}</td>
+            <td>${correctAnswers} acertos</td>
+            <td><strong>${p.score || 0} PTS</strong></td>
+          </tr>`;
+
+          sBody.innerHTML += rowHtml;
+
+          pRankBody.innerHTML += `<tr>
+            <td><strong>${medal}</strong></td>
+            <td style="color:${p.color}">${p.name}</td>
+            <td>${p.score||0} PTS (${correctAnswers} acertos)</td>
+          </tr>`;
+
+          pAccBody.innerHTML += `<tr>
+            <td><img src="${p.photo || ''}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;"></td>
+            <td style="color:${p.color}">${p.name}</td>
+            <td>${correctAnswers} acertos</td>
+            <td>${p.score||0} PTS</td>
+          </tr>`;
+        });
+      });
+
+      /* CARREGA QUIZZES GERADOS EM TEMPO REAL */
+      db.ref('teacher_quizzes').on('value', snapshot => {
+        const container = document.getElementById('prof-quizzes-container');
+        container.innerHTML = '';
+        snapshot.forEach(child => {
+          const quiz = child.val();
+          let btn = document.createElement('button');
+          btn.className = 'btn-secondary';
+          btn.style.borderLeft = '6px solid var(--user-theme-color)';
+          btn.innerText = `📋 QUIZ DO PROFESSOR: ${quiz.title} (${quiz.area})`;
+          btn.onclick = () => startTeacherQuiz(quiz);
+          container.appendChild(btn);
+        });
+      });
+    }
+
+    /* RESPOSTAS E ATUALIZAÇÃO IMEDIATA DO SCORE NO FIREBASE */
+    function checkAnswer(opt, q) {
+      const feedback = document.getElementById('quiz-feedback');
+      const badge = document.getElementById('feedback-badge');
+      const exp = document.getElementById('feedback-explanation');
+
+      if (opt === q.correct) {
+        badge.innerText = "RESPOSTA CORRETA! 🎉 (+10 PTS / +1 ACERTO)";
+        badge.style.color = "#00ff66";
+        
+        if (currentUser) {
+          currentUser.score = (currentUser.score || 0) + 10;
+          // ATUALIZA NO FIREBASE EM TEMPO REAL
+          db.ref('students/' + currentUser.name + '/score').set(currentUser.score);
+          localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
+        }
+      } else {
+        badge.innerText = "RESPOSTA INCORRETA! ❌";
+        badge.style.color = "#ff0055";
+      }
+
+      exp.innerText = q.explanation || "Sem explicação cadastrada.";
+      feedback.style.display = 'block';
+    }
+
+    /* GERADOR ESTILO GOOGLE FORMS DO PROFESSOR */
+    function addQuestionCardForms() {
+      questionCardCount++;
+      const id = questionCardCount;
+      const container = document.getElementById('forms-questions-container');
+
+      const card = document.createElement('div');
+      card.className = 'forms-card';
+      card.id = `qcard-${id}`;
+      card.innerHTML = `
+        <label>Pergunta ${id}:</label>
+        <input type="text" class="q-title" placeholder="Digite o enunciado da questão...">
+
+        <label>Tipo de Resposta:</label>
+        <select class="q-type" onchange="renderOptionsByFormsType(${id})">
+          <option value="multiple">Múltipla Escolha</option>
+          <option value="tf">Verdadeiro ou Falso</option>
+        </select>
+
+        <label>Opções (Marque com o ✔️ a resposta correta):</label>
+        <div id="q-options-box-${id}"></div>
+
+        <label>Explicação / Passo a Passo:</label>
+        <textarea class="q-explanation" rows="2" placeholder="Explicação da resposta..."></textarea>
+      `;
+      container.appendChild(card);
+      renderOptionsByFormsType(id);
+    }
+
+    function renderOptionsByFormsType(cardId) {
+      const card = document.getElementById(`qcard-${cardId}`);
+      const type = card.querySelector('.q-type').value;
+      const box = document.getElementById(`q-options-box-${cardId}`);
+      box.innerHTML = '';
+
+      if (type === 'multiple') {
+        for (let i = 1; i <= 4; i++) {
+          box.innerHTML += `
+            <div class="option-row">
+              <input type="radio" name="correct-${cardId}" class="radio-check" value="${i-1}" ${i===1?'checked':''} title="Marque a resposta correta ✔️">
+              <input type="text" class="q-opt-text" placeholder="Opção ${i}">
+            </div>
+          `;
+        }
+      } else {
+        box.innerHTML = `
+          <div class="option-row">
+            <input type="radio" name="correct-${cardId}" class="radio-check" value="Verdadeiro" checked>
+            <span>Verdadeiro ✔️</span>
+          </div>
+          <div class="option-row">
+            <input type="radio" name="correct-${cardId}" class="radio-check" value="Falso">
+            <span>Falso ✔️</span>
+          </div>
+        `;
+      }
+    }
+
+    function saveFullQuizForms() {
+      const title = document.getElementById('forms-title').value.trim();
+      const area = document.getElementById('forms-area').value;
+      const cards = document.querySelectorAll('.forms-card');
+
+      if (!title) return alert('DIGITE O TÍTULO DO FORMULÁRIO!');
+      if (cards.length === 0) return alert('ADICIONE PELO MENOS UMA PERGUNTA CLICANDO NO BOTÃO +');
+
+      let questions = [];
+
+      cards.forEach(card => {
+        const qTitle = card.querySelector('.q-title').value.trim();
+        const type = card.querySelector('.q-type').value;
+        const explanation = card.querySelector('.q-explanation').value.trim();
+        let correctVal = "";
+        let optionsArr = [];
+
+        if (type === 'multiple') {
+          const optInputs = card.querySelectorAll('.q-opt-text');
+          const selectedRadio = card.querySelector(`input[name="correct-${card.id.split('-')[1]}"]:checked`).value;
+          
+          optInputs.forEach((inp, idx) => {
+            const val = inp.value.trim() || `Opção ${idx+1}`;
+            optionsArr.push(val);
+            if (idx == selectedRadio) correctVal = val;
+          });
+        } else {
+          correctVal = card.querySelector(`input[name="correct-${card.id.split('-')[1]}"]:checked`).value;
+          optionsArr = ["Verdadeiro", "Falso"];
+        }
+
+        if (qTitle) {
+          questions.push({ title: qTitle, options: optionsArr, correct: correctVal, explanation: explanation });
+        }
+      });
+
+      db.ref('teacher_quizzes').push({ title, area, questions }, err => {
+        if (!err) {
+          alert('QUIZ CRIADO E PUBLICADO COM SUCESSO! ✔️');
+          document.getElementById('forms-questions-container').innerHTML = '';
+          document.getElementById('forms-title').value = '';
+          questionCardCount = 0;
+          addQuestionCardForms();
+        }
+      });
+    }
+
+    /* EDICAO DE PERFIL DO ALUNO */
     function registerStudent() {
       const name = document.getElementById('player-name').value.trim();
       const color = document.getElementById('player-color').value;
       const photo = document.getElementById('preview-img').src;
 
-      if (!name) return alert('Por favor, informe seu nickname!');
+      if (!name) return alert('Informe seu apelido!');
 
       currentUser = { name, color, photo, score: 0 };
       localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
-
       db.ref('students/' + name).set({ name, color, photo, score: 0 });
 
       applyUserTheme(color);
-      updateStudentDashUI();
-      listenToRanking();
+      loadStudentProfileUI();
+      listenToRealtimeData();
       renderAreaCards();
       showScreen('screen-student-dash');
     }
 
-    function updateStudentDashUI() {
-      document.getElementById('student-display-name').innerText = currentUser.name;
-      document.getElementById('student-display-photo').src = currentUser.photo;
-      
-      db.ref('students/' + currentUser.name + '/score').on('value', snapshot => {
-        const val = snapshot.val() || 0;
-        currentUser.score = val;
-        document.getElementById('student-score-display').innerText = val + ' PTS';
-      });
+    function loadStudentProfileUI() {
+      document.getElementById('edit-player-name').value = currentUser.name;
+      document.getElementById('edit-player-color').value = currentUser.color;
+      document.getElementById('edit-display-photo').src = currentUser.photo;
     }
 
-    function logoutStudent() {
-      localStorage.removeItem('mathquest_student');
-      currentUser = null;
-      showScreen('screen-login');
-    }
+    function saveProfileChanges() {
+      const newColor = document.getElementById('edit-player-color').value;
+      currentUser.color = newColor;
 
-    function loginProfessor() {
-      if (document.getElementById('prof-pass').value === 'professor72') {
-        showScreen('screen-prof-dash');
+      const fileInp = document.getElementById('edit-player-photo');
+      if (fileInp.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          currentUser.photo = reader.result;
+          updateProfileInFirebase();
+        };
+        reader.readAsDataURL(fileInp.files[0]);
       } else {
-        alert('Senha incorreta!');
+        updateProfileInFirebase();
       }
     }
 
-    function renderAreaCards() {
-      const container = document.getElementById('area-grid-container');
-      container.innerHTML = '';
-
-      areasMatematica.forEach(area => {
-        let card = document.createElement('div');
-        card.className = 'area-card';
-        card.onclick = () => startAreaQuiz(area);
-
-        card.innerHTML = `
-          <div class="area-card-title">${area}</div>
-          <div class="area-card-count">Clique para jogar ➔</div>
-        `;
-        container.appendChild(card);
+    function updateProfileInFirebase() {
+      localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
+      db.ref('students/' + currentUser.name).update({
+        color: currentUser.color,
+        photo: currentUser.photo
       });
+      applyUserTheme(currentUser.color);
+      loadStudentProfileUI();
+      alert('Perfil atualizado com sucesso!');
     }
 
-    function startAreaQuiz(areaName) {
-      db.ref('quizzes_by_area/' + areaName).once('value', snapshot => {
-        let firebaseQuizzes = [];
-        snapshot.forEach(child => firebaseQuizzes.push(child.val()));
-
-        let defaultList = defaultQuizzesDatabase[areaName] || [];
-
-        // Une as questões pré-carregadas com todas que o professor adicionar
-        currentQuizList = defaultList.concat(firebaseQuizzes);
-
-        currentQuizIndex = 0;
-        document.getElementById('quiz-area-badge').innerText = `ÁREA: ${areaName.toUpperCase()}`;
-        loadCurrentQuizQuestion();
-        showScreen('screen-quiz');
-      });
+    function startTeacherQuiz(quizObj) {
+      currentQuizList = quizObj.questions;
+      currentQuizIndex = 0;
+      document.getElementById('quiz-area-badge').innerText = `QUIZ: ${quizObj.title}`;
+      loadCurrentQuizQuestion();
+      showScreen('screen-quiz');
     }
 
     function loadCurrentQuizQuestion() {
       const q = currentQuizList[currentQuizIndex];
-      document.getElementById('quiz-counter-badge').innerText = `PERGUNTA ${currentQuizIndex + 1} DE ${currentQuizList.length}`;
-      document.getElementById('quiz-question-title').innerText = q.title;
+      document.getElementById('quiz-question-title').innerText = `${currentQuizIndex+1}. ${q.title}`;
       document.getElementById('quiz-feedback').style.display = 'none';
 
       const container = document.getElementById('quiz-options-container');
@@ -821,35 +699,11 @@
 
       q.options.forEach(opt => {
         let btn = document.createElement('button');
-        btn.className = 'quiz-option-btn';
+        btn.className = 'btn-secondary';
         btn.innerText = opt;
         btn.onclick = () => checkAnswer(opt, q);
         container.appendChild(btn);
       });
-    }
-
-    function checkAnswer(selectedOption, questionObj) {
-      const isCorrect = selectedOption === questionObj.correct;
-      const feedbackDiv = document.getElementById('quiz-feedback');
-      const badgeDiv = document.getElementById('feedback-badge');
-      const explanationP = document.getElementById('feedback-explanation');
-
-      document.getElementById('quiz-options-container').innerHTML = '';
-
-      if (isCorrect) {
-        badgeDiv.innerText = "RESPOSTA CORRETA! 🎉 (+10 PONTOS)";
-        badgeDiv.className = "badge-status status-correct";
-        if (currentUser) {
-          currentUser.score = (currentUser.score || 0) + 10;
-          db.ref('students/' + currentUser.name + '/score').set(currentUser.score);
-        }
-      } else {
-        badgeDiv.innerText = "RESPOSTA INCORRETA!";
-        badgeDiv.className = "badge-status status-incorrect";
-      }
-
-      explanationP.innerText = questionObj.explanation || "Resolução indisponível para esta questão.";
-      feedbackDiv.style.display = 'block';
     }
 
     function nextQuestionInQuiz() {
@@ -857,89 +711,36 @@
       if (currentQuizIndex < currentQuizList.length) {
         loadCurrentQuizQuestion();
       } else {
-        alert('PARABÉNS! VOCÊ COMPLETOU O QUIZ DESTA ÁREA!');
+        alert('QUIZ CONCLUÍDO!');
         showScreen('screen-student-dash');
       }
     }
 
-    function toggleQuestionTypeUI() {
-      const type = document.getElementById('new-q-type').value;
-      if (type === 'tf') {
-        document.getElementById('ui-multiple-options').style.display = 'none';
-        document.getElementById('ui-tf-options').style.display = 'block';
-      } else {
-        document.getElementById('ui-multiple-options').style.display = 'block';
-        document.getElementById('ui-tf-options').style.display = 'none';
-      }
-    }
-
-    function sendQuizToFirebase() {
-      const area = document.getElementById('new-q-area').value;
-      const type = document.getElementById('new-q-type').value;
-      const title = document.getElementById('new-q-title').value.trim();
-      const customExplanation = document.getElementById('new-q-explanation').value.trim();
-
-      if (!title) return alert('DIGITE A PERGUNTA DO QUIZ!');
-
-      let correctOpt = "";
-      let options = [];
-
-      if (type === 'tf') {
-        correctOpt = document.getElementById('new-q-tf-correct').value;
-        options = ["Verdadeiro", "Falso"];
-      } else {
-        correctOpt = document.getElementById('new-q-opt-correct').value.trim();
-        const opt2 = document.getElementById('new-q-opt2').value.trim();
-        const opt3 = document.getElementById('new-q-opt3').value.trim();
-        const opt4 = document.getElementById('new-q-opt4').value.trim();
-
-        if (!correctOpt || !opt2) return alert('PREENCHA PELO MENOS A OPÇÃO CORRETA E MAIS UMA ALTERNATIVA!');
-
-        options = [correctOpt, opt2, opt3, opt4].filter(Boolean).sort(() => Math.random() - 0.5);
-      }
-
-      const quizData = {
-        title: title,
-        correct: correctOpt,
-        options: options,
-        explanation: customExplanation || `Resolução registrada pelo professor para o tema [${area}]. Resposta correta: ${correctOpt}.`,
-        createdAt: Date.now()
-      };
-
-      db.ref('quizzes_by_area/' + area).push(quizData, err => {
-        if (!err) {
-          alert(`QUIZ CADASTRADO COM SUCESSO NA ÁREA [${area.toUpperCase()}]!`);
-          document.getElementById('new-q-title').value = '';
-          document.getElementById('new-q-opt-correct').value = '';
-          document.getElementById('new-q-opt2').value = '';
-          document.getElementById('new-q-opt3').value = '';
-          document.getElementById('new-q-opt4').value = '';
-          document.getElementById('new-q-explanation').value = '';
-        }
+    function renderAreaCards() {
+      const container = document.getElementById('area-grid-container');
+      container.innerHTML = '';
+      areasMatematica.forEach(area => {
+        let card = document.createElement('div');
+        card.className = 'area-card';
+        card.innerText = area;
+        container.appendChild(card);
       });
     }
 
-    function listenToRanking() {
-      db.ref('students').orderByChild('score').on('value', snapshot => {
-        const tbody = document.getElementById('ranking-body');
-        tbody.innerHTML = '';
-        let players = [];
-        snapshot.forEach(c => players.push(c.val()));
-        players.sort((a, b) => (b.score || 0) - (a.score || 0));
+    function loginProfessor() {
+      if (document.getElementById('prof-pass').value === 'professor72') {
+        showScreen('screen-prof-dash');
+        listenToRealtimeData();
+        if(questionCardCount === 0) addQuestionCardForms();
+      } else {
+        alert('Senha incorreta!');
+      }
+    }
 
-        players.forEach((p, i) => {
-          let pos = (i + 1) + 'º';
-          if (i === 0) pos = '🥇 1º';
-          else if (i === 1) pos = '🥈 2º';
-          else if (i === 2) pos = '🥉 3º';
-
-          tbody.innerHTML += `<tr>
-            <td>${pos}</td>
-            <td style="color:${p.color}; font-weight:bold;">${p.name}</td>
-            <td>${p.score || 0} PTS</td>
-          </tr>`;
-        });
-      });
+    function logoutStudent() {
+      localStorage.removeItem('mathquest_student');
+      currentUser = null;
+      showScreen('screen-login');
     }
   </script>
 </body>
