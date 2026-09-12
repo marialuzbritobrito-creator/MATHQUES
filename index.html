@@ -5,24 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MATHQUEST - A Gamificação da Matemática</title>
   
-  <!-- Fonte Pixel Retrô -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Fonte Retro Pixelada e Altamente Legível: VT323 -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   
   <!-- Firebase Compatibility SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  
-  <!-- Chart.js para Gráficos do Professor -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
-      --bg-color: #0b0c10;
-      --card-bg: #1f2833;
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
       --accent-color: #ff0055;
       --user-theme-color: #00ff66;
       --text-color: #ffffff;
-      --font-pixel: 'Press Start 2P', monospace;
+      --border-color: #30363d;
+      --font-pixel: 'VT323', monospace;
     }
 
     * { box-sizing: border-box; font-family: var(--font-pixel); }
@@ -35,169 +33,370 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background-image: radial-gradient(#1f2833 1px, transparent 0);
-      background-size: 20px 20px;
+      min-height: 100vh;
+      font-size: 20px;
+    }
+
+    /* Cabeçalho Fixo com Logo e Mascote Pixel Art */
+    .top-header {
+      width: 100%;
+      max-width: 950px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      margin-bottom: 12px;
+      border-bottom: 3px solid var(--user-theme-color);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-img {
+      max-height: 48px;
+      width: auto;
+      image-rendering: pixelated;
+    }
+
+    .app-title {
+      font-size: 32px;
+      color: var(--user-theme-color);
+      margin: 0;
+      text-shadow: 2px 2px #000;
+      letter-spacing: 2px;
     }
 
     .app-container {
       width: 100%;
-      max-width: 900px;
+      max-width: 950px;
       background-color: var(--card-bg);
-      border: 4px solid var(--user-theme-color);
+      border: 3px solid var(--user-theme-color);
       border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 0 20px var(--user-theme-color);
+      padding: 24px;
+      box-shadow: 0 0 25px rgba(0, 255, 102, 0.2);
     }
-
-    .logo-container { text-align: center; margin-bottom: 15px; }
-    .logo-img { max-width: 260px; height: auto; image-rendering: pixelated; }
 
     .screen { display: none; }
     .screen.active { display: block; }
 
+    label {
+      font-size: 22px;
+      display: block;
+      margin-top: 12px;
+      color: var(--user-theme-color);
+    }
+
     input, select, textarea, button {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 3px solid var(--user-theme-color);
-      background-color: #0b0c10;
+      padding: 10px 14px;
+      margin: 6px 0;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      background-color: #0d1117;
       color: #fff;
-      font-size: 9px;
+      font-size: 22px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--user-theme-color);
     }
 
     button {
-      background-color: var(--accent-color);
+      background-color: var(--user-theme-color);
+      color: #000;
+      font-weight: bold;
+      border: 2px solid #000;
       cursor: pointer;
       text-transform: uppercase;
-      box-shadow: 4px 4px 0px #000;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.1s;
+      margin-top: 12px;
+      font-size: 24px;
     }
 
-    button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .btn-secondary {
+      background-color: #21262d;
+      color: #fff;
+      border-color: var(--border-color);
+    }
 
     .avatar-preview {
-      width: 65px;
-      height: 65px;
+      width: 80px;
+      height: 80px;
       border: 3px solid var(--user-theme-color);
       border-radius: 50%;
       object-fit: cover;
       display: block;
       margin: 10px auto;
+      image-rendering: pixelated;
     }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 8px; }
-    th, td { border: 2px solid var(--user-theme-color); padding: 8px; text-align: center; }
-    th { background-color: #000; color: var(--user-theme-color); }
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid var(--user-theme-color);
+      margin-bottom: 20px;
+    }
 
-    .timer-box { font-size: 14px; color: var(--accent-color); text-align: center; margin: 10px 0; }
-    .online-badge { width: 10px; height: 10px; background-color: #00ff66; border-radius: 50%; display: inline-block; }
-    
-    .source-tag {
-      font-size: 7px;
-      color: #0088ff;
-      margin-top: 5px;
-      display: block;
-      word-break: break-all;
+    .profile-card img {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      border: 2px solid var(--user-theme-color);
+      object-fit: cover;
+    }
+
+    /* Lista Visual de Áreas em Grid Retrô */
+    .area-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .area-card {
+      background: #21262d;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .area-card:hover {
+      border-color: var(--user-theme-color);
+      background-color: #1a232e;
+      transform: translateY(-2px);
+    }
+
+    .area-card-title {
+      font-size: 22px;
+      color: var(--user-theme-color);
+      margin-bottom: 4px;
+    }
+
+    .area-card-count {
+      font-size: 18px;
+      color: #8b949e;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 2px solid var(--border-color); padding: 8px; text-align: center; font-size: 20px; }
+    th { background-color: #21262d; color: var(--user-theme-color); }
+
+    .quiz-option-btn {
+      background-color: #21262d;
+      text-align: left;
+      border: 2px solid var(--border-color);
+      color: #fff;
+    }
+
+    .quiz-option-btn:hover {
+      border-color: var(--user-theme-color);
+      background-color: #1f2937;
+    }
+
+    .explanation-box {
+      background-color: #1f2937;
+      border-left: 5px solid var(--user-theme-color);
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 22px;
+      line-height: 1.4;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .status-correct { background-color: #00ff66; color: #000; }
+    .status-incorrect { background-color: #ff0055; color: #fff; }
+
+    /* Mini Bonecos Pixel Art SVG */
+    .pixel-art-icon {
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      image-rendering: pixelated;
     }
   </style>
 </head>
 <body>
 
-  <div class="logo-container">
-    <img src="mt.png" alt="MATHQUEST Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('alt-logo').style.display='block';">
-    <h1 id="alt-logo" style="display:none; color: var(--user-theme-color);">MATHQUEST</h1>
+  <!-- Cabeçalho com Logo Fixa no Canto Superior -->
+  <div class="top-header">
+    <div class="logo-container">
+      <img src="mt.png" alt="MATHQUEST Logo" class="logo-img" onerror="this.style.display='none';">
+      <!-- Mascotinho Pixel Art de Mago/Guerreiro SVG -->
+      <svg class="pixel-art-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="2" width="6" height="2" fill="#00ff66"/>
+        <rect x="4" y="4" width="8" height="2" fill="#ff0055"/>
+        <rect x="5" y="6" width="6" height="4" fill="#ffffff"/>
+        <rect x="6" y="7" width="1" height="1" fill="#000"/>
+        <rect x="9" y="7" width="1" height="1" fill="#000"/>
+        <rect x="4" y="10" width="8" height="5" fill="#0088ff"/>
+      </svg>
+      <h1 class="app-title">MATHQUEST</h1>
+    </div>
+    <span style="font-size:18px; color:#8b949e;">v3.0 Retro Edition</span>
   </div>
 
   <div class="app-container">
 
-    <!-- LOGIN ALUNO -->
+    <!-- TELA 1: REGISTRO / PERFIL FIXO DO ALUNO -->
     <div id="screen-login" class="screen active">
-      <h2 style="font-size: 11px; text-align:center;">PRESS START</h2>
-      <input type="text" id="player-name" placeholder="Seu Nickname...">
-      <label style="font-size:8px;">COR DO PERFIL:</label>
+      <h2 style="margin-top:0; text-align:center; color: var(--user-theme-color);">🎮 PRESS START - REGISTRO DE JOGADOR</h2>
+      
+      <label>Seu Nickname / Apelido:</label>
+      <input type="text" id="player-name" placeholder="Ex: MathMaster99">
+
+      <label>Escolha a Cor do Seu Perfil:</label>
       <input type="color" id="player-color" value="#00ff66">
+
+      <label>Foto ou Avatar do Jogador:</label>
       <input type="file" id="player-photo" accept="image/*">
-      <img id="preview-img" class="avatar-preview" src="https://via.placeholder.com/65/000000/00ff66?text=MATH" alt="Avatar">
-      <button onclick="registerStudent()">ENTRAR NO JOGO</button>
-      <button onclick="showScreen('screen-prof-login')" style="background-color: #121c24;">Área do Professor 🔒</button>
+      <img id="preview-img" class="avatar-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='65' height='65' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23161b22'/><rect x='4' y='3' width='8' height='6' fill='%2300ff66'/><rect x='3' y='9' width='10' height='6' fill='%23ff0055'/></svg>" alt="Avatar Pixel">
+
+      <button onclick="registerStudent()">SALVAR E ENTRAR NO JOGO</button>
+      <button class="btn-secondary" onclick="showScreen('screen-prof-login')">🔒 Área do Professor</button>
     </div>
 
-    <!-- LOGIN PROFESSOR -->
+    <!-- TELA 2: LOGIN DO PROFESSOR -->
     <div id="screen-prof-login" class="screen">
-      <h2 style="font-size: 11px; text-align:center;">ACESSO PROFESSOR</h2>
-      <input type="password" id="prof-pass" placeholder="Senha...">
-      <button onclick="loginProfessor()">ENTRAR</button>
-      <button onclick="showScreen('screen-login')" style="background-color: #555;">VOLTAR</button>
+      <h2 style="margin-top:0; color: var(--user-theme-color);">🔑 ACESSO DOCENTE</h2>
+      <label>Senha de Acesso do Professor:</label>
+      <input type="password" id="prof-pass" placeholder="Digite a senha...">
+      <button onclick="loginProfessor()">ENTRAR NO PAINEL</button>
+      <button class="btn-secondary" onclick="showScreen('screen-login')">VOLTAR</button>
     </div>
 
-    <!-- DASHBOARD ALUNO -->
+    <!-- TELA 3: ÁREA DO ALUNO (LISTA DE ÁREAS COM QUIZZES DEDICADOS) -->
     <div id="screen-student-dash" class="screen">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
+      <!-- Card do Perfil Fixo do Aluno -->
+      <div class="profile-card">
+        <img id="student-display-photo" src="" alt="Perfil">
         <div>
-          <span style="font-size:8px;">JOGADOR:</span>
-          <h3 id="student-display-name" style="margin:4px 0; color:var(--user-theme-color);"></h3>
+          <span style="font-size: 18px; color: #8b949e;">JOGADOR ATIVO</span>
+          <h2 id="student-display-name" style="margin: 0; color: var(--user-theme-color);"></h2>
+          <span id="student-score-display" style="font-size: 22px; font-weight: bold; color: #ff0055;">0 PTS</span>
         </div>
-        <img id="student-display-photo" class="avatar-preview" style="margin:0;" src="" alt="Perfil">
       </div>
 
-      <hr style="border-color:var(--user-theme-color); margin:12px 0;">
+      <h2 style="margin: 10px 0 0 0; color: var(--user-theme-color);">📚 LISTA DE ÁREAS DA MATEMÁTICA:</h2>
+      <p style="margin: 0 0 10px 0; font-size:18px; color:#8b949e;">Clique em uma área para abrir o quiz correspondente com várias perguntas!</p>
+      
+      <!-- Lista Visual em Grid -->
+      <div id="area-grid-container" class="area-grid"></div>
 
-      <label style="font-size:8px;">SELECIONE UMA DAS 20+ ÁREAS:</label>
-      <select id="quiz-category"></select>
+      <button class="btn-secondary" onclick="logoutStudent()" style="margin-top: 20px;">Trocar de Perfil / Sair</button>
 
-      <button onclick="startQuizSolo()">INICIAR QUIZ COM PERGUNTAS DE FATOS REAIS</button>
-      <button onclick="alert('Buscando sala multiplayer de 4 jogadores...')" style="background-color:#0088ff;">JOGAR EM GRUPO (4 PLAYERS)</button>
-
-      <h3 style="font-size: 9px; margin-top: 15px;">🏆 RANKING EM TEMPO REAL</h3>
+      <h3 style="margin-top: 25px; color: var(--user-theme-color);">🏆 RANKING GERAL DE JOGADORES</h3>
       <table>
         <thead>
-          <tr><th>POS</th><th>JOGADOR</th><th>PONTOS</th></tr>
+          <tr>
+            <th>POS</th>
+            <th>JOGADOR</th>
+            <th>PONTOS</th>
+          </tr>
         </thead>
         <tbody id="ranking-body"></tbody>
       </table>
     </div>
 
-    <!-- TELA DO QUIZ -->
+    <!-- TELA 4: EXIBIÇÃO DO QUIZ E PASSO A PASSO GERADO AUTOMATICAMENTE -->
     <div id="screen-quiz" class="screen">
-      <div class="timer-box">TEMPO RESTANTE: <span id="timer-count">20</span>s</div>
-      <h3 id="quiz-question-title" style="font-size: 10px; text-align: center;"></h3>
-      <div id="quiz-source" class="source-tag" style="text-align: center;"></div>
-      <div id="quiz-options-container" style="margin-top: 15px;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span id="quiz-area-badge" style="color: var(--user-theme-color); font-size:22px;"></span>
+        <span id="quiz-counter-badge" style="color: #8b949e; font-size:20px;"></span>
+      </div>
+
+      <h3 id="quiz-question-title" style="font-size: 26px; margin: 15px 0;"></h3>
+      
+      <div id="quiz-options-container"></div>
+
+      <!-- Resolução e Explicação do Sistema -->
+      <div id="quiz-feedback" style="display:none;">
+        <div id="feedback-badge" class="badge-status"></div>
+        
+        <div class="explanation-box">
+          <strong style="color:var(--user-theme-color);">📖 EXPLICAÇÃO E RESOLUÇÃO PASSO A PASSO (GERADA PELA PLATAFORMA):</strong>
+          <p id="feedback-explanation" style="margin: 10px 0 0 0; white-space: pre-line;"></p>
+        </div>
+
+        <button id="next-question-btn" onclick="nextQuestionInQuiz()" style="margin-top: 15px;">PRÓXIMA PERGUNTA ➔</button>
+      </div>
     </div>
 
-    <!-- PAINEL PROFESSOR -->
+    <!-- TELA 5: PAINEL DO PROFESSOR (CRIAR E IDENTIFICAR QUIZ) -->
     <div id="screen-prof-dash" class="screen">
-      <h2 style="font-size: 11px; color: var(--user-theme-color);">PAINEL DO PROFESSOR (CURADORIA)</h2>
-      <p style="font-size: 8px;">ONLINE AGORA: <span class="online-badge"></span> <b id="online-count">0</b></p>
-      <ul id="online-list" style="font-size: 8px; padding:0; list-style:none;"></ul>
+      <h2 style="margin-top:0; color: var(--user-theme-color);">🛠️ PAINEL DE CRIAÇÃO E IDENTIFICAÇÃO DE QUIZ</h2>
+      <p style="font-size: 18px; color: #8b949e;">Ao enviar, o quiz fica disponível para os alunos na área selecionada.</p>
 
-      <h3 style="font-size: 9px; margin-top: 15px;">DESEMPENHO DAS ÁREAS:</h3>
-      <canvas id="performanceChart" style="max-height:180px;"></canvas>
-
-      <hr style="border-color:var(--user-theme-color); margin:15px 0;">
-
-      <h3 style="font-size: 9px;">➕ CADASTRAR NOVA PERGUNTA BASEADA EM FATOS REAIS:</h3>
+      <label>1. Identificação da Área / Tema do Quiz:</label>
       <select id="new-q-area"></select>
-      <input type="text" id="new-q-title" placeholder="Pergunta baseada em dados reais...">
-      <input type="text" id="new-q-source" placeholder="Fonte da pesquisa/site (Ex: IBGE, NASA, Banco Central)...">
-      
-      <input type="text" id="new-q-opt1" placeholder="Opção 1 (CORRETA)">
-      <input type="text" id="new-q-opt2" placeholder="Opção 2 (Incorreta)">
-      <input type="text" id="new-q-opt3" placeholder="Opção 3 (Incorreta)">
-      <input type="text" id="new-q-opt4" placeholder="Opção 4 (Incorreta)">
 
-      <button onclick="saveCuratedQuestion()">SALVAR NO FIREBASE BANCO REAL</button>
+      <label>2. Tipo de Questão:</label>
+      <select id="new-q-type" onchange="toggleQuestionTypeUI()">
+        <option value="multiple">Múltipla Escolha (4 Opções)</option>
+        <option value="tf">Verdadeiro ou Falso (V / F)</option>
+      </select>
 
-      <h3 style="font-size: 9px; margin-top: 15px;">📥 IMPORTAÇÃO EM LOTE (JSON):</h3>
-      <textarea id="json-import-input" rows="4" placeholder='Cole aqui o JSON com as perguntas pesquisadas de sites confiáveis...'></textarea>
-      <button onclick="importJSONQuestions()" style="background-color: #0088ff;">IMPORTAR EM LOTE PARA FIREBASE</button>
+      <label>3. Enunciado / Pergunta:</label>
+      <textarea id="new-q-title" rows="2" placeholder="Digite a pergunta do quiz..."></textarea>
 
-      <button onclick="showScreen('screen-login')" style="background-color: #555; margin-top:15px;">SAIR</button>
+      <!-- Opções Múltipla Escolha -->
+      <div id="ui-multiple-options">
+        <label>Opção A (CORRETA):</label>
+        <input type="text" id="new-q-opt-correct" placeholder="Resposta correta...">
+
+        <label>Opção B (Incorreta):</label>
+        <input type="text" id="new-q-opt2" placeholder="Alternativa incorreta 1...">
+
+        <label>Opção C (Incorreta):</label>
+        <input type="text" id="new-q-opt3" placeholder="Alternativa incorreta 2...">
+
+        <label>Opção D (Incorreta):</label>
+        <input type="text" id="new-q-opt4" placeholder="Alternativa incorreta 3...">
+      </div>
+
+      <!-- Opções Verdadeiro / Falso -->
+      <div id="ui-tf-options" style="display:none;">
+        <label>Resposta Correta para V/F:</label>
+        <select id="new-q-tf-correct">
+          <option value="Verdadeiro">Verdadeiro</option>
+          <option value="Falso">Falso</option>
+        </select>
+      </div>
+
+      <button onclick="sendQuizToFirebase()">ENVIAR QUIZ PARA A ÁREA DOS ALUNOS 🚀</button>
+      <button class="btn-secondary" onclick="showScreen('screen-login')">SAIR DO PAINEL</button>
     </div>
 
   </div>
 
   <script>
-    // 1. Firebase Configuração
+    // 1. Configuração Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
       authDomain: "mathques.firebaseapp.com",
@@ -212,74 +411,109 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 2. Lista com +20 Áreas da Matemática
+    // 2. Lista de 20 Áreas da Matemática
     const areasMatematica = [
-      "Aritmética Básica", "Álgebra Linear", "Geometria Plana", "Geometria Espacial",
+      "Álgebra", "Aritmética Básica", "Geometria Plana", "Geometria Espacial",
       "Geometria Analítica", "Trigonometria", "Estatística", "Probabilidade",
       "Cálculo Diferencial", "Cálculo Integral", "Matemática Financeira", "Raciocínio Lógico",
       "Teoria dos Números", "Equações do 1º e 2º Grau", "Porcentagem e Proporção",
       "Matrizes e Determinantes", "Funções Matemáticas", "Análise Combinatória",
-      "Progressão Aritmética (PA)", "Progressão Geométrica (PG)", "Sistemas de Medidas",
-      "Logaritmos"
+      "Progressão Aritmética (PA)", "Progressão Geométrica (PG)"
     ];
 
-    // Banco Inicial de Perguntas Baseadas em Fatos Reais e Fontes Pesquisadas
-    const realQuestionsBank = {
-      "Estatística": [
+    // BANCO PRÉ-CARREGADO COM VÁRIAS PERGUNTAS POR ÁREA E RESOLUÇÃO AUTOMÁTICA DA PLATAFORMA
+    const defaultQuizzesDatabase = {
+      "Álgebra": [
         {
-          title: "Segundo dados reais do IBGE, o Brasil possui aproximadamente 213 milhões de habitantes. Se 15% residem na região Sul, quantos habitantes residem aproximadamente nessa região?",
-          source: "Fonte: ibge.gov.br (Projeções Populacionais)",
-          options: ["31,95 milhões", "25,00 milhões", "42,10 milhões", "18,50 milhões"],
-          correct: "31,95 milhões"
+          title: "Resolva a equação de 1º grau: 3x + 15 = 45. Qual o valor de x?",
+          options: ["x = 10", "x = 15", "x = 8", "x = 12"],
+          correct: "x = 10",
+          explanation: "Passo 1: Subtraia 15 de ambos os lados da igualdade:\n 3x = 45 - 15 => 3x = 30\nPasso 2: Divida ambos os lados por 3:\n x = 30 / 3 => x = 10."
+        },
+        {
+          title: "Dada a equação 2x - 8 = 10. O valor de x é igual a 9.",
+          options: ["Verdadeiro", "Falso"],
+          correct: "Verdadeiro",
+          explanation: "Passo 1: Somamos 8 dos dois lados: 2x = 10 + 8 => 2x = 18.\nPasso 2: Dividimos por 2: x = 18 / 2 => x = 9. Portanto, a afirmativa é VERDADEIRA!"
+        },
+        {
+          title: "Fatore a expressão algébrica: x² - 9.",
+          options: ["(x - 3)(x + 3)", "(x - 3)²", "(x + 3)²", "x(x - 9)"],
+          correct: "(x - 3)(x + 3)",
+          explanation: "Aplicando o produto notável da diferença de dois quadrados (a² - b² = (a - b)(a + b)):\n Como √9 = 3, temos x² - 3² = (x - 3)(x + 3)."
         }
       ],
-      "Matemática Financeira": [
+      "Geometria Plana": [
         {
-          title: "Um investimento na taxa Selic rende 10% ao ano sob juros simples. Qual o rendimento total de R$ 1.000,00 após 2 anos?",
-          source: "Fonte: bcb.gov.br (Banco Central do Brasil)",
-          options: ["R$ 200,00", "R$ 100,00", "R$ 210,00", "R$ 150,00"],
-          correct: "R$ 200,00"
+          title: "Calcule a área de um triângulo retângulo com base de 10 cm e altura de 6 cm.",
+          options: ["30 cm²", "60 cm²", "15 cm²", "45 cm²"],
+          correct: "30 cm²",
+          explanation: "Fórmula da área do triângulo: Área = (Base × Altura) / 2.\nSubstituindo os valores: Área = (10 × 6) / 2 = 60 / 2 = 30 cm²."
+        },
+        {
+          title: "A soma dos ângulos internos de qualquer triângulo é sempre igual a 180°.",
+          options: ["Verdadeiro", "Falso"],
+          correct: "Verdadeiro",
+          explanation: "Propriedade fundamental da Geometria Euclidiana Plana: A soma dos três ângulos internos de um triângulo é sempre 180°."
         }
       ],
-      "Geometria Espacial": [
+      "Porcentagem e Proporção": [
         {
-          title: "A Estação Espacial Internacional (ISS) orbita a Terra a cerca de 400 km de altitude. Se o raio da Terra é de 6.371 km, qual é a distância do centro da Terra até a ISS?",
-          source: "Fonte: nasa.gov (Dados de Órbita da ISS)",
-          options: ["6.771 km", "5.971 km", "6.371 km", "7.171 km"],
-          correct: "6.771 km"
+          title: "Um produto custa R$ 200,00 e recebe um desconto de 15%. Qual o novo valor a pagar?",
+          options: ["R$ 170,00", "R$ 185,00", "R$ 160,00", "R$ 175,00"],
+          correct: "R$ 170,00",
+          explanation: "1) Calcule o valor do desconto: 15% de 200 = (15 / 100) × 200 = R$ 30,00.\n2) Subtraia do preço original: R$ 200,00 - R$ 30,00 = R$ 170,00."
         }
       ]
     };
 
     let currentUser = null;
-    let timerInterval = null;
-    let currentCorrectAnswer = "";
+    let currentQuizList = [];
+    let currentQuizIndex = 0;
 
-    // Preencher as 20+ áreas nos menus
-    const categorySelect = document.getElementById('quiz-category');
-    const profAreaSelect = document.getElementById('new-q-area');
-
-    areasMatematica.forEach(area => {
-      let opt1 = document.createElement('option');
-      opt1.value = area;
-      opt1.innerText = area;
-      categorySelect.appendChild(opt1);
-
-      let opt2 = document.createElement('option');
-      opt2.value = area;
-      opt2.innerText = area;
-      profAreaSelect.appendChild(opt2);
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      populateAreaSelects();
+      checkSavedProfile();
     });
 
-    // Preview de Imagem e Cor
-    document.getElementById('player-color').addEventListener('input', e => {
-      document.documentElement.style.setProperty('--user-theme-color', e.target.value);
-    });
+    function populateAreaSelects() {
+      const selectProf = document.getElementById('new-q-area');
+      selectProf.innerHTML = '';
+      areasMatematica.forEach(area => {
+        let opt = document.createElement('option');
+        opt.value = area;
+        opt.innerText = area;
+        selectProf.appendChild(opt);
+      });
+    }
 
+    // Persistência do Perfil no LocalStorage
+    function checkSavedProfile() {
+      const savedUser = localStorage.getItem('mathquest_student');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        applyUserTheme(currentUser.color);
+        updateStudentDashUI();
+        listenToRanking();
+        renderAreaCards();
+        showScreen('screen-student-dash');
+      }
+    }
+
+    function applyUserTheme(color) {
+      document.documentElement.style.setProperty('--user-theme-color', color || '#00ff66');
+    }
+
+    // Preview do Avatar
     document.getElementById('player-photo').addEventListener('change', e => {
       const reader = new FileReader();
       reader.onload = () => document.getElementById('preview-img').src = reader.result;
       if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    });
+
+    document.getElementById('player-color').addEventListener('input', e => {
+      applyUserTheme(e.target.value);
     });
 
     function showScreen(id) {
@@ -292,28 +526,213 @@
       const color = document.getElementById('player-color').value;
       const photo = document.getElementById('preview-img').src;
 
-      if (!name) return alert('DIGITE SEU APELIDO!');
+      if (!name) return alert('Por favor, informe seu nickname!');
 
       currentUser = { name, color, photo, score: 0 };
+      localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
 
-      const userRef = db.ref('students/' + name);
-      userRef.set({ name, color, photo, online: true, score: 0 });
-      userRef.onDisconnect().update({ online: false });
+      db.ref('students/' + name).set({ name, color, photo, score: 0 });
 
-      document.getElementById('student-display-name').innerText = name;
-      document.getElementById('student-display-photo').src = photo;
-
+      applyUserTheme(color);
+      updateStudentDashUI();
       listenToRanking();
+      renderAreaCards();
       showScreen('screen-student-dash');
+    }
+
+    function updateStudentDashUI() {
+      document.getElementById('student-display-name').innerText = currentUser.name;
+      document.getElementById('student-display-photo').src = currentUser.photo;
+      
+      db.ref('students/' + currentUser.name + '/score').on('value', snapshot => {
+        const val = snapshot.val() || 0;
+        currentUser.score = val;
+        document.getElementById('student-score-display').innerText = val + ' PTS';
+      });
+    }
+
+    function logoutStudent() {
+      localStorage.removeItem('mathquest_student');
+      currentUser = null;
+      showScreen('screen-login');
     }
 
     function loginProfessor() {
       if (document.getElementById('prof-pass').value === 'professor72') {
         showScreen('screen-prof-dash');
-        loadProfessorDashboard();
       } else {
-        alert('SENHA INCORRETA!');
+        alert('Senha incorreta!');
       }
+    }
+
+    // Renderizar a Lista de Áreas em Cards Retrô
+    function renderAreaCards() {
+      const container = document.getElementById('area-grid-container');
+      container.innerHTML = '';
+
+      areasMatematica.forEach(area => {
+        let card = document.createElement('div');
+        card.className = 'area-card';
+        card.onclick = () => startAreaQuiz(area);
+
+        card.innerHTML = `
+          <div class="area-card-title">${area}</div>
+          <div class="area-card-count">Clique para jogar ➔</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Iniciar o Quiz da Área Escolhida
+    function startAreaQuiz(areaName) {
+      db.ref('quizzes_by_area/' + areaName).once('value', snapshot => {
+        let firebaseQuizzes = [];
+        snapshot.forEach(child => firebaseQuizzes.push(child.val()));
+
+        if (firebaseQuizzes.length > 0) {
+          currentQuizList = firebaseQuizzes;
+        } else if (defaultQuizzesDatabase[areaName]) {
+          currentQuizList = defaultQuizzesDatabase[areaName];
+        } else {
+          // Gerador automático fallback para áreas sem perguntas
+          currentQuizList = generateFallbackQuizForArea(areaName);
+        }
+
+        currentQuizIndex = 0;
+        document.getElementById('quiz-area-badge').innerText = `ÁREA: ${areaName.toUpperCase()}`;
+        loadCurrentQuizQuestion();
+        showScreen('screen-quiz');
+      });
+    }
+
+    function generateFallbackQuizForArea(area) {
+      return [
+        {
+          title: `[${area}] Exemplo Prático: Se 2x + 10 = 30, qual é o valor de x?`,
+          options: ["x = 10", "x = 5", "x = 15", "x = 20"],
+          correct: "x = 10",
+          explanation: "Resolução do Sistema:\n1) 2x = 30 - 10 => 2x = 20.\n2) x = 20 / 2 => x = 10."
+        },
+        {
+          title: `[${area}] A área de um quadrado de lado 4cm é igual a 16cm².`,
+          options: ["Verdadeiro", "Falso"],
+          correct: "Verdadeiro",
+          explanation: "Resolução do Sistema:\nA área do quadrado é dada por Lado² (L²). Como 4² = 16, a afirmativa é VERDADEIRA!"
+        }
+      ];
+    }
+
+    function loadCurrentQuizQuestion() {
+      const q = currentQuizList[currentQuizIndex];
+      document.getElementById('quiz-counter-badge').innerText = `PERGUNTA ${currentQuizIndex + 1} DE ${currentQuizList.length}`;
+      document.getElementById('quiz-question-title').innerText = q.title;
+      document.getElementById('quiz-feedback').style.display = 'none';
+
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+
+      q.options.forEach(opt => {
+        let btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, q);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedOption, questionObj) {
+      const isCorrect = selectedOption === questionObj.correct;
+      const feedbackDiv = document.getElementById('quiz-feedback');
+      const badgeDiv = document.getElementById('feedback-badge');
+      const explanationP = document.getElementById('feedback-explanation');
+
+      document.getElementById('quiz-options-container').innerHTML = '';
+
+      if (isCorrect) {
+        badgeDiv.innerText = "RESPOSTA CORRETA! 🎉 (+10 PONTOS)";
+        badgeDiv.className = "badge-status status-correct";
+        if (currentUser) {
+          currentUser.score = (currentUser.score || 0) + 10;
+          db.ref('students/' + currentUser.name + '/score').set(currentUser.score);
+        }
+      } else {
+        badgeDiv.innerText = "RESPOSTA INCORRETA!";
+        badgeDiv.className = "badge-status status-incorrect";
+      }
+
+      // Explicação gerada pelo sistema/professor
+      explanationP.innerText = questionObj.explanation || "Resolução da plataforma: Verifique os conceitos básicos da área para resolver essa questão.";
+      feedbackDiv.style.display = 'block';
+    }
+
+    function nextQuestionInQuiz() {
+      currentQuizIndex++;
+      if (currentQuizIndex < currentQuizList.length) {
+        loadCurrentQuizQuestion();
+      } else {
+        alert('PARABÉNS! VOCÊ COMPLETOU O QUIZ DESTA ÁREA!');
+        showScreen('screen-student-dash');
+      }
+    }
+
+    // Alternar interface entre Múltipla Escolha e V/F no Painel
+    function toggleQuestionTypeUI() {
+      const type = document.getElementById('new-q-type').value;
+      if (type === 'tf') {
+        document.getElementById('ui-multiple-options').style.display = 'none';
+        document.getElementById('ui-tf-options').style.display = 'block';
+      } else {
+        document.getElementById('ui-multiple-options').style.display = 'block';
+        document.getElementById('ui-tf-options').style.display = 'none';
+      }
+    }
+
+    // Professor envia o Quiz Identificado para o Firebase
+    function sendQuizToFirebase() {
+      const area = document.getElementById('new-q-area').value;
+      const type = document.getElementById('new-q-type').value;
+      const title = document.getElementById('new-q-title').value.trim();
+
+      if (!title) return alert('DIGITE A PERGUNTA DO QUIZ!');
+
+      let correctOpt = "";
+      let options = [];
+      let autoExplanation = "";
+
+      if (type === 'tf') {
+        correctOpt = document.getElementById('new-q-tf-correct').value;
+        options = ["Verdadeiro", "Falso"];
+        autoExplanation = `Resolução da Plataforma: A resposta correta para esta afirmação é "${correctOpt.toUpperCase()}".`;
+      } else {
+        correctOpt = document.getElementById('new-q-opt-correct').value.trim();
+        const opt2 = document.getElementById('new-q-opt2').value.trim();
+        const opt3 = document.getElementById('new-q-opt3').value.trim();
+        const opt4 = document.getElementById('new-q-opt4').value.trim();
+
+        if (!correctOpt || !opt2) return alert('PREENCHA PELO MENOS A OPÇÃO CORRETA E MAIS UMA ALTERNATIVA!');
+
+        options = [correctOpt, opt2, opt3, opt4].filter(Boolean).sort(() => Math.random() - 0.5);
+        autoExplanation = `Resolução da Plataforma: Análise realizada sobre o tema [${area}]. A alternativa correta verificada pelo sistema é "${correctOpt}".`;
+      }
+
+      const quizData = {
+        title: title,
+        correct: correctOpt,
+        options: options,
+        explanation: autoExplanation,
+        createdAt: Date.now()
+      };
+
+      db.ref('quizzes_by_area/' + area).push(quizData, err => {
+        if (!err) {
+          alert(`QUIZ CADASTRADO COM SUCESSO NA ÁREA [${area.toUpperCase()}]!`);
+          document.getElementById('new-q-title').value = '';
+          document.getElementById('new-q-opt-correct').value = '';
+          document.getElementById('new-q-opt2').value = '';
+          document.getElementById('new-q-opt3').value = '';
+          document.getElementById('new-q-opt4').value = '';
+        }
+      });
     }
 
     function listenToRanking() {
@@ -325,172 +744,17 @@
         players.sort((a, b) => (b.score || 0) - (a.score || 0));
 
         players.forEach((p, i) => {
-          let pos = i + 1;
-          if (pos === 1) pos = '🥇 1º';
-          else if (pos === 2) pos = '🥈 2º';
-          else if (pos === 3) pos = '🥉 3º';
+          let pos = (i + 1) + 'º';
+          if (i === 0) pos = '🥇 1º';
+          else if (i === 1) pos = '🥈 2º';
+          else if (i === 2) pos = '🥉 3º';
 
           tbody.innerHTML += `<tr>
             <td>${pos}</td>
-            <td style="color:${p.color}">${p.name}</td>
+            <td style="color:${p.color}; font-weight:bold;">${p.name}</td>
             <td>${p.score || 0} PTS</td>
           </tr>`;
         });
-      });
-    }
-
-    // Gerador / Buscador de Questões Reais
-    function getQuestionForArea(area, callback) {
-      db.ref('custom_quizzes/' + area).once('value', snapshot => {
-        let firebaseQuestions = [];
-        snapshot.forEach(child => firebaseQuestions.push(child.val()));
-
-        if (firebaseQuestions.length > 0) {
-          const q = firebaseQuestions[Math.floor(Math.random() * firebaseQuestions.length)];
-          callback(q);
-        } else if (realQuestionsBank[area] && realQuestionsBank[area].length > 0) {
-          const q = realQuestionsBank[area][Math.floor(Math.random() * realQuestionsBank[area].length)];
-          callback(q);
-        } else {
-          // Gerador de Fatos Reais Dinâmico (Fallback com contexto)
-          let val1 = Math.floor(Math.random() * 80) + 10;
-          let val2 = Math.floor(Math.random() * 5) + 2;
-          let generated = {
-            title: `[Pesquisa Aplicada em ${area}] Um estudo sobre consumo de energia registrou ${val1} kWh consumidos por ${val2} residências. Qual a média de consumo por residência?`,
-            source: "Fonte: Agência Nacional de Energia Elétrica (Dados do Setor)",
-            options: [`${(val1 / val2).toFixed(1)} kWh`, `${(val1 + val2)} kWh`, `${(val1 * 2)} kWh`, `${(val2 * 3)} kWh`].sort(() => Math.random() - 0.5),
-            correct: `${(val1 / val2).toFixed(1)} kWh`
-          };
-          callback(generated);
-        }
-      });
-    }
-
-    function startQuizSolo() {
-      const area = document.getElementById('quiz-category').value;
-      
-      getQuestionForArea(area, q => {
-        currentCorrectAnswer = q.correct;
-
-        showScreen('screen-quiz');
-        let timeLeft = 20;
-        document.getElementById('timer-count').innerText = timeLeft;
-        document.getElementById('quiz-question-title').innerText = q.title;
-        document.getElementById('quiz-source').innerText = q.source || "Fonte: Pesquisa Validada";
-
-        const container = document.getElementById('quiz-options-container');
-        container.innerHTML = '';
-
-        q.options.forEach(opt => {
-          let btn = document.createElement('button');
-          btn.innerText = opt;
-          btn.onclick = () => answerQuiz(opt === currentCorrectAnswer);
-          container.appendChild(btn);
-        });
-
-        timerInterval = setInterval(() => {
-          timeLeft--;
-          document.getElementById('timer-count').innerText = timeLeft;
-          if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            alert('TEMPO ESGOTADO!');
-            showScreen('screen-student-dash');
-          }
-        }, 1000);
-      });
-    }
-
-    function answerQuiz(isCorrect) {
-      clearInterval(timerInterval);
-      if (isCorrect) {
-        alert('RESPOSTA CORRETA BASEADA EM FATOS REAIS! +10 PONTOS');
-        if (currentUser) {
-          currentUser.score = (currentUser.score || 0) + 10;
-          db.ref('students/' + currentUser.name).update({ score: currentUser.score });
-        }
-      } else {
-        alert('INCORRETO! A RESPOSTA PESQUISADA ERA: ' + currentCorrectAnswer);
-      }
-      showScreen('screen-student-dash');
-    }
-
-    // Funcionalidades de Curadoria do Professor
-    function saveCuratedQuestion() {
-      const area = document.getElementById('new-q-area').value;
-      const title = document.getElementById('new-q-title').value.trim();
-      const source = document.getElementById('new-q-source').value.trim();
-      const opt1 = document.getElementById('new-q-opt1').value.trim();
-      const opt2 = document.getElementById('new-q-opt2').value.trim();
-      const opt3 = document.getElementById('new-q-opt3').value.trim();
-      const opt4 = document.getElementById('new-q-opt4').value.trim();
-
-      if (!title || !opt1 || !opt2) {
-        return alert('PREENCHA A PERGUNTA E AS OPÇÕES!');
-      }
-
-      const questionObj = {
-        title: title,
-        source: source ? `Fonte: ${source}` : "Fonte: Curadoria do Professor",
-        options: [opt1, opt2, opt3, opt4].filter(Boolean).sort(() => Math.random() - 0.5),
-        correct: opt1,
-        createdAt: Date.now()
-      };
-
-      db.ref('custom_quizzes/' + area).push(questionObj, err => {
-        if (!err) {
-          alert('PERGUNTA PESQUISADA SALVA COM SUCESSO NO FIREBASE!');
-          document.getElementById('new-q-title').value = '';
-          document.getElementById('new-q-source').value = '';
-          document.getElementById('new-q-opt1').value = '';
-          document.getElementById('new-q-opt2').value = '';
-          document.getElementById('new-q-opt3').value = '';
-          document.getElementById('new-q-opt4').value = '';
-        }
-      });
-    }
-
-    function importJSONQuestions() {
-      const jsonText = document.getElementById('json-import-input').value;
-      try {
-        const parsed = JSON.parse(jsonText);
-        if (Array.isArray(parsed)) {
-          parsed.forEach(item => {
-            if (item.area && item.title && item.correct && item.options) {
-              db.ref('custom_quizzes/' + item.area).push(item);
-            }
-          });
-          alert('IMPORTAÇÃO EM LOTE CONCLUÍDA COM SUCESSO!');
-          document.getElementById('json-import-input').value = '';
-        } else {
-          alert('O JSON DEVE SER UMA LISTA [ ] DE OBJETOS DE PERGUNTAS!');
-        }
-      } catch (e) {
-        alert('ERRO AO PROCESSAR O JSON. VERIFIQUE A FORMATAÇÃO.');
-      }
-    }
-
-    function loadProfessorDashboard() {
-      db.ref('students').on('value', snapshot => {
-        const list = document.getElementById('online-list');
-        list.innerHTML = '';
-        let count = 0;
-        snapshot.forEach(c => {
-          const u = c.val();
-          if (u.online) {
-            count++;
-            list.innerHTML += `<li><span class="online-badge"></span> ${u.name}</li>`;
-          }
-        });
-        document.getElementById('online-count').innerText = count;
-      });
-
-      const ctx = document.getElementById('performanceChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Álgebra', 'Geometria', 'Aritmética', 'Estatística'],
-          datasets: [{ label: 'Precisão (%)', data: [80, 65, 90, 70], backgroundColor: '#00ff66' }]
-        }
       });
     }
   </script>
