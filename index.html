@@ -7,9 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- SDKs DO FIREBASE -->
+    <!-- SDKs DO FIREBASE (v9/v10 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
@@ -37,6 +38,7 @@
             padding-bottom: 40px;
         }
 
+        /* BANNER CABEÇALHO ESTILO GOOGLE FORMS */
         .forms-header-banner {
             width: 100%;
             max-width: 900px;
@@ -100,6 +102,7 @@
             border: 2px solid var(--secondary-color);
         }
 
+        /* STATUS BADGE */
         .status-badge {
             display: inline-block;
             width: 10px;
@@ -107,7 +110,6 @@
             border-radius: 50%;
             margin-right: 6px;
         }
-
         .status-online { background-color: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
         .status-offline { background-color: #777; }
 
@@ -197,23 +199,117 @@
 
         .area-card:hover { transform: translateY(-3px); border-color: var(--secondary-color); }
 
-        .ranking-item {
+        /* ESTILOS DO CONSTRUTOR FORMS DO PROFESSOR */
+        .question-builder-card {
+            background: #1c1f30;
+            border: 1px solid var(--secondary-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .opt-input-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: #202436;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .opt-radio { width: 22px; height: 22px; cursor: pointer; }
+
+        .btn-add-opt {
+            background: #282c42;
+            border: 1px dashed var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: background 0.2s;
+            margin-top: 5px;
+            font-weight: bold;
         }
 
-        .ranking-item:hover {
-            background: #2a2f47;
+        .btn-add-question {
+            background: #202436;
+            border: 2px dashed var(--primary-color);
+            color: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            font-family: var(--font-pixel);
+            font-size: 0.85rem;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .teacher-quiz-card {
+            background: rgba(0, 240, 255, 0.08);
             border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 15px;
+            cursor: pointer;
         }
 
+        /* EXECUÇÃO DE QUIZ E GABARITO */
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 14px;
+            font-size: 1rem;
+            width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-correct {
+            background: rgba(0, 255, 102, 0.2) !important;
+            border-color: var(--success-color) !important;
+            color: var(--success-color) !important;
+            font-weight: bold;
+        }
+
+        .btn-wrong {
+            background: rgba(255, 51, 102, 0.2) !important;
+            border-color: var(--danger-color) !important;
+            color: var(--danger-color) !important;
+        }
+
+        .explanation-box {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* PAINEL DE ESTATÍSTICAS E GRÁFICOS DO PROFESSOR */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #202436;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .chart-box {
+            background: #1c1f30;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        /* ESTILOS DA ABA DE INTERAÇÃO (CHAT / MURAL) */
         .chat-box {
             background: #1c1f30;
             border: 1px solid #333a52;
@@ -247,33 +343,24 @@
             font-size: 0.85rem;
             color: var(--secondary-color);
             margin-bottom: 3px;
+        }
+
+        .chat-text {
+            font-size: 0.95rem;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        .chat-time {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input-area {
             display: flex;
-            align-items: center;
-        }
-
-        .chat-text { font-size: 0.95rem; color: #fff; word-break: break-word; }
-        .chat-time { font-size: 0.7rem; color: #888; margin-top: 4px; text-align: right; }
-        .chat-input-area { display: flex; gap: 10px; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: #202436;
-            border-radius: 10px;
-            padding: 15px;
-            border-left: 4px solid var(--secondary-color);
-        }
-
-        .chart-box {
-            background: #1c1f30;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 25px;
+            gap: 10px;
         }
 
         .hidden { display: none !important; }
@@ -281,6 +368,7 @@
 </head>
 <body>
 
+    <!-- CABEÇALHO DO GOOGLE FORMS COM LOGO COM FALLBACK -->
     <div class="forms-header-banner">
         <img src="mt.png" alt="MathQuest Logo Banner" onerror="this.style.display='none'; document.getElementById('banner-fallback').style.display='flex';">
         <div id="banner-fallback" class="forms-banner-fallback" style="display: none;">
@@ -289,7 +377,7 @@
     </div>
 
     <div class="container">
-        <!-- BARRA SUPERIOR DO USUÁRIO -->
+        <!-- NAVEGAÇÃO DE USUÁRIO LOGADO -->
         <div id="user-nav" class="user-nav" style="display: none;">
             <div style="display:flex; align-items:center; gap:12px;">
                 <img id="nav-avatar" src="" class="user-avatar-small" alt="Avatar">
@@ -304,7 +392,7 @@
             <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #ff3366; color:#ff3366;" onclick="logout()">Sair</button>
         </div>
 
-        <!-- TABS DE NAVEGAÇÃO -->
+        <!-- MENU DE ABAS -->
         <div id="main-tabs" class="main-tabs" style="display: none;">
             <button id="tab-btn-quizzes" class="tab-btn active" onclick="switchTab('screen-quizzes')">📚 QUIZZES</button>
             <button id="tab-btn-interaction" class="tab-btn" onclick="switchTab('screen-interaction')">💬 INTERAÇÃO</button>
@@ -313,7 +401,7 @@
             <button id="tab-btn-teacher" class="tab-btn hidden" onclick="switchTab('screen-teacher-dash')">🎓 ÁREA DO PROFESSOR</button>
         </div>
 
-        <!-- TELA DE LOGIN SIMPLIFICADA (NÃO PEDE PERFIL) -->
+        <!-- TELA 1: LOGIN (ATUALIZADA: SEM ESCOLHA DE TIPO, DETECTA AUTOMATICAMENTE) -->
         <div id="screen-login" class="screen active">
             <h2 class="screen-title">Acessar a Plataforma</h2>
             <form onsubmit="handleLogin(event)">
@@ -328,17 +416,17 @@
                 <button type="submit" class="btn btn-primary">ENTRAR AGORA 🚀</button>
             </form>
             <p style="text-align:center; margin-top:15px; color:#aaa;">
-                Não tem uma conta? <a href="#" onclick="showScreen('screen-register')" style="color:var(--secondary-color);">Cadastre-se aqui</a>
+                Não tem uma conta? <a href="#" onclick="showScreen('screen-register')" style="color:var(--secondary-color);">Cadastre-se</a>
             </p>
         </div>
 
-        <!-- TELA DE CADASTRO -->
+        <!-- TELA 2: CADASTRO -->
         <div id="screen-register" class="screen">
             <h2 class="screen-title">Criar Nova Conta</h2>
             <form onsubmit="handleRegister(event)">
                 <div class="form-group">
                     <label>Nome Completo</label>
-                    <input type="text" id="reg-name" required placeholder="Digite seu nome">
+                    <input type="text" id="reg-name" required>
                 </div>
                 <div class="form-group">
                     <label>Tipo de Conta</label>
@@ -349,7 +437,7 @@
                 </div>
                 <div class="form-group">
                     <label>Série / Ano Letivo</label>
-                    <input type="text" id="reg-grade" placeholder="Ex: 9º Ano A (ou Disciplina no caso do Prof.)" required>
+                    <input type="text" id="reg-grade" placeholder="Ex: 9º Ano A" required>
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
@@ -362,7 +450,7 @@
             </p>
         </div>
 
-        <!-- TELA DE QUIZZES -->
+        <!-- TELA 3: QUIZZES -->
         <div id="screen-quizzes" class="screen">
             <div id="teacher-quizzes-section" style="margin-bottom:25px;">
                 <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📌 QUIZZES DO PROFESSOR</h3>
@@ -373,7 +461,7 @@
             <div id="area-grid-container" class="area-grid"></div>
         </div>
 
-        <!-- MURAL DE INTERAÇÃO COM STATUS ONLINE/OFFLINE -->
+        <!-- TELA NOVA: INTERAÇÃO / MURAL DO CONHECIMENTO -->
         <div id="screen-interaction" class="screen">
             <h2 class="screen-title">💬 Mural de Interação e Dúvidas</h2>
             <div id="chat-messages-container" class="chat-box"></div>
@@ -383,16 +471,16 @@
             </form>
         </div>
 
-        <!-- TELA DE RANKING (APENAS ALUNOS) -->
+        <!-- TELA 4: RANKING & COLEGAS (ATUALIZADA: APENAS ALUNOS, COM STATUS EM TEMPO REAL) -->
         <div id="screen-ranking" class="screen">
-            <h2 class="screen-title">🏆 Ranking Geral dos Alunos</h2>
+            <h2 class="screen-title">🏆 Ranking Geral da Turma</h2>
             <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-bottom:15px;">💡 Os professores não aparecem nesta lista de pontuação!</p>
             <div id="ranking-list-container"></div>
         </div>
 
-        <!-- TELA DE PERFIL -->
+        <!-- TELA 5: MEU PERFIL -->
         <div id="screen-profile" class="screen">
-            <h2 class="screen-title">👤 Meu Perfil</h2>
+            <h2 class="screen-title">👤 Configurações do Meu Perfil</h2>
             <div style="text-align:center; margin-bottom:20px;">
                 <img id="profile-img-preview" src="https://via.placeholder.com/100" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--primary-color);">
                 <br>
@@ -403,21 +491,102 @@
                 <label>Sua Frase de Perfil / Status</label>
                 <input type="text" id="profile-status-input" placeholder="Ex: Rumo ao topo da matemática!">
             </div>
+            <div class="form-group">
+                <label>Cor Personalizada do Tema</label>
+                <input type="color" id="profile-color-input" value="#ff007f" style="height:45px;">
+            </div>
             <button class="btn btn-primary" onclick="saveProfileChanges()">SALVAR PERFIL</button>
+
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-top:25px; margin-bottom:10px;">🏅 Minhas Medalhas Recebidas</h3>
+            <div id="my-medals-container" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
         </div>
 
-        <!-- PAINEL DO PROFESSOR -->
+        <!-- TELA 6: ÁREA DO PROFESSOR -->
         <div id="screen-teacher-dash" class="screen">
-            <h2 class="screen-title">🎓 Painel do Professor</h2>
+            <h2 class="screen-title">🎓 Painel de Controle do Professor</h2>
+
+            <!-- GRÁFICOS DE NÍVEL E DESEMPENHO DA TURMA -->
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📊 Nível de Desempenho dos Alunos</h3>
             <div class="stats-grid">
                 <div class="stat-card">
                     <small>Média Geral da Turma</small>
                     <h2 id="stat-avg-score" style="color:var(--secondary-color);">0 pts</h2>
                 </div>
+                <div class="stat-card">
+                    <small>Alunos em Alto Desempenho</small>
+                    <h2 id="stat-high-performers" style="color:var(--success-color);">0</h2>
+                </div>
+                <div class="stat-card">
+                    <small>Alunos que Precisam de Apoio</small>
+                    <h2 id="stat-low-performers" style="color:var(--danger-color);">0</h2>
+                </div>
             </div>
+
             <div class="chart-box">
                 <canvas id="performanceChart" height="140"></canvas>
             </div>
+
+            <!-- ENVIO DE MEDALHAS PARA OS ALUNOS -->
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-top:25px; margin-bottom:12px;">🏅 Premiar Aluno com Medalha</h3>
+            <form onsubmit="handleSendMedal(event)" style="background:#1c1f30; padding:15px; border-radius:12px; margin-bottom:25px;">
+                <div class="form-group">
+                    <label>Selecionar Aluno</label>
+                    <select id="medal-student-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Medalha / Selo</label>
+                    <select id="medal-type-select" required>
+                        <option value="🏆 Destaque da Turma">🏆 Destaque da Turma</option>
+                        <option value="💡 Gênio da Lógica">💡 Gênio da Lógica</option>
+                        <option value="⭐ Excelente Desempenho">⭐ Excelente Desempenho</option>
+                        <option value="🚀 Superação & Dedicação">🚀 Superação & Dedicação</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mensagem / Elogio do Professor</label>
+                    <input type="text" id="medal-msg-input" placeholder="Parabéns pelo excelente resultado!" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">ENVIAR MEDALHA DA CONQUISTA</button>
+            </form>
+
+            <!-- CONSTRUTOR DE QUIZ ESTILO FORMS -->
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📝 Construtor de Quizzes (Estilo Google Forms)</h3>
+            <form onsubmit="saveCustomQuiz(event)">
+                <div class="form-group">
+                    <label>Título / Tema do Quiz</label>
+                    <input type="text" id="form-quiz-title" placeholder="Ex: Avaliação Bimestral de Geometria" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Área Temática Principal</label>
+                    <select id="form-quiz-area" required></select>
+                </div>
+
+                <div id="questions-builder-container"></div>
+
+                <button type="button" class="btn-add-question" onclick="addQuestionCard()">➕ ADICIONAR NOVA PERGUNTA</button>
+
+                <button type="submit" class="btn btn-primary">PUBLICAR QUIZ PARA A TURMA 🚀</button>
+            </form>
+        </div>
+
+        <!-- TELA 7: EXECUÇÃO DO QUIZ -->
+        <div id="screen-game" class="screen">
+            <div style="display:flex; justify-content:space-between; color:var(--primary-color); font-weight:bold; margin-bottom:10px;">
+                <span id="game-area-tag"></span>
+                <span id="game-progress"></span>
+            </div>
+            <div id="game-author-tag" style="color:var(--secondary-color); font-size:0.85rem; margin-bottom:15px; font-weight:bold;"></div>
+
+            <div id="game-question" style="font-size:1.15rem; font-weight:700; margin-bottom:20px; line-height:1.4;"></div>
+            <div id="game-options"></div>
+
+            <div id="game-explanation" class="explanation-box">
+                <strong style="color:var(--secondary-color);">💡 Resolvendo Passo a Passo:</strong>
+                <p id="explanation-text" style="margin-top:5px;"></p>
+            </div>
+
+            <button id="btn-next-question" class="btn btn-primary" style="display:none; margin-top:20px;" onclick="nextQuestion()">PRÓXIMA QUESTÃO ➔</button>
         </div>
     </div>
 
@@ -429,35 +598,48 @@
             projectId: "mathques",
             storageBucket: "mathques.firebasestorage.app",
             messagingSenderId: "413245852392",
-            appId: "1:413245852392:web:fd9affbddda2f34eed975d"
+            appId: "1:413245852392:web:fd9affbddda2f34eed975d",
+            measurementId: "G-NJ9D8QV749"
         };
 
         let isFirebaseActive = false;
         try {
-            firebase.initializeApp(firebaseConfig);
-            isFirebaseActive = true;
+            if (firebaseConfig.apiKey !== "SUA_API_KEY") {
+                firebase.initializeApp(firebaseConfig);
+                isFirebaseActive = true;
+            }
         } catch (e) {
-            console.log("Modo offline ativo.");
+            console.log("Firebase não configurado, operando em modo local storage.");
         }
 
         let currentUser = null;
         let globalUsers = {};
+        let questionCount = 0;
+        let currentGameQuizzes = [];
+        let currentQuestionIndex = 0;
+        let userScore = 0;
+        let answeredCurrent = false;
         let chartInstance = null;
 
-        const allAreas = ["Álgebra", "Geometria Plana", "Raciocínio Lógico", "Aritmética", "Estatística", "Probabilidade"];
+        const allAreas = [
+            "Álgebra", "Geometria Plana", "Geometria Espacial", "Raciocínio Lógico", "Trigonometria",
+            "Aritmética", "Estatística", "Probabilidade", "Funções", "Matemática Financeira",
+            "Matrizes e Determinantes", "Análise Combinatória", "Sistemas Lineares", "Geometria Analítica",
+            "Progressão Aritmética (PA)", "Progressão Geométrica (PG)", "Cálculo Mental", "Equações do 2º Grau",
+            "Porcentagem e Juros", "Conjuntos Numéricos"
+        ];
 
         window.onload = function() {
             renderAreaCards();
+            populateAreaSelect();
             syncUsersData();
             checkActiveSession();
             loadChatMessages();
-            setupPresenceSystem();
         };
 
-        // GESTÃO DE STATUS ONLINE / OFFLINE
+        // GESTÃO DE STATUS ONLINE / OFFLINE E SINCRONIZAÇÃO
         function setupPresenceSystem() {
             if (!isFirebaseActive || !currentUser) return;
-
             const userStatusRef = firebase.database().ref('users/' + currentUser.name + '/online');
             const connectedRef = firebase.database().ref('.info/connected');
 
@@ -476,6 +658,7 @@
             }
             if (globalUsers[currentUser.name]) {
                 globalUsers[currentUser.name].online = isOnline;
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
             }
         }
 
@@ -495,20 +678,58 @@
             const activeScreen = document.querySelector('.screen.active');
             if (!activeScreen) return;
             if (activeScreen.id === 'screen-ranking') renderRanking();
-            if (activeScreen.id === 'screen-interaction') renderChatMessages();
+            if (activeScreen.id === 'screen-interaction') loadChatMessages();
+        }
+
+        function renderAreaCards() {
+            const container = document.getElementById('area-grid-container');
+            container.innerHTML = allAreas.map(area => `
+                <div class="area-card" onclick="startStandardAreaQuiz('${area}')">
+                    <h4 style="color:#fff; margin-bottom:5px;">${area}</h4>
+                    <small style="color:var(--secondary-color);">10 Questões</small>
+                </div>
+            `).join('');
+        }
+
+        function populateAreaSelect() {
+            document.getElementById('form-quiz-area').innerHTML = allAreas.map(a => `<option value="${a}">${a}</option>`).join('');
+        }
+
+        function switchTab(screenId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (screenId === 'screen-quizzes') document.getElementById('tab-btn-quizzes').classList.add('active');
+            if (screenId === 'screen-interaction') document.getElementById('tab-btn-interaction').classList.add('active');
+            if (screenId === 'screen-ranking') { document.getElementById('tab-btn-ranking').classList.add('active'); renderRanking(); }
+            if (screenId === 'screen-profile') { document.getElementById('tab-btn-profile').classList.add('active'); loadProfileData(); }
+            if (screenId === 'screen-teacher-dash') { document.getElementById('tab-btn-teacher').classList.add('active'); loadTeacherDashboard(); }
+            showScreen(screenId);
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId === 'screen-quizzes') renderTeacherQuizzesList();
+            if (screenId === 'screen-teacher-dash' && questionCount === 0) addQuestionCard();
         }
 
         function checkActiveSession() {
             const loggedUsername = localStorage.getItem('mathquest_logged_user');
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
             if (loggedUsername && globalUsers[loggedUsername]) {
                 currentUser = { name: loggedUsername, ...globalUsers[loggedUsername] };
                 setOnlineStatus(true);
+                setupPresenceSystem();
 
                 document.getElementById('user-nav').style.display = 'flex';
                 document.getElementById('main-tabs').style.display = 'flex';
                 document.getElementById('nav-name-text').innerText = currentUser.name;
                 document.getElementById('nav-grade').innerText = `${currentUser.role} - ${currentUser.grade}`;
                 document.getElementById('nav-avatar').src = currentUser.photo || 'https://via.placeholder.com/45';
+
+                if (currentUser.themeColor) {
+                    document.documentElement.style.setProperty('--primary-color', currentUser.themeColor);
+                }
 
                 if (currentUser.role === 'Professor') {
                     document.getElementById('tab-btn-teacher').classList.remove('hidden');
@@ -524,20 +745,6 @@
             }
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const name = document.getElementById('login-name').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            if (!globalUsers[name] || globalUsers[name].password !== password) {
-                alert("Usuário ou senha incorretos!");
-                return;
-            }
-
-            localStorage.setItem('mathquest_logged_user', name);
-            checkActiveSession();
-        }
-
         function handleRegister(e) {
             e.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
@@ -545,25 +752,41 @@
             const grade = document.getElementById('reg-grade').value.trim();
             const password = document.getElementById('reg-password').value;
 
-            const newUserObj = { 
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            globalUsers[name] = { 
                 password, 
                 role, 
                 grade, 
                 score: 0, 
-                answeredCount: 0,
-                status: role === 'Professor' ? "Professor de Matemática" : "Estudando!", 
+                status: role === 'Professor' ? "Professor de Matemática" : "Aprendendo Matemática!", 
                 photo: "https://via.placeholder.com/100", 
-                online: true 
+                themeColor: "#ff007f", 
+                medals: [],
+                online: true
             };
-
-            globalUsers[name] = newUserObj;
+            
             localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
             localStorage.setItem('mathquest_logged_user', name);
 
             if (isFirebaseActive) {
-                firebase.database().ref('users/' + name).set(newUserObj);
+                firebase.database().ref('users/' + name).set(globalUsers[name]);
             }
 
+            checkActiveSession();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value.trim();
+            const password = document.getElementById('login-password').value;
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            if (!globalUsers[name] || globalUsers[name].password !== password) {
+                alert("Usuário ou senha inválidos!");
+                return;
+            }
+
+            localStorage.setItem('mathquest_logged_user', name);
             checkActiveSession();
         }
 
@@ -574,105 +797,509 @@
             checkActiveSession();
         }
 
-        // EXIBIÇÃO APENAS DE ALUNOS NO RANKING COM INDICADOR ONLINE/OFFLINE
-        function renderRanking() {
-            const students = Object.keys(globalUsers)
-                .map(u => ({ name: u, ...globalUsers[u] }))
-                .filter(u => u.role === 'Aluno') // APENAS ALUNOS
-                .sort((a, b) => (b.score || 0) - (a.score || 0));
-
-            const container = document.getElementById('ranking-list-container');
-            if (students.length === 0) {
-                container.innerHTML = `<p style="color:#aaa; text-align:center;">Nenhum aluno cadastrado no momento.</p>`;
-                return;
-            }
-
-            container.innerHTML = students.map((s, idx) => `
-                <div class="ranking-item">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <strong style="color:var(--primary-color); width:20px;">#${idx + 1}</strong>
-                        <div style="position:relative;">
-                            <img src="${s.photo || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                        </div>
-                        <div>
-                            <strong style="color:#fff; display:flex; align-items:center;">
-                                <span class="status-badge ${s.online ? 'status-online' : 'status-offline'}"></span>
-                                ${s.name}
-                            </strong>
-                            <div style="font-size:0.8rem; color:#aaa;">${s.online ? '🟢 Online agora' : '⚪ Offline'}</div>
-                        </div>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="color:var(--secondary-color); font-weight:bold; font-size:1.05rem;">${s.score || 0} pts</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function switchTab(screenId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            if (screenId === 'screen-quizzes') document.getElementById('tab-btn-quizzes').classList.add('active');
-            if (screenId === 'screen-interaction') document.getElementById('tab-btn-interaction').classList.add('active');
-            if (screenId === 'screen-ranking') { document.getElementById('tab-btn-ranking').classList.add('active'); renderRanking(); }
-            if (screenId === 'screen-profile') document.getElementById('tab-btn-profile').classList.add('active');
-            if (screenId === 'screen-teacher-dash') document.getElementById('tab-btn-teacher').classList.add('active');
-            showScreen(screenId);
-        }
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function renderAreaCards() {
-            const container = document.getElementById('area-grid-container');
-            container.innerHTML = allAreas.map(area => `
-                <div class="area-card">
-                    <h4 style="color:#fff; margin-bottom:5px;">${area}</h4>
-                    <small style="color:var(--secondary-color);">10 Questões</small>
-                </div>
-            `).join('');
-        }
-
+        /* LÓGICA DA ABA DE INTERAÇÃO (CHAT) */
         function handleSendMessage(e) {
             e.preventDefault();
             const input = document.getElementById('chat-input-message');
             const text = input.value.trim();
             if (!text || !currentUser) return;
 
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
             const messageObj = {
                 user: currentUser.name,
                 role: currentUser.role,
                 text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                time: timeStr,
+                timestamp: Date.now()
             };
 
             if (isFirebaseActive) {
                 firebase.database().ref('chat_messages').push(messageObj);
+            } else {
+                let messages = JSON.parse(localStorage.getItem('mathquest_chat') || '[]');
+                messages.push(messageObj);
+                localStorage.setItem('mathquest_chat', JSON.stringify(messages));
+                loadChatMessages();
             }
+
             input.value = '';
         }
 
         function loadChatMessages() {
             if (isFirebaseActive) {
                 firebase.database().ref('chat_messages').on('value', (snapshot) => {
-                    const messages = snapshot.val() ? Object.values(snapshot.val()) : [];
-                    const container = document.getElementById('chat-messages-container');
-                    container.innerHTML = messages.map(msg => {
-                        const userObj = globalUsers[msg.user] || {};
-                        const isOnline = userObj.online;
-                        return `
-                            <div class="chat-message ${currentUser && currentUser.name === msg.user ? 'my-message' : ''}">
-                                <div class="chat-user">
-                                    <span class="status-badge ${isOnline ? 'status-online' : 'status-offline'}"></span>
-                                    ${msg.user} (${msg.role})
-                                </div>
-                                <div class="chat-text">${msg.text}</div>
-                                <div class="chat-time">${msg.time}</div>
-                            </div>
-                        `;
-                    }).join('');
+                    const data = snapshot.val();
+                    const messages = data ? Object.values(data) : [];
+                    renderChatMessages(messages);
                 });
+            } else {
+                renderChatMessages();
+            }
+        }
+
+        function renderChatMessages(remoteMessages = null) {
+            const container = document.getElementById('chat-messages-container');
+            const messages = remoteMessages || JSON.parse(localStorage.getItem('mathquest_chat') || '[]');
+
+            if (messages.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center; font-size:0.85rem;">Nenhuma mensagem compartilhada ainda. Seja o primeiro a interagir!</p>`;
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => {
+                const isMe = currentUser && currentUser.name === msg.user;
+                const userObj = globalUsers[msg.user] || {};
+                const isOnline = userObj.online !== undefined ? userObj.online : false;
+                return `
+                    <div class="chat-message ${isMe ? 'my-message' : ''}">
+                        <div class="chat-user">
+                            <span class="status-badge ${isOnline ? 'status-online' : 'status-offline'}"></span>
+                            ${msg.user} <span style="font-size:0.7rem; color:var(--primary-color);">(${msg.role})</span>
+                        </div>
+                        <div class="chat-text">${msg.text}</div>
+                        <div class="chat-time">${msg.time}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        /* CONSTRUTOR DE QUIZZES ESTILO GOOGLE FORMS DO PROFESSOR */
+        function addQuestionCard() {
+            questionCount++;
+            const qId = questionCount;
+            const container = document.getElementById('questions-builder-container');
+
+            const card = document.createElement('div');
+            card.className = 'question-builder-card';
+            card.id = `q-card-${qId}`;
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <strong style="color:var(--secondary-color);">Pergunta #${qId}</strong>
+                    <button type="button" style="background:transparent; border:none; color:var(--danger-color); cursor:pointer;" onclick="removeQuestionCard(${qId})">🗑️ Remover</button>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="q-title-input" placeholder="Digite o enunciado da questão..." required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Resposta</label>
+                    <select onchange="handleQuestionTypeChange(${qId}, this.value)">
+                        <option value="multiple">Múltipla Escolha</option>
+                        <option value="tf">Verdadeiro ou Falso</option>
+                    </select>
+                </div>
+                <label style="display:block; margin-bottom:8px; font-weight:bold;">Alternativas (Marque a bolinha ao lado da correta):</label>
+                <div class="options-list-container" id="opts-container-${qId}"></div>
+                
+                <button type="button" class="btn-add-opt" id="add-opt-btn-${qId}" onclick="addOptionRow(${qId})">+ Adicionar Alternativa</button>
+
+                <div class="form-group" style="margin-top:15px;">
+                    <label>Explicação Passo a Passo (Passo de Resolução):</label>
+                    <input type="text" class="q-exp-input" placeholder="Explique a resolução correta...">
+                </div>
+            `;
+
+            container.appendChild(card);
+            addOptionRow(qId, "Alternativa 1");
+            addOptionRow(qId, "Alternativa 2");
+        }
+
+        function removeQuestionCard(qId) {
+            const card = document.getElementById(`q-card-${qId}`);
+            if (card) card.remove();
+        }
+
+        function addOptionRow(qId, defaultText = "") {
+            const optsContainer = document.getElementById(`opts-container-${qId}`);
+            const optIndex = optsContainer.children.length;
+
+            const row = document.createElement('div');
+            row.className = 'opt-input-row';
+            row.innerHTML = `
+                <input type="radio" name="correct-opt-${qId}" class="opt-radio" ${optIndex === 0 ? 'checked' : ''} required>
+                <input type="text" class="opt-text-input" placeholder="Texto da opção..." value="${defaultText}" required>
+                <button type="button" style="background:transparent; border:none; color:#ff3366; cursor:pointer;" onclick="this.parentElement.remove()">✕</button>
+            `;
+            optsContainer.appendChild(row);
+        }
+
+        function handleQuestionTypeChange(qId, type) {
+            const optsContainer = document.getElementById(`opts-container-${qId}`);
+            const addBtn = document.getElementById(`add-opt-btn-${qId}`);
+            optsContainer.innerHTML = '';
+
+            if (type === 'tf') {
+                addBtn.style.display = 'none';
+                addOptionRow(qId, "Verdadeiro");
+                addOptionRow(qId, "Falso");
+            } else {
+                addBtn.style.display = 'inline-block';
+                addOptionRow(qId, "Alternativa 1");
+                addOptionRow(qId, "Alternativa 2");
+            }
+        }
+
+        function saveCustomQuiz(e) {
+            e.preventDefault();
+            const title = document.getElementById('form-quiz-title').value.trim();
+            const area = document.getElementById('form-quiz-area').value;
+            const cards = document.querySelectorAll('.question-builder-card');
+
+            if (cards.length === 0) {
+                alert("Adicione pelo menos uma pergunta!");
+                return;
+            }
+
+            const questions = [];
+            cards.forEach(card => {
+                const qTitle = card.querySelector('.q-title-input').value.trim();
+                const qExp = card.querySelector('.q-exp-input').value.trim();
+                const rows = card.querySelectorAll('.opt-input-row');
+
+                const opts = [];
+                let correctAns = "";
+
+                rows.forEach(row => {
+                    const text = row.querySelector('.opt-text-input').value.trim();
+                    const isCorrect = row.querySelector('.opt-radio').checked;
+                    opts.push(text);
+                    if (isCorrect) correctAns = text;
+                });
+
+                questions.push({
+                    q: qTitle,
+                    opts: opts,
+                    ans: correctAns,
+                    exp: qExp || "Resolução fornecida pelo professor."
+                });
+            });
+
+            let teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            teacherQuizzes.push({
+                id: Date.now(),
+                title: title,
+                area: area,
+                author: currentUser.name,
+                questions: questions
+            });
+
+            localStorage.setItem('mathquest_teacher_quizzes', JSON.stringify(teacherQuizzes));
+            alert("Quiz cadastrado e enviado com sucesso para todos os alunos!");
+            document.getElementById('questions-builder-container').innerHTML = '';
+            questionCount = 0;
+            switchTab('screen-quizzes');
+        }
+
+        function renderTeacherQuizzesList() {
+            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            const container = document.getElementById('teacher-quizzes-container');
+
+            if (teacherQuizzes.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; font-size:0.85rem;">Nenhum quiz publicado pelos professores até o momento.</p>`;
+                return;
+            }
+
+            container.innerHTML = teacherQuizzes.map(q => `
+                <div class="teacher-quiz-card" onclick="startTeacherCustomQuiz(${q.id})">
+                    <h4 style="color:#fff;">${q.title}</h4>
+                    <p style="font-size:0.85rem; color:#ccc; margin-top:4px;">
+                        👨‍🏫 Professor: <strong style="color:var(--secondary-color);">${q.author}</strong> | Área: ${q.area} | ${q.questions.length} Questões
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function startTeacherCustomQuiz(quizId) {
+            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            const quiz = teacherQuizzes.find(q => q.id === quizId);
+            if (!quiz) return;
+
+            currentGameQuizzes = quiz.questions.map(q => ({
+                area: quiz.area,
+                author: quiz.author,
+                title: quiz.title,
+                question: q.q,
+                shuffledOptions: shuffleArray(q.opts),
+                correctAnswer: q.ans,
+                explanation: q.exp
+            }));
+
+            currentQuestionIndex = 0;
+            userScore = 0;
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        function startStandardAreaQuiz(area) {
+            currentGameQuizzes = Array.from({ length: 10 }, (_, i) => {
+                const correctVal = (i + 1) * 12;
+                const opts = [
+                    `${correctVal}`,
+                    `${correctVal + 4}`,
+                    `${correctVal - 3}`,
+                    `${correctVal + 10}`
+                ];
+                return {
+                    area: area,
+                    author: null,
+                    question: `Questão ${i + 1} de ${area}: Qual o resultado do cálculo para x = ${i + 1}?`,
+                    shuffledOptions: shuffleArray(opts),
+                    correctAnswer: `${correctVal}`,
+                    explanation: `Resolução: Multiplica-se o valor de x (${i + 1}) por 12, obtendo a resposta ${correctVal}.`
+                };
+            });
+
+            currentQuestionIndex = 0;
+            userScore = 0;
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answeredCurrent = false;
+            const q = currentGameQuizzes[currentQuestionIndex];
+
+            document.getElementById('game-area-tag').innerText = q.area;
+            document.getElementById('game-progress').innerText = `Questão ${currentQuestionIndex + 1}/${currentGameQuizzes.length}`;
+
+            if (q.author) {
+                document.getElementById('game-author-tag').innerText = `👨‍🏫 Quiz do Professor: ${q.author} (${q.title})`;
+                document.getElementById('game-author-tag').style.display = 'block';
+            } else {
+                document.getElementById('game-author-tag').style.display = 'none';
+            }
+
+            document.getElementById('game-question').innerText = q.question;
+            document.getElementById('btn-next-question').style.display = 'none';
+            document.getElementById('game-explanation').style.display = 'none';
+
+            const container = document.getElementById('game-options');
+            container.innerHTML = q.shuffledOptions.map((opt, idx) => `
+                <button class="btn-outline option-btn" id="opt-btn-${idx}" onclick="checkAnswer(${idx})">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        function checkAnswer(selectedIdx) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+
+            const q = currentGameQuizzes[currentQuestionIndex];
+            const selectedOpt = q.shuffledOptions[selectedIdx];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedOpt === q.correctAnswer) {
+                userScore += 10;
+                document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-correct');
+                document.getElementById(`opt-btn-${selectedIdx}`).innerHTML += ' ✔ (Correto!)';
+            } else {
+                document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-wrong');
+                document.getElementById(`opt-btn-${selectedIdx}`).innerHTML += ' ✖ (Incorreto)';
+
+                q.shuffledOptions.forEach((opt, idx) => {
+                    if (opt === q.correctAnswer) {
+                        document.getElementById(`opt-btn-${idx}`).classList.add('btn-correct');
+                        document.getElementById(`opt-btn-${idx}`).innerHTML += ' ✔ (Gabarito Correto)';
+                    }
+                });
+            }
+
+            document.getElementById('explanation-text').innerText = q.explanation;
+            document.getElementById('game-explanation').style.display = 'block';
+            document.getElementById('btn-next-question').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentGameQuizzes.length) {
+                loadQuestion();
+            } else {
+                alert(`Quiz concluído! Você somou ${userScore} pontos!`);
+                saveUserScore(userScore);
+                switchTab('screen-quizzes');
+            }
+        }
+
+        function saveUserScore(pts) {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name].score = (globalUsers[currentUser.name].score || 0) + pts;
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                currentUser.score = globalUsers[currentUser.name].score;
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + currentUser.name + '/score').set(currentUser.score);
+                }
+            }
+        }
+
+        /* RANKING E MEU PERFIL (ATUALIZADO: FILTRA APENAS ALUNOS, EXCLUI PROFESSORES E MOSTRA STATUS EM TEMPO REAL) */
+        function renderRanking() {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const students = Object.keys(globalUsers)
+                .map(u => ({ name: u, ...globalUsers[u] }))
+                .filter(u => u.role === 'Aluno') // APENAS ALUNOS APARECEM NO RANKING
+                .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            const container = document.getElementById('ranking-list-container');
+            if (students.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center; font-size:0.85rem;">Nenhum aluno cadastrado no momento.</p>`;
+                return;
+            }
+
+            container.innerHTML = students.map((s, idx) => `
+                <div style="display:flex; align-items:center; justify-content:space-between; background:#202436; padding:12px; border-radius:8px; margin-bottom:8px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <strong style="color:var(--primary-color); width:20px;">#${idx + 1}</strong>
+                        <img src="${s.photo || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <strong style="color:#fff; display:flex; align-items:center;">
+                                <span class="status-badge ${s.online ? 'status-online' : 'status-offline'}"></span>
+                                ${s.name}
+                            </strong>
+                            <div style="font-size:0.8rem; color:#aaa;">"${s.status || ''}"</div>
+                        </div>
+                    </div>
+                    <span style="color:var(--secondary-color); font-weight:bold;">${s.score || 0} pts</span>
+                </div>
+            `).join('');
+        }
+
+        function loadProfileData() {
+            document.getElementById('profile-img-preview').src = currentUser.photo || 'https://via.placeholder.com/100';
+            document.getElementById('profile-status-input').value = currentUser.status || '';
+            document.getElementById('profile-color-input').value = currentUser.themeColor || '#ff007f';
+
+            const container = document.getElementById('my-medals-container');
+            const medals = currentUser.medals || [];
+            if (medals.length === 0) {
+                container.innerHTML = `<span style="color:#aaa; font-size:0.85rem;">Nenhuma medalha recebida até agora.</span>`;
+            } else {
+                container.innerHTML = medals.map(m => `
+                    <div style="background:#202436; border:1px solid var(--secondary-color); padding:10px; border-radius:8px; font-size:0.85rem;">
+                        <strong>${m.type}</strong><br>
+                        <small style="color:#ccc;">"${m.msg}" - Prof. ${m.from}</small>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function uploadProfilePhoto(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('profile-img-preview').src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveProfileChanges() {
+            const newPhoto = document.getElementById('profile-img-preview').src;
+            const newStatus = document.getElementById('profile-status-input').value.trim();
+            const newColor = document.getElementById('profile-color-input').value;
+
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name].photo = newPhoto;
+                globalUsers[currentUser.name].status = newStatus;
+                globalUsers[currentUser.name].themeColor = newColor;
+
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                currentUser.photo = newPhoto;
+                currentUser.status = newStatus;
+                currentUser.themeColor = newColor;
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + currentUser.name).set(globalUsers[currentUser.name]);
+                }
+
+                document.documentElement.style.setProperty('--primary-color', newColor);
+                document.getElementById('nav-avatar').src = newPhoto;
+                alert("Perfil atualizado com sucesso!");
+            }
+        }
+
+        /* PAINEL DE CONTROLE DO PROFESSOR */
+        function loadTeacherDashboard() {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const students = Object.keys(globalUsers)
+                .map(u => ({ name: u, ...globalUsers[u] }))
+                .filter(u => u.role === 'Aluno');
+
+            const select = document.getElementById('medal-student-select');
+            select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score || 0} pts)</option>`).join('');
+
+            const scores = students.map(s => s.score || 0);
+            const totalAvg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+            const highPerformers = students.filter(s => (s.score || 0) >= 50).length;
+            const lowPerformers = students.filter(s => (s.score || 0) < 50).length;
+
+            document.getElementById('stat-avg-score').innerText = `${totalAvg} pts`;
+            document.getElementById('stat-high-performers').innerText = highPerformers;
+            document.getElementById('stat-low-performers').innerText = lowPerformers;
+
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: students.map(s => s.name),
+                    datasets: [{
+                        label: 'Pontuação de Desempenho dos Alunos',
+                        data: students.map(s => s.score || 0),
+                        backgroundColor: '#00f0ff',
+                        borderColor: '#ff007f',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function handleSendMedal(e) {
+            e.preventDefault();
+            const studentName = document.getElementById('medal-student-select').value;
+            const medalType = document.getElementById('medal-type-select').value;
+            const msg = document.getElementById('medal-msg-input').value.trim();
+
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[studentName]) {
+                if (!globalUsers[studentName].medals) globalUsers[studentName].medals = [];
+                globalUsers[studentName].medals.push({
+                    type: medalType,
+                    msg: msg,
+                    from: currentUser.name
+                });
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + studentName).set(globalUsers[studentName]);
+                }
+
+                alert(`Medalha enviada para o aluno ${studentName}!`);
+                document.getElementById('medal-msg-input').value = '';
             }
         }
     </script>
