@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MATHQUEST - A Gamificação da Matemática</title>
   
-  <!-- Fonte Retro Pixelada Legível -->
+  <!-- Fonte Retro Pixelada e Altamente Legível: VT323 -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   
   <!-- Firebase Compatibility SDKs -->
@@ -14,1050 +14,933 @@
 
   <style>
     :root {
-      --bg-color: #000000; /* Fundo Total Preto */
-      --card-bg: #111111; /* Cards Grafite Escuro */
-      --user-theme-color: #00ff66; /* Verde Neon Padrão */
-      --accent-color: #ff0055; /* Rosa Neon */
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --accent-color: #ff0055;
+      --user-theme-color: #00ff66;
       --text-color: #ffffff;
-      --border-color: #333333;
+      --border-color: #30363d;
       --font-pixel: 'VT323', monospace;
     }
 
-    * { box-sizing: border-box; font-family: var(--font-pixel); image-rendering: pixelated; }
+    * { box-sizing: border-box; font-family: var(--font-pixel); }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 0;
+      padding: 15px;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      font-size: 21px;
+      font-size: 20px;
     }
 
-    /* --- IMAGENS INTEGRADAS (BASE64) --- */
-    /* Estas classes usam o código da imagem direto no CSS, sem precisar de arquivo .png */
-    
-    .img-logo-mq {
-      width: 180px; height: 50px;
-      /* Base64 de um logo pixel art 'MATHQUEST' */
-      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKwAAAAyCAYAAAAb9wXfAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5gkXDhM4S048ZAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmRBQAAAAYZJREFUeNrt2rFtwzAQRdFfWbIG4E4E6S50p6wgbeBNXCTOECbIIwX6mCR4Xw4YwB6SOn84SREgSJAwYQIEbKj7fI6IePn59+vP+f565zD6vT7HMcZ3VfX4zD/f+/oXG77/fP/O/ff5HOfHMe44wD/CpsOEidDCOofRDZshbIZwM4TNEAnbIdY5jG7YDGEzhJshbIZI2A6xzrArbNiwGQIESJiEDRBYYYmEDRBYYYmEDRBYYYmEDRCwoe7TeRjX7/V9Psd6DP4Y/O7D/eM4P45xh2F/S8KECRBYYffpPPr3Ydh9OI9+h2H34Tz6HYbdDftbEiZMgIAVNv6WvLCECRNgsMIuLGLCBAhYYRMmQMCGCidMgIASJkyAgBImTICAEv48Gz4fTpgAARU2YQIEVNioDxAmQECHhAkQ0CFhAgR0SJgAAV3S9wIEVNio4D4vSpgAAX8Vtm/433bCBghYsAkkTICAhAkTYEDChAkwIGNXfPz9YRETIKDCsO6wCRMgYP0V/vP+v4gJELC6wzZMwPoj7P43vD5b2AQIWP2GXVnChAkQsPrD/mETJkDA//5fX8IESPgFEvLh4Z+5AAAAAElFTkSuQmCC');
-      background-size: contain; background-repeat: no-repeat;
+    /* Cabeçalho Fixo com Logo e Mascote Pixel Art */
+    .top-header {
+      width: 100%;
+      max-width: 950px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      margin-bottom: 12px;
+      border-bottom: 3px solid var(--user-theme-color);
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .icon-robot {
-      width: 32px; height: 32px; display: inline-block; vertical-align: middle;
-      /* Base64 de um pequeno robô pixel art verde */
-      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5gkXDhQE5W5m+AAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmRBQAAAALNJREFUWMe117ENwzAMRNEfM066SBfpIq1S7mI6SBdpFw4T3mZ9QpA+Y5WPhx8K4Nl9R6Xf/Z655v45p4oRbyK+I5bE59H7/VwS6Yg3SbyP3u/nkkidrEnwPHmK6fN4NfE8Pkk8T55i+jxetSbe507uS4oR/80d0SREHREmYfofYfI57p64p8ImTH9PHK3wOf7+fKxwOf7+vL9wnfN41/P+wj+f9xfu674fV+K4v3Df//m97v6+8wG77fP0i4oF4wAAAABJRU5ErkJggg==');
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    /* --- LAYOUT E BARRAS --- */
-    #navbar {
-      width: 100%; max-width: 1200px;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 20px;
-      border-bottom: 2px solid var(--border-color);
-      position: sticky; top: 0; background-color: var(--bg-color); z-index: 100;
+    .logo-img {
+      max-height: 48px;
+      width: auto;
+      image-rendering: pixelated;
     }
 
-    .nav-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-
-    #main-container {
-      width: 100%; max-width: 1200px;
-      display: flex; flex-grow: 1; padding: 20px; gap: 20px;
+    .app-title {
+      font-size: 32px;
+      color: var(--user-theme-color);
+      margin: 0;
+      text-shadow: 2px 2px #000;
+      letter-spacing: 2px;
     }
 
-    #sidebar {
-      width: 250px; flex-shrink: 0;
+    .app-container {
+      width: 100%;
+      max-width: 950px;
       background-color: var(--card-bg);
-      border: 2px solid var(--border-color);
-      border-radius: 8px; padding: 15px;
-      display: none; /* Escondido antes do login */
+      border: 3px solid var(--user-theme-color);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 0 25px rgba(0, 255, 102, 0.2);
     }
 
-    #content-area { flex-grow: 1; min-width: 0; }
-
-    /* --- COMPONENTES RETRÔ --- */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    .card {
-      background-color: var(--card-bg);
-      border: 2px solid var(--border-color);
-      border-radius: 8px; padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 0 #000;
+    label {
+      font-size: 22px;
+      display: block;
+      margin-top: 12px;
+      color: var(--user-theme-color);
     }
 
-    .card-header {
-      font-size: 28px; color: var(--user-theme-color);
-      margin-top: 0; margin-bottom: 15px;
-      border-bottom: 2px solid var(--border-color); padding-bottom: 5px;
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px 14px;
+      margin: 6px 0;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      background-color: #0d1117;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--user-theme-color);
     }
 
     button {
-      width: 100%; padding: 10px; margin: 8px 0;
-      background-color: var(--user-theme-color); color: #000;
-      font-size: 22px; font-weight: bold; text-transform: uppercase;
-      border: 2px solid #000; cursor: pointer;
-      box-shadow: 4px 4px 0 #000; transition: all 0.1s;
+      background-color: var(--user-theme-color);
+      color: #000;
+      font-weight: bold;
+      border: 2px solid #000;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.1s;
+      margin-top: 12px;
+      font-size: 24px;
+      min-height: 48px;
     }
-    button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .btn-rosa { background-color: var(--accent-color); color: #fff; }
-    .btn-border { background-color: transparent; color: var(--text-color); border: 2px solid var(--text-color); }
-    .btn-border:hover { background-color: rgba(255,255,255,0.1); }
-
-    input, select, textarea {
-      width: 100%; padding: 10px; margin: 8px 0;
-      background-color: #000; color: #fff;
-      border: 2px solid var(--border-color); border-radius: 4px;
-      font-size: 20px;
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
     }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--user-theme-color); }
 
-    label { font-size: 20px; color: var(--user-theme-color); }
-
-    .menu-item {
-      padding: 10px; cursor: pointer; border-radius: 4px;
-      display: flex; align-items: center; gap: 10px;
+    .btn-secondary {
+      background-color: #21262d;
+      color: #fff;
+      border-color: var(--border-color);
     }
-    .menu-item:hover { background-color: rgba(255,255,255,0.05); }
-    .menu-item.active { background-color: var(--user-theme-color); color: #000; }
 
-    /* Avatar Pixel */
-    .avatar-frame {
-      width: 80px; height: 80px; border: 3px solid var(--user-theme-color);
-      border-radius: 8px; background-color: #000;
-      overflow: hidden; image-rendering: pixelated;
+    .avatar-preview {
+      width: 80px;
+      height: 80px;
+      border: 3px solid var(--user-theme-color);
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 10px auto;
+      image-rendering: pixelated;
     }
-    .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Ranking e Medalhas */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
-    th { background-color: rgba(255,255,255,0.05); color: var(--user-theme-color); }
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid var(--user-theme-color);
+      margin-bottom: 20px;
+    }
 
-    .rank-medal { font-size: 24px; font-weight: bold; }
-    .gold { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
-    .silver { color: #C0C0C0; text-shadow: 0 0 5px #C0C0C0; }
-    .bronze { color: #CD7F32; text-shadow: 0 0 5px #CD7F32; }
+    .profile-card img {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      border: 2px solid var(--user-theme-color);
+      object-fit: cover;
+    }
 
-    /* Utilitários */
-    .flex-row { display: flex; flex-direction: row; gap: 10px; align-items: center; }
-    .status-online { color: var(--user-theme-color); font-weight: bold; }
-    .q-builder-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+    .area-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .area-card {
+      background: #21262d;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .area-card:hover {
+      border-color: var(--user-theme-color);
+      background-color: #1a232e;
+      transform: translateY(-2px);
+    }
+
+    .area-card-title {
+      font-size: 22px;
+      color: var(--user-theme-color);
+      margin-bottom: 4px;
+    }
+
+    .area-card-count {
+      font-size: 18px;
+      color: #8b949e;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 2px solid var(--border-color); padding: 8px; text-align: center; font-size: 20px; }
+    th { background-color: #21262d; color: var(--user-theme-color); }
+
+    .quiz-option-btn {
+      background-color: #21262d;
+      text-align: left;
+      border: 2px solid var(--border-color);
+      color: #fff;
+    }
+
+    .quiz-option-btn:hover {
+      border-color: var(--user-theme-color);
+      background-color: #1f2937;
+    }
+
+    .explanation-box {
+      background-color: #1f2937;
+      border-left: 5px solid var(--user-theme-color);
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 22px;
+      line-height: 1.4;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .status-correct { background-color: #00ff66; color: #000; }
+    .status-incorrect { background-color: #ff0055; color: #fff; }
+
+    .pixel-art-icon {
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      image-rendering: pixelated;
+    }
+
+    /* RESPONSIVIDADE CELULAR, TABLET E COMPUTADOR */
+    @media (max-width: 600px) {
+      body { padding: 8px; font-size: 18px; }
+      .app-container { padding: 14px; }
+      .top-header { flex-direction: column; align-items: flex-start; }
+      .app-title { font-size: 26px; }
+      .profile-card { flex-direction: column; text-align: center; }
+      .area-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); max-height: 300px; }
+      .area-card-title { font-size: 18px; }
+      .area-card-count { font-size: 15px; }
+      th, td { padding: 5px; font-size: 16px; }
+      input, select, textarea, button { font-size: 18px; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- BARRA DE NAVEGAÇÃO -->
-  <div id="navbar">
-    <div class="nav-logo" onclick="goToHome()">
-      <div class="icon-robot"></div> <!-- Bonequinho Robo Retro -->
-      <div class="img-logo-mq"></div> <!-- Logo Pixel MQ -->
+  <div class="top-header">
+    <div class="logo-container">
+      <img src="mt.png" alt="MATHQUEST Logo" class="logo-img" onerror="this.style.display='none';">
+      <svg class="pixel-art-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="2" width="6" height="2" fill="#00ff66"/>
+        <rect x="4" y="4" width="8" height="2" fill="#ff0055"/>
+        <rect x="5" y="6" width="6" height="4" fill="#ffffff"/>
+        <rect x="6" y="7" width="1" height="1" fill="#000"/>
+        <rect x="9" y="7" width="1" height="1" fill="#000"/>
+        <rect x="4" y="10" width="8" height="5" fill="#0088ff"/>
+      </svg>
+      <h1 class="app-title">MATHQUEST</h1>
     </div>
-    <div id="nav-user-info" class="flex-row" style="display: none;">
-      <span id="nav-username"></span>
-      <div class="avatar-frame" style="width: 40px; height: 40px;"><img id="nav-avatar" src="" alt="?"></div>
-    </div>
+    <span style="font-size:18px; color:#8b949e;">v3.0 Retro Edition</span>
   </div>
 
-  <div id="main-container">
+  <div class="app-container">
 
-    <!-- MENU LATERAL (SÓ APARECE PÓS-LOGIN) -->
-    <div id="sidebar">
-      <!-- Menu do Aluno -->
-      <div id="menu-aluno">
-        <div class="menu-item active" onclick="loadScreen('aluno-home')">🤖 Home</div>
-        <div class="menu-item" onclick="loadScreen('aluno-prof-quizzes')">📝 Quizzes Professor</div>
-        <div class="menu-item" onclick="loadScreen('aluno-ranking')">🏆 Ranking</div>
-        <div class="menu-item" onclick="loadScreen('aluno-perfil')">⚙️ Editar Perfil</div>
-      </div>
-      <!-- Menu do Professor -->
-      <div id="menu-professor" style="display: none;">
-        <div class="menu-itemactive" onclick="loadScreen('prof-home')">🎮 Home Professor</div>
-        <div class="menu-item" onclick="loadScreen('prof-create-quiz')">➕ Criar Quiz Forms</div>
-        <div class="menu-item" onclick="loadScreen('prof-my-quizzes')">📚 Meus Quizzes</div>
-        <div class="menu-item" onclick="loadScreen('prof-students-panel')">👥 Painel Alunos</div>
-        <div class="menu-item" onclick="loadScreen('prof-ranking')">🏆 Ranking</div>
-      </div>
-      <button class="btn-borderbtn-rosa" onclick="logout()" style="margin-top: 20px;">SAIR (EXIT)</button>
-    </div>
-
-    <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
-    <div id="content-area">
-
-      <!-- =========================== -->
-      <!-- TELA 1: LOGIN / CADASTRO    -->
-      <!-- =========================== -->
-      <div id="screen-login" class="screen active">
-        <div class="card" style="text-align: center; max-width: 500px; margin: 0 auto;">
-          <h1 class="card-header">PRESS START</h1>
-          <div class="icon-robot" style="width: 64px; height: 64px; margin: 10px auto;"></div>
-          
-          <div id="login-aluno-fields">
-            <label>DIGITE SEU NICKNAME RETRÔ:</label>
-            <input type="text" id="login-username" placeholder="MathGamer_123">
-          </div>
-
-          <div id="login-prof-fields" style="display: none;">
-            <label>SENHA MASTER DO PROFESSOR:</label>
-            <input type="password" id="login-prof-pass" placeholder="••••••">
-          </div>
-
-          <button id="btn-login-main" onclick="handleLogin()">ENTRAR (CONFIRM)</button>
-          
-          <div style="margin-top: 15px; font-size: 18px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-            <span id="login-toggle-text">É Professor?</span> 
-            <span class="btn-borderRosa" style="cursor: pointer; color: var(--user-theme-color); font-weight: bold;" onclick="toggleLoginType()">CLIQUE AQUI</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- =========================== -->
-      <!-- TELAS DO ALUNO              -->
-      <!-- =========================== -->
+    <!-- TELA 1: REGISTRO DO ALUNO -->
+    <div id="screen-login" class="screen active">
+      <h2 style="margin-top:0; text-align:center; color: var(--user-theme-color);">🎮 PRESS START - REGISTRO DE JOGADOR</h2>
       
-      <!-- Home Aluno -->
-      <div id="screen-aluno-home" class="screen">
-        <div class="card">
-          <h2 class="card-header">BEM-VINDO, PLAYER</h2>
-          <div class="flex-row profile-card" style="background: #111; padding: 15px; border-radius: 8px;">
-            <div class="avatar-frame"><img id="aluno-home-avatar" src="" alt="?"></div>
-            <div>
-              <div id="aluno-home-name" style="font-size: 28px; color: var(--user-theme-color);"></div>
-              <div style="font-size: 24px; color: var(--accent-color);">PONTOS: <span id="aluno-home-score">0</span> XP</div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <h3 class="card-header">AVISOS DO SISTEMA</h3>
-          <p>Selecione uma opção no menu lateral para começar a jogar ou ver o ranking!</p>
-        </div>
-      </div>
+      <label>Seu Nickname / Apelido:</label>
+      <input type="text" id="player-name" placeholder="Ex: MathMaster99">
 
-      <!-- Quizzes do Professor -->
-      <div id="screen-aluno-prof-quizzes" class="screen">
-        <div class="card">
-          <h2 class="card-header">QUIZZES ENVIADOS PELO PROFESSOR</h2>
-          <div id="aluno-quizzes-list">
-            <!-- Gerado via JS -->
-            Caminhando pelos servidores...
-          </div>
-        </div>
-      </div>
+      <label>Escolha a Cor do Seu Perfil:</label>
+      <input type="color" id="player-color" value="#00ff66">
 
-      <!-- Área de Execução do Quiz (Forms Style) -->
-      <div id="screen-aluno-play-quiz" class="screen">
-        <div class="card">
-          <div class="flex-row" style="justify-content: space-between;">
-            <h2 id="play-quiz-title" class="card-header">QUIZ</h2>
-            <div class="icon-robot"></div>
-          </div>
-          <p id="play-quiz-desc"></p>
-        </div>
-        
-        <div id="play-quiz-questions-area">
-          <!-- Perguntas estilo Forms geradas aqui -->
-        </div>
+      <label>Foto ou Avatar do Jogador:</label>
+      <input type="file" id="player-photo" accept="image/*">
+      <img id="preview-img" class="avatar-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='65' height='65' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23161b22'/><rect x='4' y='3' width='8' height='6' fill='%2300ff66'/><rect x='3' y='9' width='10' height='6' fill='%23ff0055'/></svg>" alt="Avatar Pixel">
 
-        <div class="card">
-          <button id="btn-submit-quiz" class="btn-rosa" onclick="submitQuizAnswers()">ENVIAR RESPOSTAS (FINISH)</button>
-        </div>
-      </div>
-
-      <!-- Resultado do Quiz -->
-      <div id="screen-aluno-quiz-result" class="screen">
-        <div class="card" style="text-align: center;">
-          <h2 class="card-header">QUIZ CONCLUÍDO</h2>
-          <div id="quiz-result-icon" style="font-size: 60px; margin: 20px 0;">🎉</div>
-          <div style="font-size: 32px; color: var(--user-theme-color);">VOCÊ ACERTOU <span id="quiz-result-hits">0</span> / <span id="quiz-result-total">0</span></div>
-          <div style="font-size: 24px;">GANHOU <span id="quiz-result-xp" color: var(--accent-color);>0</span> XP!</div>
-          <button onclick="loadScreen('aluno-home')">VOLTAR À HOME</button>
-        </div>
-      </div>
-
-      <!-- Ranking Aluno -->
-      <div id="screen-aluno-ranking" class="screen">
-        <div class="card">
-          <h2 class="card-header">🏆 TOP PLAYERS - REAL TIME</h2>
-          <table id="aluno-ranking-table">
-            <thead>
-              <tr>
-                <th>POS</th>
-                <th>AVATAR</th>
-                <th>NICKNAME</th>
-                <th>PONTOS XP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Dados Firebase -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Editar Perfil Aluno -->
-      <div id="screen-aluno-perfil" class="screen">
-        <div class="card">
-          <h2 class="card-header">EDITOR DE PERFIL</h2>
-          <div class="flex-row" style="margin-bottom: 20px;">
-            <div class="avatar-frame"><img id="aluno-perfil-avatar-preview" src="" alt="?"></div>
-            <button class="btn-borderbtn-rosa" onclick="generateNewPixelAvatar()">GERAR NOVO AVATAR PIXEL</button>
-          </div>
-          <label>NICKNAME (Para o Ranking):</label>
-          <input type="text" id="aluno-perfil-name" disabled>
-          <label>COR DO TEMA (Verde Neon Padrão):</label>
-          <input type="color" id="aluno-perfil-color" value="#00ff66">
-          <button onclick="saveAlunoPerfil()">SALVAR ALTERAÇÕES (SAVE)</button>
-        </div>
-      </div>
-
-      <!-- =========================== -->
-      <!-- TELAS DO PROFESSOR          -->
-      <!-- =========================== -->
-
-      <!-- Home Professor -->
-      <div id="screen-prof-home" class="screen">
-        <div class="card">
-          <h2 class="card-header">PAINEL MASTER DO PROFESSOR</h2>
-          <div class="flex-row">
-            <div class="icon-robot" style="width: 48px; height: 48px;"></div>
-            <div>Bem-vindo ao centro de controle, Professor!</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Criar Quiz (Google Forms Style) -->
-      <div id="screen-prof-create-quiz" class="screen">
-        <div class="card">
-          <h2 class="card-header">CRIAR NOVO QUIZ (FORMS PIXEL)</h2>
-          <label>TÍTULO DO QUIZ:</label>
-          <input type="text" id="prof-new-quiz-title" placeholder="Ex: Avaliação de Álgebra - 8º Ano">
-          <label>DESCRIÇÃO/INSTRUÇÕES:</label>
-          <textarea id="prof-new-quiz-desc" rows="2" placeholder="Responda com atenção..."></textarea>
-          <label>ÁREA DA MATEMÁTICA:</label>
-          <select id="prof-new-quiz-area"></select>
-        </div>
-
-        <div id="prof-questions-builder-area">
-          <!-- As questões adicionadas aparecem aqui -->
-        </div>
-
-        <div class="card" style="border-style: dashed; text-align: center;">
-          <h3 style="margin-top: 0; color: var(--accent-color);">ADICIONAR PERGUNTA (ADD)</h3>
-          <div class="flex-row" style="justify-content: center;">
-            <button class="btn-borderBtn-rosa" style="width: auto;" onclick="addQuestionToBuilder('mc')">+ Múltipla Escolha</button>
-            <button class="btn-borderBtn-rosa" style="width: auto;" onclick="addQuestionToBuilder('tf')">+ Verdadeiro/Falso</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <button class="btn-rosa" onclick="finishAndPublishQuiz()">FINALIZAR E PUBLICAR QUIZ (PUBLISH)</button>
-        </div>
-      </div>
-
-      <!-- Alunos Online e Cadastro (Firebase Realtime + Logs) -->
-      <div id="screen-prof-students-panel" class="screen">
-        <div class="card">
-          <h2 class="card-header">ALUNOS ONLINE AGORA (REAL TIME)</h2>
-          <div class="flex-row" style="flex-wrap: wrap;" id="prof-online-list">
-            <!-- Gerado via Firebase RT DB -->
-          </div>
-        </div>
-        
-        <div class="card">
-          <h2 class="card-header">CADASTRO E LOGS DE ACESSO (ALL STUDENTS)</h2>
-          <table id="prof-all-students-table">
-            <thead>
-              <tr>
-                <th>AVATAR</th>
-                <th>NICKNAME</th>
-                <th>STATUS RT</th>
-                <th>ÚLTIMO LOGIN</th>
-                <th>ÚLTIMO LOGOUT</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Dados do FirebaseRT DB -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Ranking Professor (Igual Aluno mas no painel Prof) -->
-      <div id="screen-prof-ranking" class="screen">
-        <div class="card">
-          <h2 class="card-header">🏆 RANKING GERAL (PROFESSOR VIEW)</h2>
-          <table id="prof-ranking-table">
-            <thead>
-              <tr>
-                <th>POS</th>
-                <th>NICKNAME</th>
-                <th>PONTOS XP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Dados Firebase RT -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+      <button onclick="registerStudent()">SALVAR E ENTRAR NO JOGO</button>
+      <button class="btn-secondary" onclick="showScreen('screen-prof-login')">🔒 Área do Professor</button>
     </div>
+
+    <!-- TELA 2: LOGIN DO PROFESSOR -->
+    <div id="screen-prof-login" class="screen">
+      <h2 style="margin-top:0; color: var(--user-theme-color);">🔑 ACESSO DOCENTE</h2>
+      <label>Senha de Acesso do Professor:</label>
+      <input type="password" id="prof-pass" placeholder="Digite a senha...">
+      <button onclick="loginProfessor()">ENTRAR NO PAINEL</button>
+      <button class="btn-secondary" onclick="showScreen('screen-login')">VOLTAR</button>
+    </div>
+
+    <!-- TELA 3: ÁREA DO ALUNO -->
+    <div id="screen-student-dash" class="screen">
+      <div class="profile-card">
+        <img id="student-display-photo" src="" alt="Perfil">
+        <div>
+          <span style="font-size: 18px; color: #8b949e;">JOGADOR ATIVO</span>
+          <h2 id="student-display-name" style="margin: 0; color: var(--user-theme-color);"></h2>
+          <span id="student-score-display" style="font-size: 22px; font-weight: bold; color: #ff0055;">0 PTS</span>
+        </div>
+      </div>
+
+      <h2 style="margin: 10px 0 0 0; color: var(--user-theme-color);">📚 LISTA DE ÁREAS DA MATEMÁTICA:</h2>
+      <p style="margin: 0 0 10px 0; font-size:18px; color:#8b949e;">Clique em uma área para abrir o quiz correspondente!</p>
+      
+      <div id="area-grid-container" class="area-grid"></div>
+
+      <button class="btn-secondary" onclick="logoutStudent()" style="margin-top: 20px;">Trocar de Perfil / Sair</button>
+
+      <h3 style="margin-top: 25px; color: var(--user-theme-color);">🏆 RANKING GERAL DE JOGADORES</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>POS</th>
+              <th>JOGADOR</th>
+              <th>PONTOS</th>
+            </tr>
+          </thead>
+          <tbody id="ranking-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA 4: QUIZ E RESOLUÇÃO -->
+    <div id="screen-quiz" class="screen">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span id="quiz-area-badge" style="color: var(--user-theme-color); font-size:22px;"></span>
+        <span id="quiz-counter-badge" style="color: #8b949e; font-size:20px;"></span>
+      </div>
+
+      <h3 id="quiz-question-title" style="font-size: 26px; margin: 15px 0;"></h3>
+      
+      <div id="quiz-options-container"></div>
+
+      <div id="quiz-feedback" style="display:none;">
+        <div id="feedback-badge" class="badge-status"></div>
+        
+        <div class="explanation-box">
+          <strong style="color:var(--user-theme-color);">📖 EXPLICAÇÃO E RESOLUÇÃO PASSO A PASSO:</strong>
+          <p id="feedback-explanation" style="margin: 10px 0 0 0; white-space: pre-line;"></p>
+        </div>
+
+        <button id="next-question-btn" onclick="nextQuestionInQuiz()" style="margin-top: 15px;">PRÓXIMA PERGUNTA ➔</button>
+      </div>
+    </div>
+
+    <!-- TELA 5: PAINEL DO PROFESSOR (CRIAÇÃO ILIMITADA) -->
+    <div id="screen-prof-dash" class="screen">
+      <h2 style="margin-top:0; color: var(--user-theme-color);">🛠️ PAINEL DE CRIAÇÃO E IDENTIFICAÇÃO DE QUIZ</h2>
+      <p style="font-size: 18px; color: #8b949e;">Envie quantas questões quiser para qualquer área. Elas serão salvas no banco de dados.</p>
+
+      <label>1. Identificação da Área / Tema do Quiz:</label>
+      <select id="new-q-area"></select>
+
+      <label>2. Tipo de Questão:</label>
+      <select id="new-q-type" onchange="toggleQuestionTypeUI()">
+        <option value="multiple">Múltipla Escolha (4 Opções)</option>
+        <option value="tf">Verdadeiro ou Falso (V / F)</option>
+      </select>
+
+      <label>3. Enunciado / Pergunta:</label>
+      <textarea id="new-q-title" rows="2" placeholder="Digite a pergunta do quiz..."></textarea>
+
+      <div id="ui-multiple-options">
+        <label>Opção A (CORRETA):</label>
+        <input type="text" id="new-q-opt-correct" placeholder="Resposta correta...">
+
+        <label>Opção B (Incorreta):</label>
+        <input type="text" id="new-q-opt2" placeholder="Alternativa incorreta 1...">
+
+        <label>Opção C (Incorreta):</label>
+        <input type="text" id="new-q-opt3" placeholder="Alternativa incorreta 2...">
+
+        <label>Opção D (Incorreta):</label>
+        <input type="text" id="new-q-opt4" placeholder="Alternativa incorreta 3...">
+      </div>
+
+      <div id="ui-tf-options" style="display:none;">
+        <label>Resposta Correta para V/F:</label>
+        <select id="new-q-tf-correct">
+          <option value="Verdadeiro">Verdadeiro</option>
+          <option value="Falso">Falso</option>
+        </select>
+      </div>
+
+      <label>4. Explicação / Passo a Passo (Opcional):</label>
+      <textarea id="new-q-explanation" rows="2" placeholder="Digite a explicação da resposta..."></textarea>
+
+      <button onclick="sendQuizToFirebase()">ENVIAR QUIZ PARA A ÁREA DOS ALUNOS 🚀</button>
+      <button class="btn-secondary" onclick="showScreen('screen-login')">SAIR DO PAINEL</button>
+    </div>
+
   </div>
 
   <script>
-    // ==========================================
-    // 1. CONFIGURAÇÃO FIREBASE (REAL TIME RT DB)
-    // ==========================================
     const firebaseConfig = {
-      apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk", // Chave fornecida
+      apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
       authDomain: "mathques.firebaseapp.com",
-      databaseURL: "https://mathques-default-rtdb.firebaseio.com", // Base RT DB
+      databaseURL: "https://mathques-default-rtdb.firebaseio.com",
       projectId: "mathques",
       storageBucket: "mathques.firebasestorage.app",
       messagingSenderId: "413245852392",
-      appId: "1:413245852392:web:fd9affbddda2f34eed975d"
+      appId: "1:413245852392:web:fd9affbddda2f34eed975d",
+      measurementId: "G-NJ9D8QV749"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 2. CONSTANTES E ESTADO DO APP
-    const PROF_PASS_HASH = "professor123"; // Senha simples para demo
-    const XP_PER_HIT = 10;
-    const areasMatematica = ["Aritmética", "Álgebra", "Geometria", "Estatística", "Financeira", "Trigonometria", "Lógica"];
+    const areasMatematica = [
+      "Álgebra", "Aritmética Básica", "Geometria Plana", "Geometria Espacial",
+      "Geometria Analítica", "Trigonometria", "Estatística", "Probabilidade",
+      "Cálculo Diferencial", "Cálculo Integral", "Matemática Financeira", "Raciocínio Lógico",
+      "Teoria dos Números", "Equações do 1º e 2º Grau", "Porcentagem e Proporção",
+      "Matrizes e Determinantes", "Funções Matemáticas", "Análise Combinatória",
+      "Progressão Aritmética (PA)", "Progressão Geométrica (PG)"
+    ];
 
-    let appState = {
-      isProfessor: false,
-      userRef: null, // Referência no RT DB p/ User online
-      quizBuilder: [], // Questões sendo criadas pelo professor
-      currentPlayingQuiz: null // Quiz que o aluno está fazendo
+    // BANCO PRÉ-CARREGADO COM EXACTAMENTE 10 PERGUNTAS COMPLETAS POR ÁREA
+    const defaultQuizzesDatabase = {
+      "Álgebra": [
+        { title: "1. Resolva 3x + 15 = 45.", options: ["x = 10", "x = 15", "x = 8", "x = 12"], correct: "x = 10", explanation: "3x = 45 - 15 => 3x = 30 => x = 10." },
+        { title: "2. Na equação 2x - 8 = 10, o valor de x é 9.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "2x = 18 => x = 9." },
+        { title: "3. Fatore x² - 9.", options: ["(x - 3)(x + 3)", "(x - 3)²", "(x + 3)²", "x(x - 9)"], correct: "(x - 3)(x + 3)", explanation: "Diferença de quadrados: a² - b² = (a - b)(a + b)." },
+        { title: "4. Qual é o valor de x em 5x = 35?", options: ["x = 7", "x = 6", "x = 5", "x = 8"], correct: "x = 7", explanation: "x = 35 / 5 = 7." },
+        { title: "5. A expressão (a + b)² é igual a a² + 2ab + b².", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Trinômio quadrado perfeito." },
+        { title: "6. Simplifique a expressão 4x + 2x - 3x.", options: ["3x", "4x", "2x", "5x"], correct: "3x", explanation: "(4 + 2 - 3)x = 3x." },
+        { title: "7. Se x = 4, qual o valor de 2x²?", options: ["32", "16", "64", "24"], correct: "32", explanation: "2 * (4)² = 2 * 16 = 32." },
+        { title: "8. O grau do polinômio P(x) = x³ + 2x² - 5 é 3.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "O maior expoente da variável é 3." },
+        { title: "9. Resolva x / 4 = 12.", options: ["x = 48", "x = 3", "x = 16", "x = 36"], correct: "x = 48", explanation: "x = 12 * 4 = 48." },
+        { title: "10. Qual a solução de -2x = -14?", options: ["x = 7", "x = -7", "x = 12", "x = -12"], correct: "x = 7", explanation: "x = -14 / -2 = 7." }
+      ],
+      "Aritmética Básica": [
+        { title: "1. Quanto é 12 × 8?", options: ["96", "84", "108", "92"], correct: "96", explanation: "Multiplicação direta: 12 * 8 = 96." },
+        { title: "2. O número 17 é primo.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "17 só possui dois divisores: 1 e 17." },
+        { title: "3. Qual é o MMC entre 4 e 6?", options: ["12", "24", "10", "8"], correct: "12", explanation: "Múltiplos comuns: 12 é o menor divisor comum." },
+        { title: "4. Quanto é 144 / 12?", options: ["12", "14", "10", "11"], correct: "12", explanation: "12 * 12 = 144." },
+        { title: "5. O resultado de 5 + 3 × 2 é 16.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Multiplicação primeiro: 3 * 2 = 6; 5 + 6 = 11." },
+        { title: "6. Qual o MDC de 18 e 24?", options: ["6", "12", "3", "8"], correct: "6", explanation: "Maior divisor que divide ambos os números é 6." },
+        { title: "7. Quanto é 7³?", options: ["343", "49", "21", "243"], correct: "343", explanation: "7 * 7 * 7 = 343." },
+        { title: "8. A raiz quadrada de 81 é 9.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "9 * 9 = 81." },
+        { title: "9. Qual é o valor de 15% de 200?", options: ["30", "20", "15", "40"], correct: "30", explanation: "0.15 * 200 = 30." },
+        { title: "10. Quanto é 1000 - 457?", options: ["543", "553", "547", "643"], correct: "543", explanation: "1000 - 457 = 543." }
+      ],
+      "Geometria Plana": [
+        { title: "1. Área do triângulo (b=10, h=6):", options: ["30 cm²", "60 cm²", "15 cm²", "45 cm²"], correct: "30 cm²", explanation: "(10 * 6) / 2 = 30." },
+        { title: "2. A soma dos ângulos internos de um triângulo é 180°.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra fundamental dos triângulos." },
+        { title: "3. Perímetro de um quadrado com lado 5 cm:", options: ["20 cm", "25 cm", "10 cm", "15 cm"], correct: "20 cm", explanation: "4 * 5 = 20 cm." },
+        { title: "4. Área de um círculo de raio 3 cm (considere π=3):", options: ["27 cm²", "18 cm²", "9 cm²", "36 cm²"], correct: "27 cm²", explanation: "π * r² = 3 * 9 = 27." },
+        { title: "5. Um hexágono regular possui 6 lados iguais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de hexágono." },
+        { title: "6. Qual a área de um retângulo de 8m por 4m?", options: ["32 m²", "24 m²", "16 m²", "64 m²"], correct: "32 m²", explanation: "8 * 4 = 32." },
+        { title: "7. Um triângulo equilátero tem todos os lados iguais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de equilátero." },
+        { title: "8. Quantas diagonais tem um quadrado?", options: ["2", "4", "1", "0"], correct: "2", explanation: "Um quadrilátero tem 2 diagonais." },
+        { title: "9. A soma dos ângulos internos de um quadrilátero é:", options: ["360°", "180°", "540°", "720°"], correct: "360°", explanation: "(4-2)*180 = 360°." },
+        { title: "10. Um ângulo de 90° é chamado de:", options: ["Ângulo Reto", "Ângulo Agudo", "Ângulo Obtuso", "Ângulo Raso"], correct: "Ângulo Reto", explanation: "Definição de ângulo reto." }
+      ],
+      "Geometria Espacial": [
+        { title: "1. Volume de um cubo de lado 3cm:", options: ["27 cm³", "9 cm³", "18 cm³", "36 cm³"], correct: "27 cm³", explanation: "V = L³ = 3³ = 27." },
+        { title: "2. Uma esfera possui vértices.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Superfície curva contínua sem vértices." },
+        { title: "3. Quantas faces tem um paralelepípedo?", options: ["6", "8", "12", "4"], correct: "6", explanation: "Possui 6 faces retangulares." },
+        { title: "4. Um cilindro possui 2 bases circulares.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Bases superior e inferior circulares." },
+        { title: "5. Volume de um paralelepípedo (2x3x4):", options: ["24 cm³", "12 cm³", "18 cm³", "48 cm³"], correct: "24 cm³", explanation: "2 * 3 * 4 = 24." },
+        { title: "6. Quantos vértices tem um cubo?", options: ["8", "6", "12", "16"], correct: "8", explanation: "Um cubo possui 8 vértices." },
+        { title: "7. Uma pirâmide de base quadrada tem 5 vértices.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "4 na base e 1 no topo." },
+        { title: "8. Quantas arestas tem um cubo?", options: ["12", "8", "6", "10"], correct: "12", explanation: "Um cubo possui 12 arestas." },
+        { title: "9. Fórmula do volume do cilindro:", options: ["π * r² * h", "2 * π * r", "π * r * h", "4/3 * π * r³"], correct: "π * r² * h", explanation: "Área da base × altura." },
+        { title: "10. Um cone tem base circular.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Base circular com um vértice no topo." }
+      ],
+      "Geometria Analítica": [
+        { title: "1. Distância entre os pontos (0,0) e (3,4):", options: ["5", "7", "1", "25"], correct: "5", explanation: "√(3² + 4²) = √(9+16) = 5." },
+        { title: "2. O ponto (0,0) é a origem do plano cartesiano.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Cruzamento dos eixos X e Y." },
+        { title: "3. Coeficiente angular de y = 2x + 3:", options: ["2", "3", "-2", "1"], correct: "2", explanation: "O termo 'm' em y = mx + b é 2." },
+        { title: "4. O ponto (2, -3) fica no 4º quadrante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "X positivo e Y negativo fica no 4º quadrante." },
+        { title: "5. Ponto médio entre (2,4) e (6,8):", options: ["(4,6)", "(3,5)", "(4,4)", "(8,12)"], correct: "(4,6)", explanation: "((2+6)/2, (4+8)/2) = (4,6)." },
+        { title: "6. Equação da reta paralela ao eixo X:", options: ["y = k", "x = k", "y = x", "y = -x"], correct: "y = k", explanation: "Mantém valor constante em Y." },
+        { title: "7. Duas retas são perpendiculares se m1 * m2 = -1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Condição de perpendicularidade." },
+        { title: "8. A equação x² + y² = 9 representa uma circunferência.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Circunferência centrada na origem com raio 3." },
+        { title: "9. Raio da circunferência x² + y² = 16:", options: ["4", "16", "8", "2"], correct: "4", explanation: "√16 = 4." },
+        { title: "10. No ponto (5,2), o valor das abcissas é 5.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "X = Abcissa = 5." }
+      ],
+      "Trigonometria": [
+        { title: "1. Seno de 30° é equal a:", options: ["0.5", "1", "0", "0.866"], correct: "0.5", explanation: "sen(30°) = 1/2 = 0.5." },
+        { title: "2. cos²(x) + sen²(x) = 1 é a relação fundamental.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Identidade trigonométrica fundamental." },
+        { title: "3. Tangente de 45° é:", options: ["1", "0", "0.5", "√3"], correct: "1", explanation: "sen(45°)/cos(45°) = 1." },
+        { title: "4. O cosseno de 0° é 0.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "cos(0°) = 1." },
+        { title: "5. Em um triângulo retângulo, sen(X) é:", options: ["Cateto Oposto / Hipotenusa", "Cateto Adj / Hipotenusa", "Cateto Op / Cateto Adj", "Hipotenusa / Cateto Op"], correct: "Cateto Oposto / Hipotenusa", explanation: "Definição de seno." },
+        { title: "6. cosseno de 60° é:", options: ["0.5", "0.866", "1", "0"], correct: "0.5", explanation: "cos(60°) = 1/2 = 0.5." },
+        { title: "7. A conversão de 180° em radianos é π rad.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "180° equivale a π radianos." },
+        { title: "8. Secante é o inverso do cosseno.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "sec(x) = 1/cos(x)." },
+        { title: "9. Tangente é igual a Cateto Oposto / Cateto Adjacente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de tangente." },
+        { title: "10. O valor de sen(90°) é:", options: ["1", "0", "-1", "0.5"], correct: "1", explanation: "sen(90°) = 1." }
+      ],
+      "Estatística": [
+        { title: "1. Média dos números 2, 4, 6, 8:", options: ["5", "6", "4", "20"], correct: "5", explanation: "(2+4+6+8)/4 = 20/4 = 5." },
+        { title: "2. Moda é o valor de maior frequência no conjunto.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Conceito estatístico de moda." },
+        { title: "3. Mediana de [1, 3, 5, 7, 9]:", options: ["5", "3", "7", "1"], correct: "5", explanation: "O valor central é 5." },
+        { title: "4. A amplitude é a diferença entre o maior e menor valor.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Maior elemento - menor elemento." },
+        { title: "5. Moda do conjunto [2, 3, 3, 5, 7]:", options: ["3", "2", "5", "7"], correct: "3", explanation: "Aparece 2 vezes." },
+        { title: "6. A média aritmética simples divide pelo total de elementos.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Soma / N." },
+        { title: "7. Variância mede a dispersão dos dados.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Média dos desvios ao quadrado." },
+        { title: "8. O desvio padrão é a raiz quadrada da variância.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de desvio padrão." },
+        { title: "9. Média de 10 e 20:", options: ["15", "10", "20", "30"], correct: "15", explanation: "(10+20)/2 = 15." },
+        { title: "10. Em um gráfico de setores, o total equivale a 360°.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Um círculo completo representa 100%." }
+      ],
+      "Probabilidade": [
+        { title: "1. Probabilidade de tirar cara ao lançar uma moeda:", options: ["50%", "25%", "100%", "75%"], correct: "50%", explanation: "1/2 = 50%." },
+        { title: "2. A probabilidade varia entre 0 e 1 (0% a 100%).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade dos eventos probilísticos." },
+        { title: "3. Probabilidade de tirar 6 em um dado comum:", options: ["1/6", "1/2", "1/3", "6/6"], correct: "1/6", explanation: "1 caso favorável em 6." },
+        { title: "4. Evento impossível tem probabilidade igual a 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "P = 0." },
+        { title: "5. Probabilidade de tirar número par em um dado:", options: ["50%", "30%", "60%", "16%"], correct: "50%", explanation: "3 pares / 6 lados = 50%." },
+        { title: "6. A soma de todas as probabilidades de um espaço amostral é 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Total é igual a 100% (1)." },
+        { title: "7. Em um baralho de 52 cartas, a chance de tirar um ás é 4/52.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Existem 4 ases em 52 cartas." },
+        { title: "8. Evento certo tem probabilidade 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "P = 100% (1)." },
+        { title: "9. Duas moedas juntas. Chance de duas caras:", options: ["1/4", "1/2", "3/4", "1/8"], correct: "1/4", explanation: "1/2 * 1/2 = 1/4." },
+        { title: "10. Probabilidade é Casos Favoráveis / Casos Possíveis.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Fórmula clássica de Laplace." }
+      ],
+      "Cálculo Diferencial": [
+        { title: "1. A derivada de f(x) = x² é:", options: ["2x", "x", "2", "x²"], correct: "2x", explanation: "Regra do tombo: 2 * x¹." },
+        { title: "2. A derivada de uma constante é igual a zero.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Taxa de variação constante é 0." },
+        { title: "3. Derivada de f(x) = 5x:", options: ["5", "x", "5x", "0"], correct: "5", explanation: "f'(x) = 5." },
+        { title: "4. A derivada mede a taxa de variação instantânea.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Inclinção da reta tangente." },
+        { title: "5. Derivada de f(x) = x³:", options: ["3x²", "x²", "3x", "x³"], correct: "3x²", explanation: "3 * x²." },
+        { title: "6. Derivada de e^x é igual a e^x.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade da função exponencial natural." },
+        { title: "7. Derivada de sen(x):", options: ["cos(x)", "-cos(x)", "sen(x)", "tan(x)"], correct: "cos(x)", explanation: "Derivada do seno." },
+        { title: "8. Ponto de máximo/mínimo ocorre onde f'(x) = 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Pontos críticos." },
+        { title: "9. Derivada de cos(x) é -sen(x).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Derivada de cosseno." },
+        { title: "10. Derivada de 4x³:", options: ["12x²", "4x²", "12x", "3x²"], correct: "12x²", explanation: "4 * 3x² = 12x²." }
+      ],
+      "Cálculo Integral": [
+        { title: "1. A integral indefinida de 2x dx é:", options: ["x² + C", "2x² + C", "x + C", "2 + C"], correct: "x² + C", explanation: "Antiderivada de 2x." },
+        { title: "2. O Teorema Fundamental do Cálculo conecta derivada e integral.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Operações inversas." },
+        { title: "3. Integral de 1 dx é:", options: ["x + C", "1 + C", "0", "x²"], correct: "x + C", explanation: "Antiderivada da constante 1." },
+        { title: "4. A integral definida representa a área sob uma curva.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Interpretação geométrica da integral." },
+        { title: "5. Integral de x dx:", options: ["x²/2 + C", "x² + C", "2x + C", "x + C"], correct: "x²/2 + C", explanation: "Regra da potência: x² / 2." },
+        { title: "6. A constante '+ C' é adicionada em integrais indefinidas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Representa a família de antiderivadas." },
+        { title: "7. Integral de e^x dx é e^x + C.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "A antiderivada de e^x é ela mesma." },
+        { title: "8. Integral de 0 dx:", options: ["C", "0", "x", "1"], correct: "C", explanation: "Derivada de uma constante é 0." },
+        { title: "9. Integral definida tem limites de integração.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Calculada entre limites [a, b]." },
+        { title: "10. Integral de cos(x) dx:", options: ["sen(x) + C", "-sen(x) + C", "cos(x) + C", "tan(x) + C"], correct: "sen(x) + C", explanation: "Derivada de sen(x) é cos(x)." }
+      ],
+      "Matemática Financeira": [
+        { title: "1. Fórmula dos Juros Simples:", options: ["J = C * i * t", "J = C * (1+i)^t", "J = C / i", "J = C + i"], correct: "J = C * i * t", explanation: "Capital * Taxa * Tempo." },
+        { title: "2. Nos Juros Compostos, os juros incidem sobre o montante acumulado.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Juros sobre juros." },
+        { title: "3. Capital R$ 1000, taxa 10% a.a. em 2 anos (Juros Simples):", options: ["R$ 200", "R$ 100", "R$ 210", "R$ 1200"], correct: "R$ 200", explanation: "1000 * 0.10 * 2 = 200." },
+        { title: "4. Montante (M) é a soma do Capital (C) com os Juros (J).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "M = C + J." },
+        { title: "5. Qual a taxa mensal equivalente a 12% ao ano em Juros Simples?", options: ["1%", "2%", "0.5%", "12%"], correct: "1%", explanation: "12% / 12 meses = 1%." },
+        { title: "6. Inflação reduz o poder de compra da moeda.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Conceito de economia e finanças." },
+        { title: "7. O que significa a sigla CBD no mercado financeiro?", options: ["Certificado de Depósito Bancário", "Crédito Direto Bancário", "Conta Digital Bancária", "Caixa Direta de Bônus"], correct: "Certificado de Depósito Bancário", explanation: "Título de renda fixa." },
+        { title: "8. A taxa SELIC é a taxa básica de juros da economia brasileira.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definida pelo COPOM." },
+        { title: "9. Lucro é calculado por Receita total - Custo total.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "L = R - C." },
+        { title: "10. Um desconto sucessivo de 10% e 10% é igual a 20%.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Equivale a um desconto real de 19%." }
+      ],
+      "Raciocínio Lógico": [
+        { title: "1. Se todo A é B, e todo B é C, então todo A é C.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Silogismo válido." },
+        { title: "2. A negação de 'Tudo é preto' é 'Nada é preto'.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "A negação correta é 'Pelo menos algo não é preto'." },
+        { title: "3. Qual número completa a sequência: 2, 4, 8, 16, __?", options: ["32", "24", "20", "64"], correct: "32", explanation: "Multiplica por 2 a cada passo." },
+        { title: "4. Na tabela verdade, A ∧ B só é V se ambos forem V.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Operador lógico E (conjunção)." },
+        { title: "5. Se amanhã chover, irei ao cinema. Hoje não choveu. Logo:", options: ["Nada se conclui sobre hoje", "Fui ao cinema", "Não fui ao cinema", "Choveu ontem"], correct: "Nada se conclui sobre hoje", explanation: "A premissa é sobre o dia de amanhã." },
+        { title: "6. Operador 'OU' (disjunção) é Falso apenas se ambos forem Falsos.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade da disjunção." },
+        { title: "7. Próximo elemento: 1, 1, 2, 3, 5, 8, __?", options: ["13", "11", "10", "12"], correct: "13", explanation: "Sequência de Fibonacci (5+8=13)." },
+        { title: "8. Uma proposição pode ser verdadeira e falsa ao mesmo tempo.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Princípio da não-contradição." },
+        { title: "9. A negação de p → q é p ∧ ~q.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra da negação da condicional." },
+        { title: "10. Se P é V e Q é F, a condicional P → Q é Falsa.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "V → F resulta em Falso." }
+      ],
+      "Teoria dos Números": [
+        { title: "1. O único número primo par é o 2.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Todos os outros pares são divisíveis por 2." },
+        { title: "2. Qual o menor número primo positivo?", options: ["2", "1", "0", "3"], correct: "2", explanation: "1 não é considerado primo." },
+        { title: "3. O número 15 é um número composto.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Divisível por 1, 3, 5 e 15." },
+        { title: "4. O número 0 é divisível por qualquer inteiro não nulo.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "0 / n = 0." },
+        { title: "5. Números coprimos têm MDC igual a 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de primos entre si." },
+        { title: "6. Quantos divisores positivos tem o número 6?", options: ["4", "2", "3", "6"], correct: "4", explanation: "Divisores: 1, 2, 3, 6." },
+        { title: "7. Um número é divisível por 3 se a soma de seus algarismos for múltipla de 3.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Critério de divisibilidade por 3." },
+        { title: "8. O número 1 é um número primo.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "1 tem apenas 1 divisor." },
+        { title: "9. Todo número terminado em 0 ou 5 é divisível por 5.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Critério de divisibilidade por 5." },
+        { title: "10. O produto de dois números ímpares é sempre um número:", options: ["Ímpar", "Par", "Primo", "Negativo"], correct: "Ímpar", explanation: "Ímpar * Ímpar = Ímpar." }
+      ],
+      "Equações do 1º e 2º Grau": [
+        { title: "1. Valor de Delta (Δ) na equação x² - 5x + 6 = 0:", options: ["1", "25", "24", "0"], correct: "1", explanation: "Δ = b² - 4ac = 25 - 24 = 1." },
+        { title: "2. Se Δ < 0, a equação do 2º grau não possui raízes reais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Raízes complexas." },
+        { title: "3. Raízes de x² - 5x + 6 = 0:", options: ["2 e 3", "1 e 6", "-2 e -3", "0 e 5"], correct: "2 e 3", explanation: "(x-2)(x-3) = 0." },
+        { title: "4. Fórmula de Bhaskara calcula raízes do 2º grau.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "x = (-b ± √Δ) / 2a." },
+        { title: "5. Solução de 4x - 8 = 0:", options: ["x = 2", "x = 4", "x = -2", "x = 0"], correct: "x = 2", explanation: "4x = 8 => x = 2." },
+        { title: "6. Se Δ = 0, a equação tem duas raízes reais e iguais.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Raiz dupla." },
+        { title: "7. Soma das raízes de x² - 7x + 10 = 0 (S = -b/a):", options: ["7", "-7", "10", "-10"], correct: "7", explanation: "S = -(-7)/1 = 7." },
+        { title: "8. Produto das raízes de x² - 7x + 10 = 0 (P = c/a):", options: ["10", "7", "-10", "1"], correct: "10", explanation: "P = 10/1 = 10." },
+        { title: "9. Equação incompleta x² - 9 = 0 tem raízes 3 e -3.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "x² = 9 => x = ±3." },
+        { title: "10. Resolva 2x + 5 = 15.", options: ["x = 5", "x = 10", "x = 2", "x = 7"], correct: "x = 5", explanation: "2x = 10 => x = 5." }
+      ],
+      "Porcentagem e Proporção": [
+        { title: "1. 20% de R$ 500 é igual a:", options: ["R$ 100", "R$ 50", "R$ 150", "R$ 200"], correct: "R$ 100", explanation: "0.20 * 500 = 100." },
+        { title: "2. Se 2 pedreiros fazem um muro em 4 dias, 4 pedreiros fazem em:", options: ["2 dias", "8 dias", "1 dia", "4 dias"], correct: "2 dias", explanation: "Regra de 3 inversamente proporcional." },
+        { title: "3. A fração 1/4 representa 25%.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "1 / 4 = 0.25 = 25%." },
+        { title: "4. Quanto é 50% de 50%?", options: ["25%", "50%", "10%", "100%"], correct: "25%", explanation: "0.5 * 0.5 = 0.25 = 25%." },
+        { title: "5. A razão entre 10 e 20 é 1/2.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "10/20 = 1/2." },
+        { title: "6. Aumento de 10% em um produto de R$ 80 resulta em:", options: ["R$ 88", "R$ 90", "R$ 82", "R$ 85"], correct: "R$ 88", explanation: "80 + 8 = 88." },
+        { title: "7. Proporção é a igualdade entre duas razões.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição matemática." },
+        { title: "8. 100% de um valor é o próprio valor.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "100/100 = 1." },
+        { title: "9. Se x/2 = 6/4, o valor de x é:", options: ["3", "4", "6", "2"], correct: "3", explanation: "4x = 12 => x = 3." },
+        { title: "10. Converter 0.05 em porcentagem:", options: ["5%", "50%", "0.5%", "500%"], correct: "5%", explanation: "0.05 * 100 = 5%." }
+      ],
+      "Matrizes e Determinantes": [
+        { title: "1. O determinante da matriz identidade de ordem 2 é 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Det(I) = 1." },
+        { title: "2. Determinante da matriz [[2,0],[0,3]]:", options: ["6", "5", "0", "1"], correct: "6", explanation: "2*3 - 0*0 = 6." },
+        { title: "3. Uma matriz 3x2 possui 3 linhas e 2 colunas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "M x N representa Linhas x Colunas." },
+        { title: "4. Matriz transposta troca linhas por colunas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de matriz transposta." },
+        { title: "5. Determinante da matriz [[1,2],[3,4]]:", options: ["-2", "2", "10", "4"], correct: "-2", explanation: "1*4 - 2*3 = 4 - 6 = -2." },
+        { title: "6. Matriz quadrada tem o mesmo número de linhas e colunas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Linhas = Colunas." },
+        { title: "7. Matriz nula tem todos os elementos iguais a 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de matriz nula." },
+        { title: "8. Só é possível somar matrizes de mesma dimensão.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra para adição de matrizes." },
+        { title: "9. Na matriz identidade, os elementos fora da diagonal principal são 0.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Propriedade da matriz identidade." },
+        { title: "10. Se Det(A) = 0, a matriz A não possui inversa.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Matriz não invertível (singular)." }
+      ],
+      "Funções Matemáticas": [
+        { title: "1. O gráfico de uma função do 1º grau é uma reta.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "f(x) = ax + b representa uma reta." },
+        { title: "2. O gráfico de f(x) = x² é uma parábola.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Função quadrática gera parábola." },
+        { title: "3. Se f(x) = 2x + 1, qual o valor de f(3)?", options: ["7", "6", "8", "5"], correct: "7", explanation: "f(3) = 2*3 + 1 = 7." },
+        { title: "4. O domínio é o conjunto de valores de entrada (x).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de domínio." },
+        { title: "5. Em f(x) = -x² + 4, a parábola tem concavidade para baixo.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Coeficiente 'a' negativo." },
+        { title: "6. Função injetora associa elementos distintos a imagens distintas.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de injeção." },
+        { title: "7. Raiz da função f(x) = 3x - 9:", options: ["3", "9", "-3", "0"], correct: "3", explanation: "3x - 9 = 0 => x = 3." },
+        { title: "8. A função f(x) = 2^x é uma função exponencial.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Variável no expoente." },
+        { title: "9. Se f(x) = x³, f(-2) é equal a:", options: ["-8", "8", "-6", "4"], correct: "-8", explanation: "(-2)³ = -8." },
+        { title: "10. Imagem é o conjunto dos valores de saída (y).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de conjunto imagem." }
+      ],
+      "Análise Combinatória": [
+        { title: "1. Quanto é 4! (fatorial de 4)?", options: ["24", "12", "16", "10"], correct: "24", explanation: "4 * 3 * 2 * 1 = 24." },
+        { title: "2. O valor de 0! é igual a 1.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Por definição, 0! = 1." },
+        { title: "3. Quantos arranjos simples de 3 elementos tomados 2 a 2 (A3,2)?", options: ["6", "3", "9", "2"], correct: "6", explanation: "3 * 2 = 6." },
+        { title: "4. Em combinações simples, a ordem dos elementos importa.", options: ["Verdadeiro", "Falso"], correct: "Falso", explanation: "Na combinação a ordem NÃO importa." },
+        { title: "5. De quantas maneiras 3 pessoas podem se sentar em uma fila?", options: ["6", "3", "9", "12"], correct: "6", explanation: "P3 = 3! = 6." },
+        { title: "6. O valor de 5! é 120.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "5 * 4 * 3 * 2 * 1 = 120." },
+        { title: "7. Permutação de n elementos é dada por n!.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Pn = n!." },
+        { title: "8. Quantas comissões de 2 pessoas formamos com 4 candidatos?", options: ["6", "12", "8", "4"], correct: "6", explanation: "C(4,2) = (4*3)/2 = 6." },
+        { title: "9. O Princípio Fundamental da Contagem multiplica as opções.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Regra do produto." },
+        { title: "10. Quanto é 3! + 2!?", options: ["8", "12", "5", "10"], correct: "8", explanation: "6 + 2 = 8." }
+      ],
+      "Progressão Aritmética (PA)": [
+        { title: "1. Razão da PA (2, 5, 8, 11...):", options: ["3", "2", "5", "4"], correct: "3", explanation: "5 - 2 = 3." },
+        { title: "2. Em uma PA, a diferença entre termos consecutivos é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de PA." },
+        { title: "3. 10º termo da PA (1, 3, 5, 7...):", options: ["19", "20", "21", "18"], correct: "19", explanation: "a10 = 1 + 9*2 = 19." },
+        { title: "4. Fórmula do termo geral da PA é an = a1 + (n-1)*r.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Fórmula padrão do termo geral." },
+        { title: "5. Se a1 = 5 e r = 4, o segundo termo é:", options: ["9", "20", "1", "10"], correct: "9", explanation: "5 + 4 = 9." },
+        { title: "6. Soma dos 3 primeiros termos da PA (2, 4, 6...):", options: ["12", "10", "14", "8"], correct: "12", explanation: "2 + 4 + 6 = 12." },
+        { title: "7. PA com razão negativa é chamada de decrescente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Termos diminuem." },
+        { title: "8. Se r = 0, a PA é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Todos os termos são iguais." },
+        { title: "9. Qual o 5º termo da PA (10, 20, 30...)?", options: ["50", "40", "60", "70"], correct: "50", explanation: "10 + 4*10 = 50." },
+        { title: "10. Fórmula da soma da PA: Sn = (a1 + an)*n / 2.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Soma de Gauss." }
+      ],
+      "Progressão Geométrica (PG)": [
+        { title: "1. Razão da PG (2, 6, 18, 54...):", options: ["3", "4", "2", "6"], correct: "3", explanation: "6 / 2 = 3." },
+        { title: "2. Em uma PG, a divisão entre termos consecutivos é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Definição de razão (q)." },
+        { title: "3. 4º termo da PG (1, 2, 4...):", options: ["8", "6", "16", "12"], correct: "8", explanation: "1 * 2³ = 8." },
+        { title: "4. Fórmula do termo geral da PG é an = a1 * q^(n-1).", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Fórmula padrão do termo geral." },
+        { title: "5. Se a1 = 3 e q = 2, o 3º termo é:", options: ["12", "6", "18", "24"], correct: "12", explanation: "3 * 2² = 12." },
+        { title: "6. PG com razão q > 1 e termos positivos é crescente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Termos aumentam." },
+        { title: "7. Produto dos termos de uma PG cresce exponencialmente.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Multiplicação sucessiva." },
+        { title: "8. Se q = 1, a PG é constante.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Termos são multiplicados por 1." },
+        { title: "9. Qual o 3º termo da PG (5, 15, 45...)?", options: ["45", "30", "135", "90"], correct: "45", explanation: "3º termo é 45." },
+        { title: "10. PG alternante ocorre quando a razão q é negativa.", options: ["Verdadeiro", "Falso"], correct: "Verdadeiro", explanation: "Sinais se alternam (+ e -)." }
+      ]
     };
 
-    // ==========================================
-    // 3. INICIALIZAÇÃO E NAVEGAÇÃO
-    // ==========================================
+    let currentUser = null;
+    let currentQuizList = [];
+    let currentQuizIndex = 0;
+
     window.addEventListener('DOMContentLoaded', () => {
       populateAreaSelects();
-      checkAuthAndLoad();
+      checkSavedProfile();
     });
 
-    function goToHome() {
-      if (!appState.userRef && !appState.isProfessor) loadScreen('login');
-      else loadScreen(appState.isProfessor ? 'prof-home' : 'aluno-home');
-    }
-
     function populateAreaSelects() {
-      const selectProf = document.getElementById('prof-new-quiz-area');
+      const selectProf = document.getElementById('new-q-area');
+      selectProf.innerHTML = '';
       areasMatematica.forEach(area => {
         let opt = document.createElement('option');
-        opt.value = area; opt.innerText = area;
+        opt.value = area;
+        opt.innerText = area;
         selectProf.appendChild(opt);
       });
     }
 
-    // ==========================================
-    // 4. SISTEMA DE LOGIN, AUTH E LOGS (RT)
-    // ==========================================
-    function toggleLoginType() {
-      const aFields = document.getElementById('login-aluno-fields');
-      const pFields = document.getElementById('login-prof-fields');
-      const toggleTxt = document.getElementById('login-toggle-text');
-      const btn = document.getElementById('btn-login-main');
-
-      if (aFields.style.display === 'none') {
-        aFields.style.display = 'block'; pFields.style.display = 'none';
-        toggleTxt.innerText = "É Professor?"; btn.innerText = "ENTRAR (CONFIRM)";
-      } else {
-        aFields.style.display = 'none'; pFields.style.display = 'block';
-        toggleTxt.innerText = "É Aluno?"; btn.innerText = "ACESSO MASTER";
+    function checkSavedProfile() {
+      const savedUser = localStorage.getItem('mathquest_student');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        applyUserTheme(currentUser.color);
+        updateStudentDashUI();
+        listenToRanking();
+        renderAreaCards();
+        showScreen('screen-student-dash');
       }
     }
 
-    function handleLogin() {
-      const isProfLog = document.getElementById('login-prof-fields').style.display === 'block';
-
-      if (isProfLog) {
-        // Login Professor
-        const pass = document.getElementById('login-prof-pass').value;
-        if (pass === PROF_PASS_HASH) {
-          appState.isProfessor = true;
-          appState.userRef = "prof_master";
-          localStorage.setItem('mq_auth', JSON.stringify({ isProf: true }));
-          showProfessorInterface();
-          loadScreen('prof-home');
-        } else { alert("SENHA INCORRETA!"); }
-      } else {
-        // Login/Cadastro Aluno
-        const nick = document.getElementById('login-username').value.trim();
-        if (!nick) return alert("DIGITE UM NICKNAME!");
-        
-        // RT DB: Verifica se aluno existe ou cria
-        db.ref('users/' + nick).once('value', snapshot => {
-          if (snapshot.exists()) {
-            // Login
-            loginAluno(nick, snapshot.val());
-          } else {
-            // Cadastro
-            const newAluno = {
-              username: nick,
-              avatar: generatePixelAvatarUrl(nick), // Gera um avatar pixel fixo baseado no nick
-              themeColor: "#00ff66",
-              score: 0,
-              createdAt: Date.now(),
-              loginCount: 0
-            };
-            db.ref('users/' + nick).set(newAluno).then(() => {
-              loginAluno(nick, newAluno);
-            });
-          }
-        });
-      }
-    }
-
-    function loginAluno(nick, userData) {
-      appState.isProfessor = false;
-      localStorage.setItem('mq_auth', JSON.stringify({ isProf: false, nick: nick }));
-      
-      // Estabelece referência de presença RT RT
-      appState.userRef = db.ref('status/' + nick);
-      
-      // Logs de Acesso RT RT
-      db.ref('users/' + nick).update({
-        lastLogin: Date.now(),
-        loginCount: (userData.loginCount || 0) + 1
-      });
-
-      // Configura presença Realtime (RT DB built-in .info/connected)
-      db.ref('.info/connected').on('value', snap => {
-        if (snap.val() === true) {
-          // Se conectar, define 'online' e configura p/ apagar no disconnect
-          appState.userRef.onDisconnect().update({ online: false, lastDisconnect: firebase.database.ServerValue.TIMESTAMP });
-          appState.userRef.update({ online: true, lastLogin: firebase.database.ServerValue.TIMESTAMP });
-        }
-      });
-
-      showAlunoInterface(nick, userData);
-      loadScreen('aluno-home');
-    }
-
-    function checkAuthAndLoad() {
-      const auth = localStorage.getItem('mq_auth');
-      if (!auth) return;
-      const authData = JSON.parse(auth);
-      
-      if (authData.isProf) {
-        appState.isProfessor = true;
-        showProfessorInterface();
-        loadScreen('prof-home');
-      } else if (authData.nick) {
-        db.ref('users/' + authData.nick).once('value', snapshot => {
-          if (snapshot.exists()) loginAluno(authData.nick, snapshot.val());
-        });
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('mq_auth');
-      if (appState.userRef && !appState.isProfessor) {
-        // Força logout manual RT RT
-        appState.userRef.update({ online: false, manualLogout: Date.now() });
-        appState.userRef.off(); // Remove listeners de presença
-      }
-      appState.isProfessor = false; appState.userRef = null;
-      location.reload();
-    }
-
-    // ==========================================
-    // 5. INTERFACES (ALUNO/PROF) E TELAS
-    // ==========================================
-    function loadScreen(screenId) {
-      // Navegação e Ativação do Menu
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      const target = document.getElementById('screen-' + screenId);
-      if (target) target.classList.add('active');
-
-      const prefix = appState.isProfessor ? 'prof-' : 'aluno-';
-      const menuId = screenId.replace(prefix, ''); // Pega o nome limpo do menu
-
-      document.querySelectorAll('#sidebar .menu-item').forEach(m => m.classList.remove('active'));
-      // Tenta achar e ativar o item do menu
-      const menuItem = [...document.querySelectorAll('#sidebar .menu-item')].find(m => m.getAttribute('onclick').includes(screenId));
-      if (menuItem) menuItem.classList.add('active');
-
-      // Gatilhos de carregamento de dados RT RT RT
-      if (screenId === 'aluno-prof-quizzes') listenToPublishedQuizzes();
-      if (screenId === 'aluno-ranking' || screenId === 'prof-ranking') listenToRankingRT();
-      if (screenId === 'aluno-perfil') loadPerfilEditor();
-      if (screenId === 'prof-students-panel') listenToStudentsPanelRT();
-    }
-
-    function showAlunoInterface(nick, userData) {
-      document.getElementById('sidebar').style.display = 'block';
-      document.getElementById('menu-aluno').style.display = 'block';
-      document.getElementById('menu-professor').style.display = 'none';
-      
-      const navInfo = document.getElementById('nav-user-info');
-      navInfo.style.display = 'flex';
-      document.getElementById('nav-username').innerText = nick;
-      document.getElementById('nav-avatar').src = userData.avatar;
-
-      // Home Aluno RT RT RT
-      document.getElementById('aluno-home-name').innerText = nick;
-      document.getElementById('aluno-home-avatar').src = userData.avatar;
-      document.getElementById('aluno-home-score').innerText = userData.score || 0;
-      
-      // Listener RT RT p/ o placar na home
-      db.ref('users/' + nick + '/score').on('value', snap => {
-        document.getElementById('aluno-home-score').innerText = snap.val() || 0;
-      });
-
-      applyTheme(userData.themeColor);
-    }
-
-    function showProfessorInterface() {
-      document.getElementById('sidebar').style.display = 'block';
-      document.getElementById('menu-aluno').style.display = 'none';
-      document.getElementById('menu-professor').style.display = 'block';
-      document.getElementById('nav-user-info').style.display = 'none';
-      applyTheme("#ff0055"); // Tema Professor é Rosa Neon fixo
-    }
-
-    function applyTheme(color) {
+    function applyUserTheme(color) {
       document.documentElement.style.setProperty('--user-theme-color', color || '#00ff66');
     }
 
-    // ==========================================
-    // 6. FUNÇÕES ALUNO: QUIZ E PERFIL (RT)
-    // ==========================================
-    
-    // Lista Quizzes RT RT RT
-    function listenToPublishedQuizzes() {
-      db.ref('published_quizzes').on('value', snapshot => {
-        const container = document.getElementById('aluno-quizzes-list');
-        container.innerHTML = '';
-        if (!snapshot.exists()) { container.innerHTML = '<p>Nenhum quiz pendente do Professor.</p>'; return; }
+    document.getElementById('player-photo').addEventListener('change', e => {
+      const reader = new FileReader();
+      reader.onload = () => document.getElementById('preview-img').src = reader.result;
+      if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    });
 
-        snapshot.forEach(child => {
-          const quiz = child.val();
-          const qId = child.key;
-          const totalQ = Object.keys(quiz.questions || {}).length;
+    document.getElementById('player-color').addEventListener('input', e => {
+      applyUserTheme(e.target.value);
+    });
 
-          const card = document.createElement('div');
-          card.className = 'card flex-row';
-          card.style.justifyContent = 'space-between';
-          card.innerHTML = `
-            <div>
-              <div style="font-size: 24px; color: var(--user-theme-color);">${quiz.title}</div>
-              <div style="font-size: 18px; color: #8b949e;">${quiz.area} | ${totalQ} Perguntas</div>
-            </div>
-            <button class="btn-rosa" style="width: auto;" onclick="playQuiz('${qId}')">JOGAR (START)</button>
-          `;
-          container.appendChild(card);
-        });
-      });
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
-    // Iniciar e Jogar Quiz (Forms Style)
-    function playQuiz(quizId) {
-      db.ref('published_quizzes/' + quizId).once('value', snapshot => {
-        if (!snapshot.exists()) return alert("Quiz não encontrado!");
-        const quiz = snapshot.val();
-        appState.currentPlayingQuiz = { ...quiz, id: quizId };
+    function registerStudent() {
+      const name = document.getElementById('player-name').value.trim();
+      const color = document.getElementById('player-color').value;
+      const photo = document.getElementById('preview-img').src;
 
-        document.getElementById('play-quiz-title').innerText = quiz.title;
-        document.getElementById('play-quiz-desc').innerText = quiz.desc;
-        const qArea = document.getElementById('play-quiz-questions-area');
-        qArea.innerHTML = '';
+      if (!name) return alert('Por favor, informe seu nickname!');
 
-        // Gera as questões estilo Forms
-        let qIndex = 1;
-        snapshot.child('questions').forEach(qSnap => {
-          const qData = qSnap.val();
-          const qId = qSnap.key;
-          
-          const qCard = document.createElement('div');
-          qCard.className = 'card q-forms-item';
-          qCard.innerHTML = `
-            <div style="font-size: 22px; margin-bottom: 10px;">${qIndex}) ${qData.title}</div>
-            <div id="q-options-${qId}">
-              <!-- Opções geradas aqui -->
-            </div>
-          `;
+      currentUser = { name, color, photo, score: 0 };
+      localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
 
-          const optionsDiv = qCard.querySelector(`#q-options-${qId}`);
-          
-          if (qData.type === 'tf') {
-            // Forms Verdadeiro/Falso (Radio)
-            optionsDiv.innerHTML = `
-              <label class="flex-row"><input type="radio" name="ans-${qId}" value="Verdadeiro"> Verdadeiro</label><br>
-              <label class="flex-row"><input type="radio" name="ans-${qId}" value="Falso"> Falso</label>
-            `;
-          } else {
-            // Forms Múltipla Escolha (Radio)
-            qData.options.forEach(opt => {
-              optionsDiv.innerHTML += `<label class="flex-row"><input type="radio" name="ans-${qId}" value="${opt}"> ${opt}</label><br>`;
-            });
-          }
-          qArea.appendChild(qCard);
-          qIndex++;
-        });
+      db.ref('students/' + name).set({ name, color, photo, score: 0 });
 
-        loadScreen('aluno-play-quiz');
-      });
+      applyUserTheme(color);
+      updateStudentDashUI();
+      listenToRanking();
+      renderAreaCards();
+      showScreen('screen-student-dash');
     }
 
-    // Corrigir e Enviar Quiz
-    function submitQuizAnswers() {
-      if (!appState.currentPlayingQuiz) return;
-      const nick = localStorage.getItem('mq_auth') ? JSON.parse(localStorage.getItem('mq_auth')).nick : null;
-      if (!nick) return logout();
-
-      let hits = 0;
-      let total = 0;
-      let missed = false;
-
-      // Itera sobre as questões RT RT
-      for (const qId in appState.currentPlayingQuiz.questions) {
-        total++;
-        const correctAns = appState.currentPlayingQuiz.questions[qId].correct;
-        // Pega rádio selecionado no Forms
-        const selected = document.querySelector(`input[name="ans-${qId}"]:checked`);
-        
-        if (!selected) { missed = true; break; } // Forms: obriga responder tudo
-
-        if (selected.value === correctAns) { hits++; }
-      }
-
-      if (missed) return alert("Por favor, responda todas as questões!");
-
-      // Calcula XP e Atualiza Firebase RT DB RT DB
-      const xpGained = hits * XP_PER_HIT;
-      const finalHits = hits;
-      const finalTotal = total;
-
-      // RT DB Transação/Update RT DB
-      db.ref('users/' + nick + '/score').transaction(currentScore => {
-        return (currentScore || 0) + xpGained;
-      });
-
-      // Salva log de quiz feito RT RT
-      db.ref('users/' + nick + '/quizzes_done').push({
-        quizId: appState.currentPlayingQuiz.id,
-        quizTitle: appState.currentPlayingQuiz.title,
-        hits: finalHits,
-        total: finalTotal,
-        xpGained: xpGained,
-        doneAt: Date.now()
-      });
-
-      appState.currentPlayingQuiz = null;
-
-      // Exibe Resultado
-      document.getElementById('quiz-result-hits').innerText = finalHits;
-      document.getElementById('quiz-result-total').innerText = finalTotal;
-      document.getElementById('quiz-result-xp').innerText = xpGained;
-      document.getElementById('quiz-result-icon').innerText = finalHits === finalTotal ? "🏆 PERFECT" : "🎉";
-      loadScreen('aluno-quiz-result');
-    }
-
-    // Perfil Aluno (RT RT)
-    function loadPerfilEditor() {
-      db.ref('users/' + localStorage.getItem('mq_auth') ? JSON.parse(localStorage.getItem('mq_auth')).nick : '').once('value', snap => {
-        if (!snap.exists()) return;
-        const u = snap.val();
-        document.getElementById('aluno-perfil-name').value = u.username;
-        document.getElementById('aluno-perfil-color').value = u.themeColor || "#00ff66";
-        document.getElementById('aluno-perfil-avatar-preview').src = u.avatar;
-      });
-    }
-
-    function saveAlunoPerfil() {
-      const nick = localStorage.getItem('mq_auth') ? JSON.parse(localStorage.getItem('mq_auth')).nick : null;
-      if (!nick) return;
+    function updateStudentDashUI() {
+      document.getElementById('student-display-name').innerText = currentUser.name;
+      document.getElementById('student-display-photo').src = currentUser.photo;
       
-      const newColor = document.getElementById('aluno-perfil-color').value;
-      const newAvatar = document.getElementById('aluno-perfil-avatar-preview').src;
-
-      db.ref('users/' + nick).update({
-        themeColor: newColor,
-        avatar: newAvatar
-      }).then(() => {
-        applyTheme(newColor);
-        document.getElementById('nav-avatar').src = newAvatar;
-        alert("PERFIL ATUALIZADO NO FIREBASE!");
-        loadScreen('aluno-home');
+      db.ref('students/' + currentUser.name + '/score').on('value', snapshot => {
+        const val = snapshot.val() || 0;
+        currentUser.score = val;
+        document.getElementById('student-score-display').innerText = val + ' PTS';
       });
     }
 
-    // ==========================================
-    // 7. FUNÇÕES PROFESSOR: CREATE QUIZ E PAINEL (RT)
-    // ==========================================
-    
-    // Forms Builder RT RT RT
-    function addQuestionToBuilder(type) {
-      const qId = 'q_' + Date.now();
-      const area = document.getElementById('prof-questions-builder-area');
-      
-      const qItem = document.createElement('div');
-      qItem.className = 'card q-builder-item';
-      qItem.setAttribute('data-qid', qId);
-      qItem.setAttribute('data-type', type);
-      
-      let typeText = type === 'mc' ? "Múltipla Escolha" : "Verdadeiro/Falso";
-      
-      let html = `
-        <div class="flex-row" style="justify-content: space-between;">
-          <h4 style="margin: 0; color: var(--user-theme-color);">PERGUNTA ${area.children.length + 1} (${typeText})</h4>
-          <button class="btn-borderbtn-rosa" style="width: auto; padding: 5px 10px; font-size: 16px;" onclick="removeQuestion('${qId}')">Remover X</button>
-        </div>
-        <input type="text" class="q-title" placeholder="Digite o enunciado da pergunta style Google Forms...">
-      `;
+    function logoutStudent() {
+      localStorage.removeItem('mathquest_student');
+      currentUser = null;
+      showScreen('screen-login');
+    }
 
-      if (type === 'mc') {
-        // Inputs p/ Múltipla Escolha
-        html += `
-          <div class="mc-options-inputs">
-            <input type="text" class="q-opt1 q-mc-correct" placeholder="Opção 1 (CORRETA estilo Forms)">
-            <input type="text" class="q-opt2" placeholder="Opção 2 (Incorreta)">
-            <input type="text" class="q-opt3" placeholder="Opção 3 (Incorreta)">
-            <input type="text" class="q-opt4" placeholder="Opção 4 (Incorreta)">
-          </div>
-        `;
+    function loginProfessor() {
+      if (document.getElementById('prof-pass').value === 'professor72') {
+        showScreen('screen-prof-dash');
       } else {
-        // Input p/ V/F (Correct answer)
-        html += `
-          <label>Resposta Correta:</label>
-          <select class="q-tf-correct">
-            <option value="Verdadeiro">Verdadeiro</option>
-            <option value="Falso">Falso</option>
-          </select>
+        alert('Senha incorreta!');
+      }
+    }
+
+    function renderAreaCards() {
+      const container = document.getElementById('area-grid-container');
+      container.innerHTML = '';
+
+      areasMatematica.forEach(area => {
+        let card = document.createElement('div');
+        card.className = 'area-card';
+        card.onclick = () => startAreaQuiz(area);
+
+        card.innerHTML = `
+          <div class="area-card-title">${area}</div>
+          <div class="area-card-count">Clique para jogar ➔</div>
         `;
+        container.appendChild(card);
+      });
+    }
+
+    function startAreaQuiz(areaName) {
+      db.ref('quizzes_by_area/' + areaName).once('value', snapshot => {
+        let firebaseQuizzes = [];
+        snapshot.forEach(child => firebaseQuizzes.push(child.val()));
+
+        let defaultList = defaultQuizzesDatabase[areaName] || [];
+
+        // Une as questões pré-carregadas com todas que o professor adicionar
+        currentQuizList = defaultList.concat(firebaseQuizzes);
+
+        currentQuizIndex = 0;
+        document.getElementById('quiz-area-badge').innerText = `ÁREA: ${areaName.toUpperCase()}`;
+        loadCurrentQuizQuestion();
+        showScreen('screen-quiz');
+      });
+    }
+
+    function loadCurrentQuizQuestion() {
+      const q = currentQuizList[currentQuizIndex];
+      document.getElementById('quiz-counter-badge').innerText = `PERGUNTA ${currentQuizIndex + 1} DE ${currentQuizList.length}`;
+      document.getElementById('quiz-question-title').innerText = q.title;
+      document.getElementById('quiz-feedback').style.display = 'none';
+
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+
+      q.options.forEach(opt => {
+        let btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, q);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedOption, questionObj) {
+      const isCorrect = selectedOption === questionObj.correct;
+      const feedbackDiv = document.getElementById('quiz-feedback');
+      const badgeDiv = document.getElementById('feedback-badge');
+      const explanationP = document.getElementById('feedback-explanation');
+
+      document.getElementById('quiz-options-container').innerHTML = '';
+
+      if (isCorrect) {
+        badgeDiv.innerText = "RESPOSTA CORRETA! 🎉 (+10 PONTOS)";
+        badgeDiv.className = "badge-status status-correct";
+        if (currentUser) {
+          currentUser.score = (currentUser.score || 0) + 10;
+          db.ref('students/' + currentUser.name + '/score').set(currentUser.score);
+        }
+      } else {
+        badgeDiv.innerText = "RESPOSTA INCORRETA!";
+        badgeDiv.className = "badge-status status-incorrect";
       }
 
-      qItem.innerHTML = html;
-      area.appendChild(qItem);
+      explanationP.innerText = questionObj.explanation || "Resolução indisponível para esta questão.";
+      feedbackDiv.style.display = 'block';
     }
 
-    function removeQuestion(qId) {
-      const el = document.querySelector(`.q-builder-item[data-qid="${qId}"]`);
-      if (el) el.remove();
-      // Re-indexa títulos
-      [...document.getElementById('prof-questions-builder-area').children].forEach((el, i) => {
-        el.querySelector('h4').innerText = el.querySelector('h4').innerText.replace(/\d+/, i + 1);
-      });
+    function nextQuestionInQuiz() {
+      currentQuizIndex++;
+      if (currentQuizIndex < currentQuizList.length) {
+        loadCurrentQuizQuestion();
+      } else {
+        alert('PARABÉNS! VOCÊ COMPLETOU O QUIZ DESTA ÁREA!');
+        showScreen('screen-student-dash');
+      }
     }
 
-    function finishAndPublishQuiz() {
-      const title = document.getElementById('prof-new-quiz-title').value.trim();
-      const desc = document.getElementById('prof-new-quiz-desc').value.trim();
-      const areaMat = document.getElementById('prof-new-quiz-area').value;
-      const questionsEls = [...document.getElementById('prof-questions-builder-area').children];
+    function toggleQuestionTypeUI() {
+      const type = document.getElementById('new-q-type').value;
+      if (type === 'tf') {
+        document.getElementById('ui-multiple-options').style.display = 'none';
+        document.getElementById('ui-tf-options').style.display = 'block';
+      } else {
+        document.getElementById('ui-multiple-options').style.display = 'block';
+        document.getElementById('ui-tf-options').style.display = 'none';
+      }
+    }
 
-      if (!title || questionsEls.length < 1) return alert("Preencha o título e adicione pelo menos 1 pergunta.");
+    function sendQuizToFirebase() {
+      const area = document.getElementById('new-q-area').value;
+      const type = document.getElementById('new-q-type').value;
+      const title = document.getElementById('new-q-title').value.trim();
+      const customExplanation = document.getElementById('new-q-explanation').value.trim();
 
-      const questionsData = {};
-      let error = null;
+      if (!title) return alert('DIGITE A PERGUNTA DO QUIZ!');
 
-      questionsEls.forEach((el, index) => {
-        const qId = el.getAttribute('data-qid');
-        const type = el.getAttribute('data-type');
-        const qTitle = el.querySelector('.q-title').value.trim();
-        
-        if (!qTitle) { error = `Título vazio na Pergunta ${index+1}`; return; }
+      let correctOpt = "";
+      let options = [];
 
-        let qData = { type: type, title: qTitle };
+      if (type === 'tf') {
+        correctOpt = document.getElementById('new-q-tf-correct').value;
+        options = ["Verdadeiro", "Falso"];
+      } else {
+        correctOpt = document.getElementById('new-q-opt-correct').value.trim();
+        const opt2 = document.getElementById('new-q-opt2').value.trim();
+        const opt3 = document.getElementById('new-q-opt3').value.trim();
+        const opt4 = document.getElementById('new-q-opt4').value.trim();
 
-        if (type === 'tf') {
-          qData.correct = el.querySelector('.q-tf-correct').value;
-        } else {
-          const correctMC = el.querySelector('.q-opt1').value.trim();
-          const o2 = el.querySelector('.q-opt2').value.trim();
-          const o3 = el.querySelector('.q-opt3').value.trim();
-          const o4 = el.querySelector('.q-opt4').value.trim();
+        if (!correctOpt || !opt2) return alert('PREENCHA PELO MENOS A OPÇÃO CORRETA E MAIS UMA ALTERNATIVA!');
 
-          if (!correctMC || !o2 || !o3 || !o4) { error = `Preencha as 4 opções na Pergunta ${index+1}`; return; }
+        options = [correctOpt, opt2, opt3, opt4].filter(Boolean).sort(() => Math.random() - 0.5);
+      }
 
-          qData.correct = correctMC;
-          qData.options = [correctMC, o2, o3, o4]; // No Forms Real, a ordem pode ser aleatória na exibição
-        }
-        questionsData[qId] = qData;
-      });
-
-      if (error) return alert(error);
-
-      // Publica no Firebase RT DB RT DB
-      const quizId = 'quiz_' + Date.now();
-      const finalQuizObj = {
-        title, desc, area: areaMat, createdAt: Date.now(), questions: questionsData
+      const quizData = {
+        title: title,
+        correct: correctOpt,
+        options: options,
+        explanation: customExplanation || `Resolução registrada pelo professor para o tema [${area}]. Resposta correta: ${correctOpt}.`,
+        createdAt: Date.now()
       };
 
-      db.ref('published_quizzes/' + quizId).set(finalQuizObj).then(() => {
-        alert("QUIZ PUBLICADO NO FIREBASE! Todos os alunos receberão.");
-        // Limpa builder
-        document.getElementById('prof-new-quiz-title').value = '';
-        document.getElementById('prof-new-quiz-desc').value = '';
-        document.getElementById('prof-questions-builder-area').innerHTML = '';
-        loadScreen('prof-home');
+      db.ref('quizzes_by_area/' + area).push(quizData, err => {
+        if (!err) {
+          alert(`QUIZ CADASTRADO COM SUCESSO NA ÁREA [${area.toUpperCase()}]!`);
+          document.getElementById('new-q-title').value = '';
+          document.getElementById('new-q-opt-correct').value = '';
+          document.getElementById('new-q-opt2').value = '';
+          document.getElementById('new-q-opt3').value = '';
+          document.getElementById('new-q-opt4').value = '';
+          document.getElementById('new-q-explanation').value = '';
+        }
       });
     }
 
-    // Painel de Alunos RT RT RT
-    function listenToStudentsPanelRT() {
-      // 1. Ouvir presença RT RT RT
-      db.ref('status').on('value', snap => {
-        const onList = document.getElementById('prof-online-list');
-        onList.innerHTML = '';
-        
-        let onCount = 0;
-        if (snap.exists()) {
-          snap.forEach(userSnap => {
-            if (userSnap.child('online').val() === true) {
-              const nick = userSnap.key;
-              onCount++;
-              
-              const badge = document.createElement('div');
-              badge.className = 'flex-row';
-              badge.style = 'background: rgba(0,255,102,0.1); border: 1px solid var(--user-theme-color); padding: 5px 10px; border-radius: 4px; font-size: 18px; margin: 5px;';
-              badge.innerHTML = `<span class="status-online">●</span> ${nick}`;
-              onList.appendChild(badge);
-            }
-          });
-        }
-        if (onCount === 0) onList.innerHTML = '<p>Nenhum aluno online agora.</p>';
-      });
-
-      // 2. Ouvir todos os cadastros e logs RT RT RT
-      db.ref('users').on('value', snap => {
-        const tbody = document.getElementById('prof-all-students-table').querySelector('tbody');
+    function listenToRanking() {
+      db.ref('students').orderByChild('score').on('value', snapshot => {
+        const tbody = document.getElementById('ranking-body');
         tbody.innerHTML = '';
+        let players = [];
+        snapshot.forEach(c => players.push(c.val()));
+        players.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-        if (!snap.exists()) { tbody.innerHTML = '<tr><td colspan="5">Nenhum aluno cadastrado.</td></tr>'; return; }
+        players.forEach((p, i) => {
+          let pos = (i + 1) + 'º';
+          if (i === 0) pos = '🥇 1º';
+          else if (i === 1) pos = '🥈 2º';
+          else if (i === 2) pos = '🥉 3º';
 
-        snap.forEach(userSnap => {
-          const u = userSnap.val();
-          const nick = userSnap.key;
-
-          const row = document.createElement('tr');
-          
-          // Verifica status RT
-          db.ref('status/' + nick + '/online').once('value', sSnap => {
-            const isRTOnline = sSnap.val() === true;
-            
-            row.innerHTML = `
-              <td><div class="avatar-frame" style="width: 30px; height: 30px;"><img src="${u.avatar}" alt="?"></div></td>
-              <td>${nick}</td>
-              <td class="${isRTOnline ? 'status-online' : ''}">${isRTOnline ? 'ONLINE' : 'OFFLINE'}</td>
-              <td>${u.lastLogin ? formatPixelTime(u.lastLogin) : '--:--'}</td>
-              <td>${u.manualLogout ? formatPixelTime(u.manualLogout) : (u.lastLogin ? 'AUTO' : '--:--')}</td>
-            `;
-          });
-
-          tbody.appendChild(row);
+          tbody.innerHTML += `<tr>
+            <td>${pos}</td>
+            <td style="color:${p.color}; font-weight:bold;">${p.name}</td>
+            <td>${p.score || 0} PTS</td>
+          </tr>`;
         });
       });
     }
-
-    // ==========================================
-    // 8. RANKING SISTEMA E RT DB (RT RT)
-    // ==========================================
-    function listenToRankingRT() {
-      // RT RT RT Ordenado por XP via Firebase
-      db.ref('users').orderByChild('score').on('value', snapshot => {
-        const lists = [
-          { tBody: document.getElementById('aluno-ranking-table').querySelector('tbody'), withAvatar: true },
-          { tBody: document.getElementById('prof-ranking-table').querySelector('tbody'), withAvatar: false }
-        ];
-
-        lists.forEach(l => {
-          l.tBody.innerHTML = '';
-          if (!snapshot.exists()) { l.tBody.innerHTML = '<tr><td colspan="4">Sem dados no Ranking.</td></tr>'; return; }
-
-          let users = [];
-          snapshot.forEach(child => {
-            users.push(child.val());
-          });
-
-          // Inverte ordem p/ XP maior em cima RT RT
-          users.reverse();
-
-          users.forEach((u, index) => {
-            const pos = index + 1;
-            const medalClass = pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : '';
-            const posText = pos <= 3 ? `<span class="rank-medal ${medalClass}">●</span>` : pos + 'º';
-
-            const row = document.createElement('tr');
-            
-            let html = `
-              <td style="text-align: center;">${posText}</td>
-            `;
-            if (l.withAvatar) {
-              html += `<td><div class="avatar-frame" style="width: 30px; height: 30px; border-color: ${u.themeColor};"><img src="${u.avatar}" alt="?"></div></td>`;
-            }
-            html += `
-              <td style="color: ${u.themeColor || '#fff'}; font-weight: bold;">${u.username}</td>
-              <td style="color: var(--accent-color); font-weight: bold;">${u.score || 0} XP</td>
-            `;
-            
-            row.innerHTML = html;
-            l.tBody.appendChild(row);
-          });
-        });
-      });
-    }
-
-    // ==========================================
-    // 9. UTILITÁRIOS (AVATAR E TEMPO)
-    // ==========================================
-    
-    // Tempo formatado estilo Retrô/Pixel
-    function formatPixelTime(timestamp) {
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' ' + date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    }
-
-    // Gerador de Avatares Pixel Art simples base64
-    // Usa técnica de hashing p/ fixar avatar por nick RT RT RT
-    function generatePixelAvatarUrl(nick) {
-      // Hashing simples para gerar cor e forma determinística baseada no nick
-      let hash = 0;
-      for (let i = 0; i < nick.length; i++) { hash = nick.charCodeAt(i) + ((hash << 5) - hash); }
-      
-      const c1 = (hash & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
-      const c2 = ((hash >> 16) & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
-
-      // Gera um SVG pixel art 8x8 determinístico e converte p/ DataURI
-      let pixelData = "";
-      for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-          // Usa hash e coords p/ decidir cor do pixel
-          if ((hash >> (x + y * 8) & 1)) {
-            pixelData += `<rect x="${x}" y="${y}" width="1" height="1" fill="#${c1}"/>`;
-          } else {
-            if (((hash >> 16) >> (x + y * 8) & 1)) {
-              pixelData += `<rect x="${x}" y="${y}" width="1" height="1" fill="#${c2}"/>`;
-            }
-          }
-        }
-      }
-
-      // SVG Completo
-      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'><rect width='8' height='8' fill='%23000000'/>${pixelData}</svg>`;
-      return 'data:image/svg+xml;base64,' + btoa(svg);
-    }
-
-    function generateNewPixelAvatar() {
-      const el = document.getElementById('aluno-perfil-name');
-      // Cria avatar temporário p/ demo/mudança, usa timestamp RT
-      document.getElementById('aluno-perfil-avatar-preview').src = generatePixelAvatarUrl(el.value + Date.now());
-    }
-
   </script>
 </body>
 </html>
