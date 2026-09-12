@@ -6,6 +6,13 @@
     <title>MathQuest - A Gamificação da Matemática</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SDKs DO FIREBASE (v9/v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary-color: #ff007f;
@@ -291,6 +298,60 @@
             margin-bottom: 25px;
         }
 
+        /* ESTILOS DA ABA DE INTERAÇÃO (CHAT / MURAL) */
+        .chat-box {
+            background: #1c1f30;
+            border: 1px solid #333a52;
+            border-radius: 12px;
+            height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            background: #202436;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border-left: 3px solid var(--secondary-color);
+            max-width: 85%;
+        }
+
+        .chat-message.my-message {
+            align-self: flex-end;
+            border-left: none;
+            border-right: 3px solid var(--primary-color);
+            background: #2a1b30;
+        }
+
+        .chat-user {
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-bottom: 3px;
+        }
+
+        .chat-text {
+            font-size: 0.95rem;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        .chat-time {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -317,9 +378,10 @@
             <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #ff3366; color:#ff3366;" onclick="logout()">Sair</button>
         </div>
 
-        <!-- MENU DE ABAS -->
+        <!-- MENU DE ABAS (COM A NOVA ABA DE INTERAÇÃO IMPLEMENTADA) -->
         <div id="main-tabs" class="main-tabs" style="display: none;">
             <button id="tab-btn-quizzes" class="tab-btn active" onclick="switchTab('screen-quizzes')">📚 QUIZZES</button>
+            <button id="tab-btn-interaction" class="tab-btn" onclick="switchTab('screen-interaction')">💬 INTERAÇÃO</button>
             <button id="tab-btn-ranking" class="tab-btn" onclick="switchTab('screen-ranking')">🏆 RANKING</button>
             <button id="tab-btn-profile" class="tab-btn" onclick="switchTab('screen-profile')">👤 MEU PERFIL</button>
             <button id="tab-btn-teacher" class="tab-btn hidden" onclick="switchTab('screen-teacher-dash')">🎓 ÁREA DO PROFESSOR</button>
@@ -380,6 +442,16 @@
 
             <h2 class="screen-title">20 Áreas Temáticas Padrão</h2>
             <div id="area-grid-container" class="area-grid"></div>
+        </div>
+
+        <!-- TELA NOVA: INTERAÇÃO / MURAL DO CONHECIMENTO -->
+        <div id="screen-interaction" class="screen">
+            <h2 class="screen-title">💬 Mural de Interação e Dúvidas</h2>
+            <div id="chat-messages-container" class="chat-box"></div>
+            <form onsubmit="handleSendMessage(event)" class="chat-input-area">
+                <input type="text" id="chat-input-message" placeholder="Compartilhe uma dúvida ou ideia..." required style="flex:1;">
+                <button type="submit" class="btn btn-primary" style="width:auto; padding:0 20px;">Enviar 🚀</button>
+            </form>
         </div>
 
         <!-- TELA 4: RANKING & COLEGAS -->
@@ -502,6 +574,29 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE COM SUAS CREDENCIAIS
+        const firebaseConfig = {
+            apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
+            authDomain: "mathques.firebaseapp.com",
+            databaseURL: "https://mathques-default-rtdb.firebaseio.com",
+            projectId: "mathques",
+            storageBucket: "mathques.firebasestorage.app",
+            messagingSenderId: "413245852392",
+            appId: "1:413245852392:web:fd9affbddda2f34eed975d",
+            measurementId: "G-NJ9D8QV749"
+        };
+
+        // Inicializar o Firebase caso a chave esteja presente ou fallback local seguro
+        let isFirebaseActive = false;
+        try {
+            if (firebaseConfig.apiKey !== "SUA_API_KEY") {
+                firebase.initializeApp(firebaseConfig);
+                isFirebaseActive = true;
+            }
+        } catch (e) {
+            console.log("Firebase não configurado, operando em modo local storage.");
+        }
+
         let currentUser = null;
         let questionCount = 0;
         let currentGameQuizzes = [];
@@ -523,6 +618,7 @@
             renderAreaCards();
             populateAreaSelect();
             checkActiveSession();
+            loadChatMessages();
         };
 
         function renderAreaCards() {
@@ -542,6 +638,7 @@
         function switchTab(screenId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             if (screenId === 'screen-quizzes') document.getElementById('tab-btn-quizzes').classList.add('active');
+            if (screenId === 'screen-interaction') document.getElementById('tab-btn-interaction').classList.add('active');
             if (screenId === 'screen-ranking') { document.getElementById('tab-btn-ranking').classList.add('active'); renderRanking(); }
             if (screenId === 'screen-profile') { document.getElementById('tab-btn-profile').classList.add('active'); loadProfileData(); }
             if (screenId === 'screen-teacher-dash') { document.getElementById('tab-btn-teacher').classList.add('active'); loadTeacherDashboard(); }
@@ -618,6 +715,71 @@
             localStorage.removeItem('mathquest_logged_user');
             currentUser = null;
             checkActiveSession();
+        }
+
+        /* LÓGICA DA ABA DE INTERAÇÃO (CHAT) */
+        function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input-message');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            const messageObj = {
+                user: currentUser.name,
+                role: currentUser.role,
+                text: text,
+                time: timeStr,
+                timestamp: Date.now()
+            };
+
+            if (isFirebaseActive) {
+                firebase.database().ref('chat_messages').push(messageObj);
+            } else {
+                let messages = JSON.parse(localStorage.getItem('mathquest_chat') || '[]');
+                messages.push(messageObj);
+                localStorage.setItem('mathquest_chat', JSON.stringify(messages));
+                renderChatMessages();
+            }
+
+            input.value = '';
+        }
+
+        function loadChatMessages() {
+            if (isFirebaseActive) {
+                firebase.database().ref('chat_messages').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const messages = data ? Object.values(data) : [];
+                    renderChatMessages(messages);
+                });
+            } else {
+                renderChatMessages();
+            }
+        }
+
+        function renderChatMessages(remoteMessages = null) {
+            const container = document.getElementById('chat-messages-container');
+            const messages = remoteMessages || JSON.parse(localStorage.getItem('mathquest_chat') || '[]');
+
+            if (messages.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center; font-size:0.85rem;">Nenhuma mensagem compartilhada ainda. Seja o primeiro a interagir!</p>`;
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => {
+                const isMe = currentUser && currentUser.name === msg.user;
+                return `
+                    <div class="chat-message ${isMe ? 'my-message' : ''}">
+                        <div class="chat-user">${msg.user} <span style="font-size:0.7rem; color:var(--primary-color);">(${msg.role})</span></div>
+                        <div class="chat-text">${msg.text}</div>
+                        <div class="chat-time">${msg.time}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
         }
 
         /* CONSTRUTOR DE QUIZZES ESTILO GOOGLE FORMS DO PROFESSOR */
@@ -786,7 +948,7 @@
                 author: quiz.author,
                 title: quiz.title,
                 question: q.q,
-                shuffledOptions: shuffleArray(q.opts), // EMBARALHA ALTERNATIVAS
+                shuffledOptions: shuffleArray(q.opts),
                 correctAnswer: q.ans,
                 explanation: q.exp
             }));
@@ -798,7 +960,6 @@
         }
 
         function startStandardAreaQuiz(area) {
-            // CARREGA 10 QUESTÕES POR ÁREA COM ALTERNATIVAS EMBARALHADAS
             currentGameQuizzes = Array.from({ length: 10 }, (_, i) => {
                 const correctVal = (i + 1) * 12;
                 const opts = [
@@ -811,7 +972,7 @@
                     area: area,
                     author: null,
                     question: `Questão ${i + 1} de ${area}: Qual o resultado do cálculo para x = ${i + 1}?`,
-                    shuffledOptions: shuffleArray(opts), // NUNCA FICA SÓ NA LETRA A
+                    shuffledOptions: shuffleArray(opts),
                     correctAnswer: `${correctVal}`,
                     explanation: `Resolução: Multiplica-se o valor de x (${i + 1}) por 12, obtendo a resposta ${correctVal}.`
                 };
@@ -859,7 +1020,6 @@
 
             buttons.forEach(btn => btn.disabled = true);
 
-            // CORREÇÃO MOSTRADA SOMENTE APÓS O CLIQUE DO ALUNO
             if (selectedOpt === q.correctAnswer) {
                 userScore += 10;
                 document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-correct');
@@ -976,18 +1136,16 @@
             }
         }
 
-        /* PAINEL DE CONTROLE DO PROFESSOR (Estatísticas, Gráficos e Medalhas) */
+        /* PAINEL DE CONTROLE DO PROFESSOR */
         function loadTeacherDashboard() {
             const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const students = Object.keys(users)
                 .map(u => ({ name: u, ...users[u] }))
                 .filter(u => u.role === 'Aluno');
 
-            // Popular select de alunos
             const select = document.getElementById('medal-student-select');
             select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score} pts)</option>`).join('');
 
-            // Métricas
             const scores = students.map(s => s.score || 0);
             const totalAvg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
             const highPerformers = students.filter(s => (s.score || 0) >= 50).length;
@@ -997,7 +1155,6 @@
             document.getElementById('stat-high-performers').innerText = highPerformers;
             document.getElementById('stat-low-performers').innerText = lowPerformers;
 
-            // Renderizar Gráfico Chart.js
             const ctx = document.getElementById('performanceChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
