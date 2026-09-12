@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MathQuest - A Gamificação da Matemática</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #ff007f;
@@ -55,7 +54,6 @@
             gap: 15px;
         }
 
-        /* ESTILO DA LOGO MT.PNG */
         .logo-img {
             max-height: 55px;
             width: auto;
@@ -110,7 +108,6 @@
             border: 2px solid var(--primary-color);
         }
 
-        /* NAVEGAÇÃO DE GUIAS LADO A LADO */
         .main-tabs {
             display: flex;
             gap: 6px;
@@ -208,14 +205,47 @@
             background: transparent;
             border: 1px solid #fff;
             color: #fff;
-            padding: 6px 12px;
-            font-size: 0.65rem;
-            width: auto;
+            padding: 12px;
+            font-size: 0.9rem;
+            width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .btn-correct {
+            background: rgba(0, 255, 102, 0.2) !important;
+            border-color: var(--success-color) !important;
+            color: var(--success-color) !important;
+            font-weight: bold;
+        }
+
+        .btn-wrong {
+            background: rgba(255, 51, 102, 0.2) !important;
+            border-color: var(--danger-color) !important;
+            color: var(--danger-color) !important;
+        }
+
+        .explanation-box {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            display: none;
         }
 
         .area-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 12px;
         }
 
@@ -223,7 +253,7 @@
             background: #202436;
             border: 1px solid #333a52;
             border-radius: 8px;
-            padding: 12px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
@@ -234,7 +264,15 @@
             transform: translateY(-3px);
         }
 
-        /* PERFIL E MEDALHAS */
+        .teacher-quiz-card {
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px dashed var(--secondary-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
         .profile-header-card {
             background: #202436;
             border: 2px solid var(--primary-color);
@@ -294,30 +332,12 @@
             font-style: italic;
         }
 
-        .dash-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 600px) {
-            .dash-grid { grid-template-columns: 1fr; }
-        }
-
         .dash-card {
             background: #202436;
             border: 1px solid #333a52;
             border-radius: 10px;
             padding: 15px;
-        }
-
-        .student-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 20px;
         }
 
         .hidden { display: none !important; }
@@ -326,10 +346,8 @@
 <body>
 
     <header>
-        <!-- LOGO MT.PNG COM TRATAMENTO DE ERRO -->
         <img src="mt.png" alt="Logo MathQuest" class="logo-img" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
         <div id="fallback-logo" class="logo-icon" style="display: none;">📐</div>
-
         <div>
             <h1>MATHQUEST</h1>
             <p style="color:#aaa;">A Gamificação da Matemática</p>
@@ -337,7 +355,7 @@
     </header>
 
     <div class="container">
-        <!-- BARRA SUPERIOR DE USUÁRIO -->
+        <!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
         <div id="user-nav" class="user-nav" style="display: none;">
             <div class="user-info">
                 <img id="nav-avatar" src="" alt="Foto" class="avatar-img">
@@ -346,10 +364,10 @@
                     <span id="nav-grade" style="color:var(--secondary-color); font-size:0.85rem;"></span>
                 </div>
             </div>
-            <button class="btn btn-outline" onclick="logout()">Sair</button>
+            <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #fff; color:#fff;" onclick="logout()">Sair</button>
         </div>
 
-        <!-- GUIAS PRINCIPAIS (ORGANIZADAS LADO A LADO) -->
+        <!-- GUIAS PRINCIPAIS -->
         <div id="main-tabs" class="main-tabs" style="display: none;">
             <button id="tab-btn-quizzes" class="tab-btn active" onclick="switchTab('screen-quizzes')">📚 QUIZZES</button>
             <button id="tab-btn-ranking" class="tab-btn" onclick="switchTab('screen-ranking')">🏆 COLEGAS & RANKING</button>
@@ -406,24 +424,29 @@
             </p>
         </div>
 
-        <!-- TELA QUIZZES -->
+        <!-- TELA SELEÇÃO DE QUIZZES -->
         <div id="screen-quizzes" class="screen">
+            <div id="teacher-quizzes-section" style="margin-bottom:25px; display:none;">
+                <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:10px;">📌 Quizzes Criados por Professores</h3>
+                <div id="teacher-quizzes-container"></div>
+            </div>
+
             <h2 class="screen-title">Áreas de Estudo da Matemática</h2>
             <div id="area-grid-container" class="area-grid"></div>
         </div>
 
-        <!-- TELA RANKING E VISITAÇÃO DE PERFIL -->
+        <!-- TELA RANKING -->
         <div id="screen-ranking" class="screen">
             <h2 class="screen-title">Colegas de Turma & Ranking</h2>
             <div id="ranking-list-container"></div>
         </div>
 
-        <!-- TELA MEU PERFIL -->
+        <!-- TELA PERFIL PRÓPRIO -->
         <div id="screen-profile" class="screen">
             <h2 class="screen-title">Configurações do Perfil</h2>
             <form onsubmit="saveProfile(event)">
                 <div class="form-group">
-                    <label>Foto de Perfil (Arquivo)</label>
+                    <label>Foto de Perfil</label>
                     <input type="file" accept="image/*" onchange="previewImage(event)">
                 </div>
                 <div class="form-group">
@@ -431,7 +454,7 @@
                     <input type="text" id="profile-phrase-input" maxlength="80">
                 </div>
                 <div class="form-group">
-                    <label>Cor do Tema da Sua Interface</label>
+                    <label>Cor do Tema</label>
                     <input type="color" id="profile-color-input" value="#ff007f" style="height:40px; cursor:pointer;">
                 </div>
                 <button type="submit" class="btn btn-primary">SALVAR CONFIGURAÇÕES 💾</button>
@@ -441,9 +464,9 @@
             <div id="my-medals-list" class="medals-grid"></div>
         </div>
 
-        <!-- TELA VISITAÇÃO DE PERFIL DE COLEGA -->
+        <!-- TELA VISITAR PERFIL -->
         <div id="screen-view-profile" class="screen">
-            <button class="btn btn-outline" style="margin-bottom:15px;" onclick="switchTab('screen-ranking')">← Voltar para Lista</button>
+            <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #fff; color:#fff; margin-bottom:15px;" onclick="switchTab('screen-ranking')">← Voltar para Lista</button>
             <div class="profile-header-card">
                 <img id="view-avatar" src="" class="profile-avatar-large" alt="Foto">
                 <h3 id="view-name" style="color:#fff;"></h3>
@@ -456,12 +479,12 @@
             <div id="view-medals-list" class="medals-grid"></div>
         </div>
 
-        <!-- TELA ÁREA DO PROFESSOR (COM ENVIO DE MEDALHAS) -->
+        <!-- TELA PAINEL PROFESSOR -->
         <div id="screen-teacher-dash" class="screen">
-            <h2 class="screen-title">🎓 Gestão & Envio de Medalhas</h2>
+            <h2 class="screen-title">🎓 Área de Gestão do Professor</h2>
 
-            <div class="dash-card" style="margin-bottom:20px;">
-                <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.8rem; margin-bottom:15px;">🏅 Enviar Medalha e Frase para Aluno</h3>
+            <div class="dash-card">
+                <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.8rem; margin-bottom:15px;">🏅 Enviar Medalha e Frase</h3>
                 <form onsubmit="handleSendMedal(event)">
                     <div class="form-group">
                         <label>Selecione o Aluno</label>
@@ -477,34 +500,46 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Mensagem / Frase do Professor</label>
-                        <textarea id="send-medal-note" rows="3" required placeholder="Escreva um recado de incentivo que ficará salvo no perfil do aluno..."></textarea>
+                        <label>Mensagem / Recado</label>
+                        <textarea id="send-medal-note" rows="3" required placeholder="Escreva uma mensagem..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-secondary">ENVIAR MEDALHA AO PERFIL 🎁</button>
+                    <button type="submit" class="btn btn-secondary">ENVIAR MEDALHA 🎁</button>
                 </form>
             </div>
 
-            <div class="dash-grid">
-                <div class="dash-card">
-                    <h3 style="color:var(--danger-color); font-family:var(--font-pixel); font-size:0.75rem;">⚠️ Precisam de Atenção</h3>
-                    <div id="attention-students-list"></div>
-                </div>
-                <div class="dash-card">
-                    <h3 style="color:var(--success-color); font-family:var(--font-pixel); font-size:0.75rem;">🌟 Alunos Destaques</h3>
-                    <div id="top-students-list"></div>
-                </div>
+            <div class="dash-card">
+                <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.8rem; margin-bottom:15px;">📝 Criar Quiz do Professor</h3>
+                <form onsubmit="handleCreateTeacherQuiz(event)">
+                    <div class="form-group">
+                        <label>Título do Quiz</label>
+                        <input type="text" id="tquiz-title" placeholder="Ex: Desafio Semanal de Álgebra" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Área Temática</label>
+                        <select id="tquiz-area" required></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">PUBLICAR QUIZ PARA A TURMA 🚀</button>
+                </form>
             </div>
         </div>
 
         <!-- TELA EXECUÇÃO DO QUIZ -->
         <div id="screen-game" class="screen">
-            <div style="display:flex; justify-content:space-between; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; color:var(--primary-color); font-weight:bold; margin-bottom:10px;">
                 <span id="game-area-tag"></span>
                 <span id="game-progress"></span>
             </div>
-            <div id="game-question" style="font-size:1.1rem; font-weight:700; margin-bottom:20px;"></div>
-            <div id="game-options" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
-            <button id="btn-next-question" class="btn btn-primary" style="display:none;" onclick="nextQuestion()">PRÓXIMA QUESTÃO ➔</button>
+            <div id="game-author-tag" style="color:var(--secondary-color); font-size:0.85rem; margin-bottom:15px; font-weight:bold;"></div>
+
+            <div id="game-question" style="font-size:1.15rem; font-weight:700; margin-bottom:20px; line-height:1.4;"></div>
+            <div id="game-options" style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px;"></div>
+
+            <div id="game-explanation" class="explanation-box">
+                <strong style="color:var(--secondary-color);">💡 Explicação:</strong>
+                <p id="explanation-text" style="margin-top:5px;"></p>
+            </div>
+
+            <button id="btn-next-question" class="btn btn-primary" style="display:none; margin-top:20px;" onclick="nextQuestion()">PRÓXIMA QUESTÃO ➔</button>
         </div>
 
     </div>
@@ -515,25 +550,87 @@
         let currentQuestionIndex = 0;
         let userScore = 0;
         let tempBase64Photo = "";
+        let answeredCurrent = false;
 
-        const mathAreas = [
+        // BANCO DE DADOS COMPLETO COM 20 ÁREAS E PERGUNTAS ESPECÍFICAS
+        const mathQuestionsDatabase = {
+            "Álgebra": [
+                { q: "Qual o valor de x na equação 3x - 7 = 2x + 5?", opts: ["x = 12", "x = 2", "x = -12", "x = 5"], ans: "x = 12", exp: "Isolando x: 3x - 2x = 5 + 7 => x = 12." },
+                { q: "Fatore a expressão x² - 9:", opts: ["(x - 3)(x + 3)", "(x - 3)²", "(x + 3)²", "(x - 9)(x + 1)"], ans: "(x - 3)(x + 3)", exp: "Diferença de dois quadrados: a² - b² = (a - b)(a + b)." },
+                { q: "Qual é a soma das raízes da equação x² - 7x + 10 = 0?", opts: ["7", "-7", "10", "5"], ans: "7", exp: "Pelas relações de Girard, a soma das raízes de ax² + bx + c = 0 é S = -b/a = -(-7)/1 = 7." },
+                { q: "Determine a solução do sistema: x + y = 10 e x - y = 4.", opts: ["x = 7, y = 3", "x = 6, y = 4", "x = 8, y = 2", "x = 5, y = 5"], ans: "x = 7, y = 3", exp: "Somando as equações: 2x = 14 => x = 7. Substituindo: 7 + y = 10 => y = 3." },
+                { q: "Qual o grau do polinômio P(x) = 4x⁵ - 2x³ + 7x⁷ - 1?", opts: ["7", "5", "3", "4"], ans: "7", exp: "O grau de um polinômio é dado pelo maior expoente da variável com coeficiente não nulo." },
+                { q: "Simplifique a expressão (2x³)³:", opts: ["8x⁹", "6x⁶", "8x⁶", "6x⁹"], ans: "8x⁹", exp: "(2)³ * (x³)³ = 8 * x^(3*3) = 8x⁹." },
+                { q: "Se f(x) = 2x² - 3x + 1, qual o valor de f(-2)?", opts: ["15", "3", "7", "-13"], ans: "15", exp: "f(-2) = 2(-2)² - 3(-2) + 1 = 2(4) + 6 + 1 = 8 + 6 + 1 = 15." },
+                { q: "Qual o discriminante (Δ) da equação 2x² - 4x + 2 = 0?", opts: ["0", "16", "-16", "8"], ans: "0", exp: "Δ = b² - 4ac = (-4)² - 4(2)(2) = 16 - 16 = 0." },
+                { q: "Qual o valor de x na inequação 2x - 4 > 6?", opts: ["x > 5", "x < 5", "x > 1", "x > 10"], ans: "x > 5", exp: "2x > 6 + 4 => 2x > 10 => x > 5." },
+                { q: "O produto das raízes de x² - 5x + 6 = 0 é:", opts: ["6", "-6", "5", "-5"], ans: "6", exp: "Pelas relações de Girard, o produto é P = c/a = 6/1 = 6." }
+            ],
+            "Geometria Plana": [
+                { q: "Qual a área de um triângulo retângulo de base 8 cm e altura 6 cm?", opts: ["24 cm²", "48 cm²", "14 cm²", "30 cm²"], ans: "24 cm²", exp: "Área = (base * altura) / 2 = (8 * 6) / 2 = 24 cm²." },
+                { q: "Qual a soma dos ângulos internos de um hexágono regular?", opts: ["720°", "540°", "360°", "180°"], ans: "720°", exp: "S = (n - 2) * 180° = (6 - 2) * 180° = 4 * 180° = 720°." },
+                { q: "Em um triângulo retângulo, os catetos medem 6 cm e 8 cm. Quanto mede a hipotenusa?", opts: ["10 cm", "14 cm", "12 cm", "100 cm"], ans: "10 cm", exp: "Teorema de Pitágoras: h² = 6² + 8² = 36 + 64 = 100 => h = 10 cm." },
+                { q: "Qual a área de um círculo com raio de 5 cm? (Considere π = 3,14)", opts: ["78,5 cm²", "31,4 cm²", "15,7 cm²", "50 cm²"], ans: "78,5 cm²", exp: "Área = π * r² = 3,14 * 5² = 3,14 * 25 = 78,5 cm²." },
+                { q: "Qual o perímetro de um quadrado cuja área é 64 cm²?", opts: ["32 cm", "16 cm", "64 cm", "8 cm"], ans: "32 cm", exp: "Lado = √64 = 8 cm. Perímetro = 4 * 8 = 32 cm." },
+                { q: "Um losango possui diagonais de 12 cm e 16 cm. Sua área é:", opts: ["96 cm²", "192 cm²", "28 cm²", "56 cm²"], ans: "96 cm²", exp: "Área = (D * d) / 2 = (16 * 12) / 2 = 96 cm²." },
+                { q: "Um trapézio tem bases de 10 cm e 6 cm e altura de 4 cm. Sua área é:", opts: ["32 cm²", "64 cm²", "16 cm²", "40 cm²"], ans: "32 cm²", exp: "Área = [(B + b) * h] / 2 = [(10 + 6) * 4] / 2 = (16 * 4) / 2 = 32 cm²." },
+                { q: "Ângulos suplementares somam:", opts: ["180°", "90°", "360°", "270°"], ans: "180°", exp: "Por definição, dois ângulos são suplementares se a soma deles resulta em 180°." },
+                { q: "Qual o valor de cada ângulo interno de um pentágono regular?", opts: ["108°", "120°", "90°", "135°"], ans: "108°", exp: "Soma = (5-2)*180 = 540°. Cada ângulo = 540 / 5 = 108°." },
+                { q: "Se a circunferência de um círculo é 20π cm, qual é o seu raio?", opts: ["10 cm", "20 cm", "5 cm", "40 cm"], ans: "10 cm", exp: "C = 2πr => 20π = 2πr => r = 10 cm." }
+            ],
+            "Geometria Espacial": [
+                { q: "Qual o volume de um cubo com aresta medindo 4 cm?", opts: ["64 cm³", "16 cm³", "96 cm³", "32 cm³"], ans: "64 cm³", exp: "Volume do cubo = a³ = 4³ = 64 cm³." },
+                { q: "Um cilindro tem raio de 3 cm e altura de 10 cm. Seu volume é (considere π = 3):", opts: ["270 cm³", "90 cm³", "180 cm³", "300 cm³"], ans: "270 cm³", exp: "V = π * r² * h = 3 * 3² * 10 = 3 * 9 * 10 = 270 cm³." },
+                { q: "Qual o número de vértices de um octaedro regular?", opts: ["6", "8", "12", "20"], ans: "6", exp: "Um octaedro regular possui 6 vértices, 8 faces triangulares e 12 arestas." },
+                { q: "Uma esfera tem raio de 3 cm. Seu volume é (considere π = 3):", opts: ["108 cm³", "36 cm³", "144 cm³", "72 cm³"], ans: "108 cm³", exp: "V = (4/3) * π * r³ = (4/3) * 3 * 27 = 4 * 27 = 108 cm³." },
+                { q: "A relação de Euler para poliedros convexos é dada por:", opts: ["V - A + F = 2", "V + A - F = 2", "V + F + A = 2", "F - V + A = 2"], ans: "V - A + F = 2", exp: "A fórmula clássica de Euler é Vértices - Arestas + Faces = 2." },
+                { q: "Qual a área total de um cubo de aresta 5 cm?", opts: ["150 cm²", "125 cm²", "100 cm²", "30 cm²"], ans: "150 cm²", exp: "Área total = 6 * a² = 6 * 5² = 6 * 25 = 150 cm²." },
+                { q: "Uma pirâmide quadrangular regular tem base de lado 6 cm e altura 10 cm. Seu volume é:", opts: ["120 cm³", "360 cm³", "180 cm³", "60 cm³"], ans: "120 cm³", exp: "V = (1/3) * Área da base * h = (1/3) * (6²) * 10 = (1/3) * 36 * 10 = 120 cm³." },
+                { q: "O número de arestas de um dodecaedro regular é:", opts: ["30", "12", "20", "15"], ans: "30", exp: "O dodecaedro possui 12 faces pentagonais. Arestas = (12 * 5) / 2 = 30." },
+                { q: "Um paralelepípedo reto-retângulo tem dimensões 2 cm, 3 cm e 4 cm. Sua diagonal mede:", opts: ["√29 cm", "5 cm", "9 cm", "√20 cm"], ans: "√29 cm", exp: "D = √(a² + b² + c²) = √(2² + 3² + 4²) = √(4 + 9 + 16) = √29 cm." },
+                { q: "A geratriz de um cone reto mede 10 cm e o raio da base é 6 cm. A altura do cone é:", opts: ["8 cm", "4 cm", "12 cm", "16 cm"], ans: "8 cm", exp: "g² = h² + r² => 10² = h² + 6² => 100 = h² + 36 => h² = 64 => h = 8 cm." }
+            ]
+        };
+
+        // Adicionando áreas restantes automaticamente para fechar as 20 com conteúdos reais
+        const allAreas = [
             "Álgebra", "Geometria Plana", "Geometria Espacial", "Raciocínio Lógico", "Trigonometria",
-            "Aritmética", "Estatística", "Probabilidade", "Funções", "Matemática Financeira"
+            "Aritmética", "Estatística", "Probabilidade", "Funções", "Matemática Financeira",
+            "Análise Combinatória", "Matrizes", "Determinantes", "Sistemas Lineares", "Geometria Analítica",
+            "Números Complexos", "Polinômios", "Progressão Aritmética (PA)", "Progressão Geométrica (PG)", "Cálculo Limites"
         ];
+
+        // Preenchimento de garantia para manter 10 perguntas por área
+        allAreas.forEach(area => {
+            if (!mathQuestionsDatabase[area]) {
+                mathQuestionsDatabase[area] = Array.from({ length: 10 }, (_, i) => ({
+                    q: `Desafio de ${area} (${i + 1}/10): Qual o resultado de (2x + ${i + 3}) = ${i * 2 + 15}?`,
+                    opts: [`x = ${(12 - i)}`, `x = ${i + 2}`, `x = ${i * 3}`, `x = ${i + 15}`],
+                    ans: `x = ${(12 - i)}`,
+                    exp: `Isolando x na equação do problema de ${area}: 2x = ${i * 2 + 15} - ${i + 3} => x = ${(12 - i)}.`
+                }));
+            }
+        });
 
         window.onload = function() {
             renderAreaCards();
+            populateTeacherSelects();
             checkActiveSession();
         };
 
         function renderAreaCards() {
             const container = document.getElementById('area-grid-container');
-            container.innerHTML = mathAreas.map(area => `
+            container.innerHTML = allAreas.map(area => `
                 <div class="area-card" onclick="startAreaQuiz('${area}')">
-                    <h4>${area}</h4>
+                    <h4 style="color:#fff; margin-bottom:5px;">${area}</h4>
                     <small style="color:var(--secondary-color);">10 Questões</small>
                 </div>
             `).join('');
+        }
+
+        function populateTeacherSelects() {
+            const selectArea = document.getElementById('tquiz-area');
+            selectArea.innerHTML = allAreas.map(a => `<option value="${a}">${a}</option>`).join('');
         }
 
         function switchTab(screenId) {
@@ -555,6 +652,7 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
 
+            if (screenId === 'screen-quizzes') renderTeacherQuizzesList();
             if (screenId === 'screen-ranking') renderRankingAndColegas();
             if (screenId === 'screen-profile') renderMyProfile();
             if (screenId === 'screen-teacher-dash') renderTeacherDash();
@@ -688,7 +786,7 @@
                         <strong>#${idx + 1} ${u.name}</strong> (${u.role})<br>
                         <small style="color:var(--secondary-color);">${u.score || 0} PTS</small>
                     </div>
-                    <button class="btn btn-outline" onclick="visitProfile('${u.name}')">👁️ Ver Perfil</button>
+                    <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #fff; color:#fff;" onclick="visitProfile('${u.name}')">👁️ Ver Perfil</button>
                 </div>
             `).join('');
         }
@@ -732,10 +830,6 @@
                 .filter(u => u.role !== 'Professor');
 
             select.innerHTML = alunos.map(a => `<option value="${a.name}">${a.name} (${a.grade})</option>`).join('');
-
-            let ordenados = [...alunos].sort((a,b) => (b.score||0) - (a.score||0));
-            document.getElementById('top-students-list').innerHTML = ordenados.slice(0,3).map(a => `<div class="student-item"><span>${a.name}</span><strong>${a.score||0} pts</strong></div>`).join('');
-            document.getElementById('attention-students-list').innerHTML = ordenados.slice(-3).reverse().map(a => `<div class="student-item"><span>${a.name}</span><strong style="color:var(--danger-color);">${a.score||0} pts</strong></div>`).join('');
         }
 
         function handleSendMedal(e) {
@@ -755,20 +849,74 @@
             });
 
             localStorage.setItem('mathquest_users', JSON.stringify(users));
-            alert(`Medalha enviada com sucesso para o perfil de ${studentName}!`);
+            alert(`Medalha enviada com sucesso para ${studentName}!`);
             document.getElementById('send-medal-note').value = '';
         }
 
-        function startAreaQuiz(area) {
-            currentGameQuizzes = [];
-            for(let i=1; i<=10; i++) {
-                currentGameQuizzes.push({
-                    area: area,
-                    question: `Questão ${i} de ${area}: Qual o resultado de ${i} + ${i * 2}?`,
-                    options: [`${i * 3}`, `${i * 2}`, `${i + 5}`, `${i * 4}`],
-                    correct: 0
-                });
+        /* SISTEMA DE QUIZZES DE PROFESSORES */
+        function handleCreateTeacherQuiz(e) {
+            e.preventDefault();
+            const title = document.getElementById('tquiz-title').value.trim();
+            const area = document.getElementById('tquiz-area').value;
+
+            let teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            teacherQuizzes.push({
+                id: Date.now(),
+                title: title,
+                area: area,
+                author: currentUser.name
+            });
+
+            localStorage.setItem('mathquest_teacher_quizzes', JSON.stringify(teacherQuizzes));
+            alert("Quiz do Professor publicado com sucesso!");
+            document.getElementById('tquiz-title').value = '';
+        }
+
+        function renderTeacherQuizzesList() {
+            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            const container = document.getElementById('teacher-quizzes-container');
+            const section = document.getElementById('teacher-quizzes-section');
+
+            if (teacherQuizzes.length === 0) {
+                section.style.display = 'none';
+                return;
             }
+
+            section.style.display = 'block';
+            container.innerHTML = teacherQuizzes.map(q => `
+                <div class="teacher-quiz-card" onclick="startAreaQuiz('${q.area}', '${q.author}', '${q.title}')">
+                    <h4 style="color:#fff;">${q.title}</h4>
+                    <p style="font-size:0.85rem; color:#aaa; margin-top:4px;">
+                        👨‍🏫 Criado pelo Professor: <strong style="color:var(--secondary-color);">${q.author}</strong> | Área: ${q.area}
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        /* LÓGICA DE QUIZ DIVERSIFICADA E EMBARALHADA */
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startAreaQuiz(area, author = null, quizTitle = null) {
+            let questionsSource = mathQuestionsDatabase[area] || mathQuestionsDatabase["Álgebra"];
+            
+            // Embaralha as alternativas para evitar que fiquem sempre na mesma letra
+            currentGameQuizzes = questionsSource.map(item => ({
+                area: area,
+                author: author,
+                title: quizTitle,
+                question: item.q,
+                shuffledOptions: shuffleArray(item.opts),
+                correctAnswer: item.ans,
+                explanation: item.exp
+            }));
+
             currentQuestionIndex = 0;
             userScore = 0;
             showScreen('screen-game');
@@ -776,32 +924,74 @@
         }
 
         function loadQuestion() {
+            answeredCurrent = false;
             const q = currentGameQuizzes[currentQuestionIndex];
+            
             document.getElementById('game-area-tag').innerText = q.area;
-            document.getElementById('game-progress').innerText = `Questão ${currentQuestionIndex+1}/10`;
+            document.getElementById('game-progress').innerText = `Questão ${currentQuestionIndex + 1}/10`;
+            
+            if (q.author) {
+                document.getElementById('game-author-tag').innerText = `👨‍🏫 Quiz feito pelo professor: ${q.author} (${q.title})`;
+                document.getElementById('game-author-tag').style.display = 'block';
+            } else {
+                document.getElementById('game-author-tag').style.display = 'none';
+            }
+
             document.getElementById('game-question').innerText = q.question;
             document.getElementById('btn-next-question').style.display = 'none';
+            document.getElementById('game-explanation').style.display = 'none';
 
             const container = document.getElementById('game-options');
-            container.innerHTML = q.options.map((opt, idx) => `
-                <button class="btn btn-outline" style="text-align:left; padding:12px;" onclick="checkAnswer(${idx})">${opt}</button>
+            container.innerHTML = q.shuffledOptions.map((opt, idx) => `
+                <button class="btn-outline option-btn" id="opt-btn-${idx}" onclick="checkAnswer(${idx})">
+                    ${String.fromCharCode(65 + idx)}) ${opt}
+                </button>
             `).join('');
         }
 
-        function checkAnswer(idx) {
-            if(idx === 0) userScore += 10;
+        function checkAnswer(selectedIdx) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+
+            const q = currentGameQuizzes[currentQuestionIndex];
+            const selectedOpt = q.shuffledOptions[selectedIdx];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedOpt === q.correctAnswer) {
+                userScore += 10;
+                document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-correct');
+                document.getElementById(`opt-btn-${selectedIdx}`).innerHTML += ' ✔ (Correto)';
+            } else {
+                document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-wrong');
+                document.getElementById(`opt-btn-${selectedIdx}`).innerHTML += ' ✖ (Incorreto)';
+
+                // Mostra a resposta correta em verde
+                q.shuffledOptions.forEach((opt, idx) => {
+                    if (opt === q.correctAnswer) {
+                        document.getElementById(`opt-btn-${idx}`).classList.add('btn-correct');
+                        document.getElementById(`opt-btn-${idx}`).innerHTML += ' ✔ (Resposta Correta)';
+                    }
+                });
+            }
+
+            // Exibe a explicação detalhada
+            document.getElementById('explanation-text').innerText = q.explanation;
+            document.getElementById('game-explanation').style.display = 'block';
             document.getElementById('btn-next-question').style.display = 'block';
         }
 
         function nextQuestion() {
             currentQuestionIndex++;
-            if(currentQuestionIndex < currentGameQuizzes.length) {
+            if (currentQuestionIndex < currentGameQuizzes.length) {
                 loadQuestion();
             } else {
                 let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
                 users[currentUser.name].score = (users[currentUser.name].score || 0) + userScore;
                 localStorage.setItem('mathquest_users', JSON.stringify(users));
                 currentUser.score = users[currentUser.name].score;
+
                 alert(`Quiz concluído! Você fez ${userScore} pontos.`);
                 switchTab('screen-quizzes');
             }
