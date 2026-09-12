@@ -2305,26 +2305,241 @@
             }
         }
     </script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        function updateMascotBubble(text, emoji = "🧙‍♂️") {
+            const bubble = document.getElementById('mascot-bubble');
+            const avatar = document.getElementById('mascot-avatar');
+            if (bubble) bubble.innerText = text;
+            if (avatar) avatar.innerText = emoji;
+        }
 
-<style>
-  html, body {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-  }
+        /* PERFIL DO USUÁRIO & MEDALHAS */
+        function loadProfileData() {
+            if (!currentUser) return;
+            document.getElementById('profile-img-preview').src = currentUser.photo || 'https://via.placeholder.com/100';
+            document.getElementById('profile-status-input').value = currentUser.status || '';
+            document.getElementById('profile-color-input').value = currentUser.themeColor || '#ff007f';
 
-  img, video, canvas {
-    max-width: 100%;
-    height: auto;
-  }
+            renderDailyQuests();
+            renderMyMedals();
+        }
 
-  @media (max-width: 768px) {
-    body {
-      zoom: 0.9;
-    }
-  }
-</style>
+        function uploadProfilePhoto(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64Photo = evt.target.result;
+                document.getElementById('profile-img-preview').src = base64Photo;
+                currentUser.photo = base64Photo;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveProfileChanges() {
+            if (!currentUser) return;
+            const newStatus = document.getElementById('profile-status-input').value.trim();
+            const newColor = document.getElementById('profile-color-input').value;
+
+            currentUser.status = newStatus;
+            currentUser.themeColor = newColor;
+
+            document.documentElement.style.setProperty('--primary-color', newColor);
+            saveUserData();
+            alert("Perfil atualizado com sucesso!");
+        }
+
+        function renderDailyQuests() {
+            const container = document.getElementById('daily-quests-container');
+            const quests = [
+                { title: 'Concluir 1 Quiz', reward: '🪙 20 Moedas', done: (currentUser.score || 0) > 0 },
+                { title: 'Manter Ofensiva por 3 Dias', reward: '⭐ 50 XP', done: (currentUser.streak || 0) >= 3 },
+                { title: 'Alcançar o Nível 2', reward: '🏆 Medalha Iniciante', done: (currentUser.level || 1) >= 2 }
+            ];
+
+            container.innerHTML = quests.map(q => `
+                <div class="quest-card">
+                    <div>
+                        <strong>${q.title}</strong>
+                        <div style="font-size:0.8rem; color:var(--secondary-color);">${q.reward}</div>
+                    </div>
+                    <div>${q.done ? '✅ Concluída' : '⏳ Em progresso'}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderMyMedals() {
+            const container = document.getElementById('my-medals-container');
+            const medals = currentUser.medals || [];
+
+            if (medals.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; font-size:0.85rem;">Nenhuma medalha recebida ainda. Continue jogando ou aguarde seu professor!</p>`;
+                return;
+            }
+
+            container.innerHTML = medals.map(m => `
+                <div style="background:#202436; border:1px solid var(--secondary-color); padding:10px; border-radius:8px; text-align:center; min-width:120px;">
+                    <div style="font-size:1.5rem;">${m.type.split(' ')[0]}</div>
+                    <strong style="font-size:0.8rem; display:block; color:#fff;">${m.type.replace(/^[^\s]+\s*/, '')}</strong>
+                    <small style="color:#aaa; font-size:0.7rem;">"${m.msg}"</small>
+                </div>
+            `).join('');
+        }
+
+        /* RANKING & MODAL DE ALUNOS */
+        function renderRanking() {
+            const container = document.getElementById('ranking-list-container');
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            const sortedUsers = Object.keys(globalUsers)
+                .map(key => ({ name: key, ...globalUsers[key] }))
+                .filter(u => u.role === 'Aluno')
+                .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            if (sortedUsers.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center;">Nenhum aluno cadastrado no ranking ainda.</p>`;
+                return;
+            }
+
+            container.innerHTML = sortedUsers.map((user, idx) => `
+                <div class="ranking-card" onclick="openUserProfileModal('${user.name}')">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-family:var(--font-pixel); color:var(--secondary-color); font-size:1rem; width:25px;">#${idx + 1}</span>
+                        <img src="${user.photo || 'https://via.placeholder.com/45'}" class="user-avatar-small" alt="${user.name}">
+                        <div>
+                            <strong style="color:#fff; display:block;">${user.name}</strong>
+                            <small style="color:#aaa;">${user.grade} | Lvl ${user.level || 1}</small>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <strong style="color:var(--success-color); font-size:1.1rem;">${user.score || 0} pts</strong>
+                        <div style="font-size:0.75rem; color:#ffd700;">🪙 ${user.coins || 0}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openUserProfileModal(username) {
+            const user = globalUsers[username];
+            if (!user) return;
+
+            document.getElementById('modal-user-img').src = user.photo || 'https://via.placeholder.com/120';
+            document.getElementById('modal-user-name').innerText = user.name;
+            document.getElementById('modal-user-status-dot').className = `status-badge ${user.online ? 'status-online' : 'status-offline'}`;
+            document.getElementById('modal-user-role-grade').innerText = `${user.role} - ${user.grade} (Nível ${user.level || 1})`;
+            document.getElementById('modal-user-status-text').innerText = `"${user.status || 'Sem frase de perfil'}"`;
+            document.getElementById('modal-user-score').innerText = `${user.score || 0} pts`;
+
+            const medalsContainer = document.getElementById('modal-user-medals');
+            const medals = user.medals || [];
+
+            if (medals.length === 0) {
+                medalsContainer.innerHTML = `<p style="color:#aaa; font-size:0.85rem;">Nenhuma medalha conquistada.</p>`;
+            } else {
+                medalsContainer.innerHTML = medals.map(m => `
+                    <div style="background:#202436; padding:8px 12px; border-radius:6px; font-size:0.85rem; border-left:3px solid var(--secondary-color);">
+                        <strong>${m.type}</strong> - <em style="color:#ccc;">"${m.msg}"</em>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('user-profile-modal').classList.remove('hidden');
+        }
+
+        function closeUserProfileModal() {
+            document.getElementById('user-profile-modal').classList.add('hidden');
+        }
+
+        /* PAINEL DO PROFESSOR */
+        function loadTeacherDashboard() {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const students = Object.keys(globalUsers)
+                .map(k => ({ name: k, ...globalUsers[k] }))
+                .filter(u => u.role === 'Aluno');
+
+            // Popular select de medalhas
+            const studentSelect = document.getElementById('medal-student-select');
+            studentSelect.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.grade})</option>`).join('');
+
+            // Cálculos de Estatísticas
+            let totalScore = 0;
+            let highPerformers = 0;
+            let lowPerformers = 0;
+
+            students.forEach(s => {
+                const sc = s.score || 0;
+                totalScore += sc;
+                if (sc >= 100) highPerformers++;
+                else lowPerformers++;
+            });
+
+            const avgScore = students.length > 0 ? Math.round(totalScore / students.length) : 0;
+
+            document.getElementById('stat-avg-score').innerText = `${avgScore} pts`;
+            document.getElementById('stat-high-performers').innerText = highPerformers;
+            document.getElementById('stat-low-performers').innerText = lowPerformers;
+
+            renderPerformanceChart(students);
+        }
+
+        function renderPerformanceChart(students) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            const labels = students.map(s => s.name);
+            const data = students.map(s => s.score || 0);
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pontuação por Aluno',
+                        data: data,
+                        backgroundColor: '#00f0ff',
+                        borderColor: '#ff007f',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.1)' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#ffffff' } }
+                    }
+                }
+            });
+        }
+
+        function handleSendMedal(e) {
+            e.preventDefault();
+            const studentName = document.getElementById('medal-student-select').value;
+            const medalType = document.getElementById('medal-type-select').value;
+            const msg = document.getElementById('medal-msg-input').value.trim();
+
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (!globalUsers[studentName]) return;
+
+            if (!globalUsers[studentName].medals) globalUsers[studentName].medals = [];
+            globalUsers[studentName].medals.push({
+                type: medalType,
+                msg: msg,
+                date: new Date().toLocaleDateString('pt-BR')
+            });
+
+            localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+
+            if (isFirebaseActive) {
+                firebase.database().ref('users/' + studentName + '/medals').set(globalUsers[studentName].medals);
+            }
+
+            alert(`Medalha enviada com sucesso para ${studentName}!`);
+            document.getElementById('medal-msg-input').value = '';
+        }
+    </script>
+
 
 </body>
 </html>
