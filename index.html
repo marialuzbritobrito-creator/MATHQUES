@@ -55,6 +55,13 @@
             gap: 15px;
         }
 
+        /* ESTILO DA LOGO MT.PNG */
+        .logo-img {
+            max-height: 55px;
+            width: auto;
+            object-fit: contain;
+        }
+
         .logo-icon {
             font-size: 2.2rem;
             color: var(--secondary-color);
@@ -319,7 +326,10 @@
 <body>
 
     <header>
-        <div class="logo-icon">📐</div>
+        <!-- LOGO MT.PNG COM TRATAMENTO DE ERRO -->
+        <img src="mt.png" alt="Logo MathQuest" class="logo-img" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
+        <div id="fallback-logo" class="logo-icon" style="display: none;">📐</div>
+
         <div>
             <h1>MATHQUEST</h1>
             <p style="color:#aaa;">A Gamificação da Matemática</p>
@@ -665,7 +675,6 @@
             list.innerHTML = renderMedalCards(currentUser.medals || []);
         }
 
-        /* LÓGICA DE VISITAÇÃO DE PERFIL DE COLEGA */
         function renderRankingAndColegas() {
             const container = document.getElementById('ranking-list-container');
             const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
@@ -715,7 +724,6 @@
             `).join('');
         }
 
-        /* ENVIO DE MEDALHAS PELO PROFESSOR */
         function renderTeacherDash() {
             const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const select = document.getElementById('send-student-select');
@@ -725,7 +733,6 @@
 
             select.innerHTML = alunos.map(a => `<option value="${a.name}">${a.name} (${a.grade})</option>`).join('');
 
-            // Ranking rápido
             let ordenados = [...alunos].sort((a,b) => (b.score||0) - (a.score||0));
             document.getElementById('top-students-list').innerHTML = ordenados.slice(0,3).map(a => `<div class="student-item"><span>${a.name}</span><strong>${a.score||0} pts</strong></div>`).join('');
             document.getElementById('attention-students-list').innerHTML = ordenados.slice(-3).reverse().map(a => `<div class="student-item"><span>${a.name}</span><strong style="color:var(--danger-color);">${a.score||0} pts</strong></div>`).join('');
@@ -752,7 +759,6 @@
             document.getElementById('send-medal-note').value = '';
         }
 
-        /* LOGICA BASICA DE QUIZ */
         function startAreaQuiz(area) {
             currentGameQuizzes = [];
             for(let i=1; i<=10; i++) {
