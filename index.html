@@ -401,7 +401,7 @@
             <button id="tab-btn-teacher" class="tab-btn hidden" onclick="switchTab('screen-teacher-dash')">🎓 ÁREA DO PROFESSOR</button>
         </div>
 
-        <!-- TELA 1: LOGIN (ATUALIZADA: SEM ESCOLHA DE TIPO, DETECTA AUTOMATICAMENTE) -->
+        <!-- TELA 1: LOGIN -->
         <div id="screen-login" class="screen active">
             <h2 class="screen-title">Acessar a Plataforma</h2>
             <form onsubmit="handleLogin(event)">
@@ -471,7 +471,7 @@
             </form>
         </div>
 
-        <!-- TELA 4: RANKING & COLEGAS (ATUALIZADA: APENAS ALUNOS, COM STATUS EM TEMPO REAL) -->
+        <!-- TELA 4: RANKING & COLEGAS -->
         <div id="screen-ranking" class="screen">
             <h2 class="screen-title">🏆 Ranking Geral da Turma</h2>
             <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-bottom:15px;">💡 Os professores não aparecem nesta lista de pontuação!</p>
@@ -637,7 +637,6 @@
             loadChatMessages();
         };
 
-        // GESTÃO DE STATUS ONLINE / OFFLINE E SINCRONIZAÇÃO
         function setupPresenceSystem() {
             if (!isFirebaseActive || !currentUser) return;
             const userStatusRef = firebase.database().ref('users/' + currentUser.name + '/online');
@@ -686,7 +685,7 @@
             container.innerHTML = allAreas.map(area => `
                 <div class="area-card" onclick="startStandardAreaQuiz('${area}')">
                     <h4 style="color:#fff; margin-bottom:5px;">${area}</h4>
-                    <small style="color:var(--secondary-color);">10 Questões</small>
+                    <small style="color:var(--secondary-color);">10 Questões Dinâmicas</small>
                 </div>
             `).join('');
         }
@@ -797,7 +796,6 @@
             checkActiveSession();
         }
 
-        /* LÓGICA DA ABA DE INTERAÇÃO (CHAT) */
         function handleSendMessage(e) {
             e.preventDefault();
             const input = document.getElementById('chat-input-message');
@@ -867,7 +865,6 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        /* CONSTRUTOR DE QUIZZES ESTILO GOOGLE FORMS DO PROFESSOR */
         function addQuestionCard() {
             questionCount++;
             const qId = questionCount;
@@ -1042,25 +1039,181 @@
             loadQuestion();
         }
 
+        /* GERADOR AUTOMÁTICO DE 10 QUESTÕES ESPECÍFICAS PARA CADA UMA DAS 20 ÁREAS */
         function startStandardAreaQuiz(area) {
-            currentGameQuizzes = Array.from({ length: 10 }, (_, i) => {
-                const correctVal = (i + 1) * 12;
-                const opts = [
-                    `${correctVal}`,
-                    `${correctVal + 4}`,
-                    `${correctVal - 3}`,
-                    `${correctVal + 10}`
-                ];
-                return {
+            let questions = [];
+
+            for (let i = 1; i <= 10; i++) {
+                let n1 = Math.floor(Math.random() * 15) + 2;
+                let n2 = Math.floor(Math.random() * 10) + 1;
+                let qText = "", correctAns = "", expText = "", opts = [];
+
+                if (area === "Álgebra") {
+                    let val = n1 * i;
+                    qText = `Qual é o valor de x na equação: ${n1}x = ${val}?`;
+                    correctAns = `x = ${i}`;
+                    expText = `Divida ambos os lados por ${n1}: x = ${val} / ${n1} = ${i}.`;
+                    opts = [`x = ${i}`, `x = ${i + 2}`, `x = ${Math.max(1, i - 1)}`, `x = ${i * 2}`];
+                } 
+                else if (area === "Geometria Plana") {
+                    let lado = n1;
+                    let areaVal = lado * lado;
+                    qText = `Qual é a área de um quadrado cujo lado mede ${lado} cm?`;
+                    correctAns = `${areaVal} cm²`;
+                    expText = `A área do quadrado calcula-se multiplicando lado por lado (${lado} × ${lado} = ${areaVal}).`;
+                    opts = [`${areaVal} cm²`, `${lado * 4} cm²`, `${areaVal + 6} cm²`, `${Math.max(1, areaVal - 5)} cm²`];
+                }
+                else if (area === "Geometria Espacial") {
+                    let arq = n1;
+                    let vol = arq * arq * arq;
+                    qText = `Qual é o volume de um cubo com aresta de ${arq} cm?`;
+                    correctAns = `${vol} cm³`;
+                    expText = `O volume do cubo é aresta ao cubo (${arq}³ = ${vol}).`;
+                    opts = [`${vol} cm³`, `${arq * 6} cm²`, `${vol + 12} cm³`, `${Math.max(1, vol - 8)} cm³`];
+                }
+                else if (area === "Raciocínio Lógico") {
+                    let seq = n1;
+                    let prox = seq + (i * 3);
+                    qText = `Dada a sequência lógica: ${seq}, ${seq + 3}, ${seq + 6}, ${seq + 9}, ... Qual é o próximo termo?`;
+                    correctAns = `${prox}`;
+                    expText = `A sequência avança somando 3 unidades a cada passo. O próximo valor é ${prox}.`;
+                    opts = [`${prox}`, `${prox + 2}`, `${prox - 1}`, `${prox + 5}`];
+                }
+                else if (area === "Trigonometria") {
+                    let ang = [30, 45, 60][i % 3];
+                    let valTrig = ang === 30 ? "0.5" : (ang === 45 ? "0.71" : "0.87");
+                    qText = `Qual é o valor aproximado do seno de ${ang}°?`;
+                    correctAns = `${valTrig}`;
+                    expText = `O valor tabelado e aproximado para o seno de ${ang}° é ${valTrig}.`;
+                    opts = [`${valTrig}`, `${(parseFloat(valTrig) + 0.2).toFixed(2)}`, `${(Math.max(0.1, parseFloat(valTrig) - 0.2)).toFixed(2)}`, "1.00"];
+                }
+                else if (area === "Aritmética") {
+                    let res = n1 + n2 * i;
+                    qText = `Qual é o resultado da expressão aritmética: ${n1} + ${n2} × ${i}?`;
+                    correctAns = `${res}`;
+                    expText = `Pela ordem das operações, faça primeiro a multiplicação (${n2} × ${i} = ${n2 * i}) e depois some ${n1} (${res}).`;
+                    opts = [`${res}`, `${res + 4}`, `${res - 2}`, `${res + 10}`];
+                }
+                else if (area === "Estatística") {
+                    let media = n1 + i;
+                    qText = `Em um conjunto de dados, se a soma total de ${n2 + 5} valores resulta em ${(n2 + 5) * media}, qual é a média aritmética?`;
+                    correctAns = `${media}`;
+                    expText = `A média é a soma total dividida pela quantidade de elementos: ${(n2 + 5) * media} / ${n2 + 5} = ${media}.`;
+                    opts = [`${media}`, `${media + 3}`, `${media - 1}`, `${media * 2}`];
+                }
+                else if (area === "Probabilidade") {
+                    let total = 10 + i;
+                    let fav = 2;
+                    qText = `Em uma urna com ${total} bolas, sendo ${fav} premiadas, qual é a probabilidade de retirar uma premiada?`;
+                    correctAns = `${fav}/${total}`;
+                    expText = `A probabilidade é o número de casos favoráveis (${fav}) dividido pelo total de casos (${total}).`;
+                    opts = [`${fav}/${total}`, `1/${total}`, `${fav}/10`, `2/5`];
+                }
+                else if (area === "Funções") {
+                    let a = i;
+                    let b = 3;
+                    let xVal = 2;
+                    let fRes = a * xVal + b;
+                    qText = `Dada a função afim f(x) = ${a}x + ${b}, qual é o valor de f(${xVal})?`;
+                    correctAns = `${fRes}`;
+                    expText = `Substitua x por ${xVal}: ${a}(${xVal}) + ${b} = ${a * xVal} + ${b} = ${fRes}.`;
+                    opts = [`${fRes}`, `${fRes + 3}`, `${fRes - 2}`, `${fRes + 5}`];
+                }
+                else if (area === "Matemática Financeira") {
+                    let capital = 100 * i;
+                    let juros = capital * 0.1;
+                    qText = `Qual é o valor dos juros simples de um capital de R$ ${capital} aplicados a uma taxa de 10% ao mês?`;
+                    correctAns = `R$ ${juros}`;
+                    expText = `Multiplique o capital pela taxa percentual: ${capital} × 0.1 = ${juros}.`;
+                    opts = [`R$ ${juros}`, `R$ ${juros + 50}`, `R$ ${capital}`, `R$ ${juros * 2}`];
+                }
+                else if (area === "Matrizes e Determinantes") {
+                    let det = (n1 * i) - (n2 * 2);
+                    qText = `Qual é o determinante de uma matriz 2x2 com diagonal principal ${n1 * i} e secundária ${n2 * 2}? (Principal - Secundária)`;
+                    correctAns = `${det}`;
+                    expText = `O determinante é o produto da diagonal principal menos o produto da secundária: ${n1 * i} - ${n2 * 2} = ${det}.`;
+                    opts = [`${det}`, `${det + 5}`, `${det - 3}`, `${det * 2}`];
+                }
+                else if (area === "Análise Combinatória") {
+                    let comb = n1 + i;
+                    qText = `De quantas maneiras podemos organizar ${comb} elementos distintos em fila (Permutação Simples de ${comb})? Ou qual o arranjo base?`;
+                    correctAns = `${comb * 2} combinações`;
+                    expText = `Aplicando o conceito combinatório para o fator ${comb}, obtemos o total estruturado de ${comb * 2}.`;
+                    opts = [`${comb * 2} combinações`, `${comb + 5} combinações`, `${comb * 3} combinações`, `${comb} combinações`];
+                }
+                else if (area === "Sistemas Lineares") {
+                    let valX = i;
+                    let valY = 2;
+                    qText = `No sistema linear, se x = ${valX} e y = ${valY}, quanto vale a soma x + y?`;
+                    correctAns = `${valX + valY}`;
+                    expText = `Basta somar os valores dados: ${valX} + ${valY} = ${valX + valY}.`;
+                    opts = [`${valX + valY}`, `${valX + valY + 2}`, `${valX + valY - 1}`, `${valX * valY}`];
+                }
+                else if (area === "Geometria Analítica") {
+                    let d = i * 2;
+                    qText = `Qual é a distância no eixo cartesiano se o deslocamento horizontal for ${d} unidades?`;
+                    correctAns = `${d} unidades`;
+                    expText = `A distância direta equivale ao módulo do deslocamento informado (${d} unidades).`;
+                    opts = [`${d} unidades`, `${d + 4} unidades`, `${d * 2} unidades`, `${Math.max(1, d - 2)} unidades`];
+                }
+                else if (area === "Progressão Aritmética (PA)") {
+                    let a1 = 2;
+                    let r = i;
+                    let an = a1 + (5 - 1) * r;
+                    qText = `Dada uma PA com primeiro termo a1 = ${a1} e razão r = ${r}, qual é o 5º termo (a5)?`;
+                    correctAns = `${an}`;
+                    expText = `Fórmula do termo geral: an = a1 + (n - 1)r -> 2 + (5 - 1)(${r}) = ${an}.`;
+                    opts = [`${an}`, `${an + 3}`, `${an - 2}`, `${an + 6}`];
+                }
+                else if (area === "Progressão Geométrica (PG)") {
+                    let a1 = 2;
+                    let qR = 2;
+                    let anPG = a1 * Math.pow(qR, i - 1);
+                    qText = `Dada uma PG com a1 = ${a1} e razão q = ${qR}, qual é o termo na posição ${i}?`;
+                    correctAns = `${anPG}`;
+                    expText = `Fórmula do termo geral da PG: an = a1 * q^(n-1) -> ${a1} * 2^(${i}-1) = ${anPG}.`;
+                    opts = [`${anPG}`, `${anPG * 2}`, `${anPG + 4}`, `${Math.max(1, anPG / 2)}`];
+                }
+                else if (area === "Cálculo Mental") {
+                    let valMental = 50 + (i * 10);
+                    qText = `Cálculo Rápido: Quanto é ${valMental} dividido por 2 e somado com 5?`;
+                    correctAns = `${(valMental / 2) + 5}`;
+                    expText = `Divida ${valMental} por 2 (${valMental / 2}) e some 5, resultando em ${(valMental / 2) + 5}.`;
+                    opts = [`${(valMental / 2) + 5}`, `${(valMental / 2) + 10}`, `${valMental / 2}`, `${(valMental / 2) - 5}`];
+                }
+                else if (area === "Equações do 2º Grau") {
+                    let raiz = i;
+                    qText = `Se uma equação do 2º grau possui raízes x = ${raiz} e x = -${raiz}, qual é o produto das raízes?`;
+                    correctAns = `${- (raiz * raiz)}`;
+                    expText = `Multiplicando as raízes: (${raiz}) × (-${raiz}) = ${- (raiz * raiz)}.`;
+                    opts = [`${- (raiz * raiz)}`, `${raiz * raiz}`, `0`, `${raiz * 2}`];
+                }
+                else if (area === "Porcentagem e Juros") {
+                    let pct = i * 5;
+                    qText = `Quanto equivale ${pct}% de 200?`;
+                    correctAns = `${200 * (pct / 100)}`;
+                    expText = `Transforme a porcentagem em decimal (${pct / 100}) e multiplique por 200, resultando em ${200 * (pct / 100)}.`;
+                    opts = [`${200 * (pct / 100)}`, `${(200 * (pct / 100)) + 10}`, `${(200 * (pct / 100)) - 5}`, `${pct * 2}`];
+                }
+                else {
+                    let numGen = n1 * i;
+                    qText = `Questão ${i} de Conjuntos Numéricos: O elemento ${numGen} pertence ao conjunto dos números inteiros?`;
+                    correctAns = `Sim, é inteiro`;
+                    expText = `O número ${numGen} é um valor inteiro positivo pertencente ao conjunto Z.`;
+                    opts = ["Sim, é inteiro", "Não, é irracional", "Apenas decimal", "Pertence aos complexos"];
+                }
+
+                questions.push({
                     area: area,
                     author: null,
-                    question: `Questão ${i + 1} de ${area}: Qual o resultado do cálculo para x = ${i + 1}?`,
+                    question: qText,
                     shuffledOptions: shuffleArray(opts),
-                    correctAnswer: `${correctVal}`,
-                    explanation: `Resolução: Multiplica-se o valor de x (${i + 1}) por 12, obtendo a resposta ${correctVal}.`
-                };
-            });
+                    correctAnswer: correctAns,
+                    explanation: expText
+                });
+            }
 
+            currentGameQuizzes = questions;
             currentQuestionIndex = 0;
             userScore = 0;
             showScreen('screen-game');
@@ -1148,12 +1301,11 @@
             }
         }
 
-        /* RANKING E MEU PERFIL (ATUALIZADO: FILTRA APENAS ALUNOS, EXCLUI PROFESSORES E MOSTRA STATUS EM TEMPO REAL) */
         function renderRanking() {
             globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const students = Object.keys(globalUsers)
                 .map(u => ({ name: u, ...globalUsers[u] }))
-                .filter(u => u.role === 'Aluno') // APENAS ALUNOS APARECEM NO RANKING
+                .filter(u => u.role === 'Aluno')
                 .sort((a, b) => (b.score || 0) - (a.score || 0));
 
             const container = document.getElementById('ranking-list-container');
@@ -1235,7 +1387,6 @@
             }
         }
 
-        /* PAINEL DE CONTROLE DO PROFESSOR */
         function loadTeacherDashboard() {
             globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const students = Object.keys(globalUsers)
