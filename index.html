@@ -187,6 +187,23 @@
 
         .area-card:hover { transform: translateY(-3px); border-color: var(--secondary-color); }
 
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #202436;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ranking-item:hover {
+            background: #2a2f47;
+            border: 1px solid var(--secondary-color);
+        }
+
         .question-builder-card {
             background: #1c1f30;
             border: 1px solid var(--secondary-color);
@@ -347,6 +364,43 @@
             gap: 10px;
         }
 
+        /* MODAL DE PERFIL DO COLEGUINHA */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 2px solid var(--secondary-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            padding: 25px;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+            position: relative;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #ff3366;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -449,6 +503,7 @@
         <!-- TELA 4: RANKING -->
         <div id="screen-ranking" class="screen">
             <h2 class="screen-title">🏆 Ranking Geral da Turma</h2>
+            <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-bottom:15px;">💡 Clique em um colega para visualizar o perfil dele!</p>
             <div id="ranking-list-container"></div>
         </div>
 
@@ -558,6 +613,25 @@
             </div>
 
             <button id="btn-next-question" class="btn btn-primary" style="display:none; margin-top:20px;" onclick="nextQuestion()">PRÓXIMA QUESTÃO ➔</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZAÇÃO DO PERFIL DO COLEGAS -->
+    <div id="peer-profile-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <button class="close-modal-btn" onclick="closePeerProfile()">✕</button>
+            <div style="text-align:center; margin-bottom:15px;">
+                <img id="modal-peer-photo" src="https://via.placeholder.com/100" style="width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid var(--secondary-color);">
+                <h3 id="modal-peer-name" style="color:#fff; margin-top:10px;">Nome do Aluno</h3>
+                <span id="modal-peer-grade" style="color:var(--secondary-color); font-size:0.85rem;"></span>
+                <p id="modal-peer-status" style="color:#aaa; font-style:italic; font-size:0.85rem; margin-top:5px;"></p>
+            </div>
+            <div style="background:#202436; padding:12px; border-radius:8px; text-align:center; margin-bottom:15px;">
+                <small style="color:#aaa;">Pontuação Acumulada</small>
+                <h2 id="modal-peer-score" style="color:var(--primary-color); font-family:var(--font-pixel); font-size:1.1rem; margin-top:4px;">0 pts</h2>
+            </div>
+            <h4 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.7rem; margin-bottom:10px;">🏅 Medalhas Conquistadas</h4>
+            <div id="modal-peer-medals" style="display:flex; gap:8px; flex-wrap:wrap; max-height:150px; overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -952,7 +1026,6 @@
             loadQuestion();
         }
 
-        /* GERADOR DE QUESTÕES REAIS E FUNDAMENTADAS PARA AS 20 ÁREAS */
         function generateQuestionsForArea(area) {
             const questions = [];
             for (let i = 1; i <= 10; i++) {
@@ -1158,7 +1231,7 @@
             }
 
             container.innerHTML = students.map((s, idx) => `
-                <div style="display:flex; align-items:center; justify-content:space-between; background:#202436; padding:12px; border-radius:8px; margin-bottom:8px;">
+                <div class="ranking-item" onclick="viewPeerProfile('${s.name}')">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <strong style="color:var(--primary-color); width:20px;">#${idx + 1}</strong>
                         <img src="${s.photo || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -1173,6 +1246,38 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        /* FUNÇÕES DE VISUALIZAÇÃO DO PERFIL DO COLEGA */
+        function viewPeerProfile(username) {
+            const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const peer = users[username];
+            if (!peer) return;
+
+            document.getElementById('modal-peer-photo').src = peer.photo || 'https://via.placeholder.com/100';
+            document.getElementById('modal-peer-name').innerText = username;
+            document.getElementById('modal-peer-grade').innerText = peer.grade || '';
+            document.getElementById('modal-peer-status').innerText = peer.status ? `"${peer.status}"` : '';
+            document.getElementById('modal-peer-score').innerText = `${peer.score || 0} pts`;
+
+            const medalsContainer = document.getElementById('modal-peer-medals');
+            const medals = peer.medals || [];
+            if (medals.length === 0) {
+                medalsContainer.innerHTML = `<span style="color:#aaa; font-size:0.8rem;">Este aluno ainda não possui medalhas.</span>`;
+            } else {
+                medalsContainer.innerHTML = medals.map(m => `
+                    <div style="background:#161824; border:1px solid var(--secondary-color); padding:8px; border-radius:6px; font-size:0.8rem; width:100%;">
+                        <strong style="color:#fff;">${m.type}</strong><br>
+                        <small style="color:#ccc;">"${m.msg}" - Prof. ${m.from}</small>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('peer-profile-modal').classList.remove('hidden');
+        }
+
+        function closePeerProfile() {
+            document.getElementById('peer-profile-modal').classList.add('hidden');
         }
 
         function loadProfileData() {
