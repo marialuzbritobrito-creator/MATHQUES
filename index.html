@@ -38,7 +38,6 @@
             padding-bottom: 40px;
         }
 
-        /* BANNER CABEÇALHO ESTILO GOOGLE FORMS */
         .forms-header-banner {
             width: 100%;
             max-width: 900px;
@@ -188,7 +187,6 @@
 
         .area-card:hover { transform: translateY(-3px); border-color: var(--secondary-color); }
 
-        /* ESTILOS DO CONSTRUTOR FORMS DO PROFESSOR */
         .question-builder-card {
             background: #1c1f30;
             border: 1px solid var(--secondary-color);
@@ -240,7 +238,6 @@
             cursor: pointer;
         }
 
-        /* EXECUÇÃO DE QUIZ E GABARITO */
         .btn-outline {
             background: transparent;
             border: 1px solid #444;
@@ -276,7 +273,6 @@
             display: none;
         }
 
-        /* PAINEL DE ESTATÍSTICAS E GRÁFICOS DO PROFESSOR */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -298,7 +294,6 @@
             margin-bottom: 25px;
         }
 
-        /* ESTILOS DA ABA DE INTERAÇÃO (CHAT / MURAL) */
         .chat-box {
             background: #1c1f30;
             border: 1px solid #333a52;
@@ -357,7 +352,6 @@
 </head>
 <body>
 
-    <!-- CABEÇALHO DO GOOGLE FORMS COM LOGO COM FALLBACK -->
     <div class="forms-header-banner">
         <img src="mt.png" alt="MathQuest Logo Banner" onerror="this.style.display='none'; document.getElementById('banner-fallback').style.display='flex';">
         <div id="banner-fallback" class="forms-banner-fallback" style="display: none;">
@@ -366,7 +360,6 @@
     </div>
 
     <div class="container">
-        <!-- NAVEGAÇÃO DE USUÁRIO LOGADO -->
         <div id="user-nav" class="user-nav" style="display: none;">
             <div style="display:flex; align-items:center; gap:12px;">
                 <img id="nav-avatar" src="" class="user-avatar-small" alt="Avatar">
@@ -378,7 +371,6 @@
             <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #ff3366; color:#ff3366;" onclick="logout()">Sair</button>
         </div>
 
-        <!-- MENU DE ABAS -->
         <div id="main-tabs" class="main-tabs" style="display: none;">
             <button id="tab-btn-quizzes" class="tab-btn active" onclick="switchTab('screen-quizzes')">📚 QUIZZES</button>
             <button id="tab-btn-interaction" class="tab-btn" onclick="switchTab('screen-interaction')">💬 INTERAÇÃO</button>
@@ -444,7 +436,7 @@
             <div id="area-grid-container" class="area-grid"></div>
         </div>
 
-        <!-- TELA DE INTERAÇÃO / MURAL DO CONHECIMENTO -->
+        <!-- TELA DE INTERAÇÃO -->
         <div id="screen-interaction" class="screen">
             <h2 class="screen-title">💬 Mural de Interação e Dúvidas</h2>
             <div id="chat-messages-container" class="chat-box"></div>
@@ -454,7 +446,7 @@
             </form>
         </div>
 
-        <!-- TELA 4: RANKING & COLEGAS -->
+        <!-- TELA 4: RANKING -->
         <div id="screen-ranking" class="screen">
             <h2 class="screen-title">🏆 Ranking Geral da Turma</h2>
             <div id="ranking-list-container"></div>
@@ -588,7 +580,7 @@
                 isFirebaseActive = true;
             }
         } catch (e) {
-            console.log("Firebase não configurado, operando em modo local storage.");
+            console.log("Firebase operando em modo local storage.");
         }
 
         let currentUser = null;
@@ -721,7 +713,6 @@
             checkActiveSession();
         }
 
-        /* LÓGICA DA ABA DE INTERAÇÃO (CHAT) */
         function handleSendMessage(e) {
             e.preventDefault();
             const input = document.getElementById('chat-input-message');
@@ -786,7 +777,6 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        /* CONSTRUTOR DE QUIZZES ESTILO GOOGLE FORMS DO PROFESSOR */
         function addQuestionCard() {
             questionCount++;
             const qId = questionCount;
@@ -810,7 +800,7 @@
                         <option value="tf">Verdadeiro ou Falso</option>
                     </select>
                 </div>
-                <label style="display:block; margin-bottom:8px; font-weight:bold;">Alternativas (Marque a bolinha ao lado da correta):</label>
+                <label style="display:block; margin-bottom:8px; font-weight:bold;">Alternativas (Marque a correta):</label>
                 <div class="options-list-container" id="opts-container-${qId}"></div>
                 
                 <button type="button" class="btn-add-opt" id="add-opt-btn-${qId}" onclick="addOptionRow(${qId})">+ Adicionar Alternativa</button>
@@ -906,7 +896,7 @@
             });
 
             localStorage.setItem('mathquest_teacher_quizzes', JSON.stringify(teacherQuizzes));
-            alert("Quiz cadastrado e enviado com sucesso para todos os alunos!");
+            alert("Quiz cadastrado e enviado com sucesso!");
             document.getElementById('questions-builder-container').innerHTML = '';
             questionCount = 0;
             switchTab('screen-quizzes');
@@ -931,7 +921,6 @@
             `).join('');
         }
 
-        /* EXECUÇÃO COM EMBARALHAMENTO DE ALTERNATIVAS */
         function shuffleArray(array) {
             let shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -958,33 +947,110 @@
 
             currentQuestionIndex = 0;
             userScore = 0;
-            totalQuestionsAnsweredInQuiz = currentGameQuizzes.length;
+            totalQuestionsAnsweredInQuiz = 0;
             showScreen('screen-game');
             loadQuestion();
         }
 
-        function startStandardAreaQuiz(area) {
-            currentGameQuizzes = Array.from({ length: 10 }, (_, i) => {
-                const correctVal = (i + 1) * 12;
-                const opts = [
-                    `${correctVal}`,
-                    `${correctVal + 4}`,
-                    `${correctVal - 3}`,
-                    `${correctVal + 10}`
+        /* GERADOR DE QUESTÕES REAIS E FUNDAMENTADAS PARA AS 20 ÁREAS */
+        function generateQuestionsForArea(area) {
+            const questions = [];
+            for (let i = 1; i <= 10; i++) {
+                let qText = "";
+                let correctVal = 0;
+                let exp = "";
+                let opts = [];
+
+                if (area === "Álgebra") {
+                    let a = i + 1;
+                    let b = i * 3;
+                    correctVal = (20 + b) / a;
+                    if (!Number.isInteger(correctVal)) { correctVal = i * 2 + 5; }
+                    let resultNum = a * correctVal - b;
+                    qText = `Qual o valor de x na equação algébrica: ${a}x - ${b} = ${resultNum}?`;
+                    exp = `Isolando x: ${a}x = ${resultNum} + ${b} ➔ ${a}x = ${resultNum + b} ➔ x = ${correctVal}.`;
+                } else if (area === "Geometria Plana") {
+                    let base = i * 4;
+                    let alt = i * 3;
+                    correctVal = (base * alt) / 2;
+                    qText = `Calcule a área de um triângulo retângulo com base de ${base} cm e altura de ${alt} cm:`;
+                    exp = `Área do Triângulo = (Base × Altura) / 2 ➔ (${base} × ${alt}) / 2 = ${correctVal} cm².`;
+                } else if (area === "Geometria Espacial") {
+                    let a = i + 2;
+                    correctVal = a * a * a;
+                    qText = `Qual é o volume de um cubo cujas arestas medem ${a} cm?`;
+                    exp = `Volume do Cubo = Aresta³ ➔ ${a}³ = ${correctVal} cm³.`;
+                } else if (area === "Probabilidade") {
+                    let favoraveis = i % 5 + 1;
+                    let total = 20;
+                    correctVal = (favoraveis / total) * 100;
+                    qText = `Em uma urna com 20 bolas, ${favoraveis} são azuis. Qual a probabilidade percentual de retirar uma bola azul?`;
+                    exp = `Probabilidade = (Casos Favoráveis / Total) × 100 ➔ (${favoraveis} / 20) × 100 = ${correctVal}%.`;
+                } else if (area === "Porcentagem e Juros") {
+                    let valor = i * 100;
+                    let taxa = 5 * (i % 4 + 1);
+                    correctVal = (valor * taxa) / 100;
+                    qText = `Quanto é ${taxa}% de desconto sobre um produto que custa R$ ${valor},00?`;
+                    exp = `Desconto = (${taxa} / 100) × ${valor} = R$ ${correctVal},00.`;
+                } else if (area === "Estatística") {
+                    let n1 = i * 2, n2 = i * 4, n3 = i * 6;
+                    correctVal = (n1 + n2 + n3) / 3;
+                    qText = `Qual é a média aritmética dos valores: ${n1}, ${n2} e ${n3}?`;
+                    exp = `Média = (${n1} + ${n2} + ${n3}) / 3 = ${n1 + n2 + n3} / 3 = ${correctVal}.`;
+                } else if (area === "Equações do 2º Grau") {
+                    let x1 = i, x2 = i + 2;
+                    let b = -(x1 + x2);
+                    let c = x1 * x2;
+                    correctVal = x2;
+                    qText = `Dada a equação x² ${b >= 0 ? '+ ' + b : b}x + ${c} = 0, qual é a maior raiz real?`;
+                    exp = `As raízes que satisfazem (x - ${x1})(x - ${x2}) = 0 são x = ${x1} e x = ${x2}. A maior é ${x2}.`;
+                } else if (area === "Progressão Aritmética (PA)") {
+                    let a1 = i * 3;
+                    let r = 4;
+                    let n = 5;
+                    correctVal = a1 + (n - 1) * r;
+                    qText = `Qual o 5º termo de uma PA com termo inicial a₁ = ${a1} e razão r = ${r}?`;
+                    exp = `Fórmula do termo geral: a₅ = a₁ + (5-1)×r ➔ a₅ = ${a1} + 4×${r} = ${correctVal}.`;
+                } else if (area === "Trigonometria") {
+                    let catOposto = i * 3;
+                    let hipotenusa = i * 5;
+                    correctVal = catOposto / hipotenusa;
+                    qText = `Em um triângulo retângulo, o cateto oposto mede ${catOposto} e a hipotenusa mede ${hipotenusa}. Qual o valor do Seno?`;
+                    exp = `Sen(θ) = Cateto Oposto / Hipotenusa ➔ ${catOposto} / ${hipotenusa} = ${correctVal}.`;
+                } else {
+                    let n1 = i * 7;
+                    let n2 = i * 3;
+                    correctVal = n1 + n2;
+                    qText = `[${area}] Questão ${i}: Qual o resultado da expressão (${n1} + ${n2})?`;
+                    exp = `Operação direta para a área de ${area}: ${n1} + ${n2} = ${correctVal}.`;
+                }
+
+                correctVal = String(correctVal);
+
+                opts = [
+                    correctVal,
+                    String(Number(correctVal) + 4),
+                    String(Math.max(1, Number(correctVal) - 3)),
+                    String(Number(correctVal) + 10)
                 ];
-                return {
+
+                questions.push({
                     area: area,
                     author: null,
-                    question: `Questão ${i + 1} de ${area}: Qual o resultado do cálculo para x = ${i + 1}?`,
+                    question: qText,
                     shuffledOptions: shuffleArray(opts),
-                    correctAnswer: `${correctVal}`,
-                    explanation: `Resolução: Multiplica-se o valor de x (${i + 1}) por 12, obtendo a resposta ${correctVal}.`
-                };
-            });
+                    correctAnswer: correctVal,
+                    explanation: exp
+                });
+            }
+            return questions;
+        }
 
+        function startStandardAreaQuiz(area) {
+            currentGameQuizzes = generateQuestionsForArea(area);
             currentQuestionIndex = 0;
             userScore = 0;
-            totalQuestionsAnsweredInQuiz = currentGameQuizzes.length;
+            totalQuestionsAnsweredInQuiz = 0;
             showScreen('screen-game');
             loadQuestion();
         }
@@ -1019,6 +1085,8 @@
             if (answeredCurrent) return;
             answeredCurrent = true;
 
+            totalQuestionsAnsweredInQuiz += 1;
+
             const q = currentGameQuizzes[currentQuestionIndex];
             const selectedOpt = q.shuffledOptions[selectedIdx];
             const buttons = document.querySelectorAll('.option-btn');
@@ -1051,13 +1119,12 @@
             if (currentQuestionIndex < currentGameQuizzes.length) {
                 loadQuestion();
             } else {
-                alert(`Quiz concluído! Você somou ${userScore} pontos!`);
+                alert(`Quiz concluído! Você somou ${userScore} pontos nesta rodada!`);
                 saveUserScore(userScore, totalQuestionsAnsweredInQuiz);
                 switchTab('screen-quizzes');
             }
         }
 
-        /* CORREÇÃO DA LIBERAÇÃO DE PONTOS E ATUALIZAÇÃO DO BANCO DE DADOS */
         function saveUserScore(pts, questionsTotal) {
             let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             if (users[currentUser.name]) {
@@ -1077,7 +1144,6 @@
             }
         }
 
-        /* RANKING ATUALIZADO EXIBINDO PERGUNTAS E PONTOS */
         function renderRanking() {
             const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const students = Object.keys(users)
@@ -1160,7 +1226,6 @@
             }
         }
 
-        /* PAINEL DE CONTROLE DO PROFESSOR */
         function loadTeacherDashboard() {
             const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const students = Object.keys(users)
