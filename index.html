@@ -1,1065 +1,963 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MATHQUEST - Gamificação em Tempo Real</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathQuest - A Gamificação da Matemática</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff007f;
+            --secondary-color: #00f0ff;
+            --bg-dark: #0d0e15;
+            --card-bg: #161824;
+            --text-color: #ffffff;
+            --success-color: #00ff66;
+            --danger-color: #ff3366;
+            --font-pixel: 'Press Start 2P', cursive;
+            --font-main: 'Rajdhani', sans-serif;
+        }
 
-  <style>
-    :root {
-      --bg-color: #0d1117;
-      --card-bg: #161b22;
-      --accent-color: #ff0055;
-      --user-theme-color: #00ff66;
-      --text-color: #ffffff;
-      --border-color: #30363d;
-      --font-pixel: 'VT323', monospace;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+        }
 
-    * { box-sizing: border-box; font-family: var(--font-pixel); }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px 10px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 20%);
+        }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 0 0 20px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      font-size: 20px;
-    }
+        header {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(22, 24, 36, 0.9);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
 
-    .banner-container {
-      width: 100%;
-      max-width: 950px;
-      background-color: #161b22;
-      border-bottom: 4px solid var(--user-theme-color);
-      text-align: center;
-      overflow: hidden;
-      margin-bottom: 15px;
-    }
+        header h1 {
+            font-family: var(--font-pixel);
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            text-shadow: 2px 2px var(--primary-color);
+            margin-bottom: 8px;
+        }
 
-    .banner-img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      display: block;
-      image-rendering: pixelated;
-    }
+        header p {
+            font-size: 1.1rem;
+            color: #aaa;
+            font-weight: 600;
+        }
 
-    .app-container {
-      width: 100%;
-      max-width: 950px;
-      background-color: var(--card-bg);
-      border: 3px solid var(--user-theme-color);
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.2);
-    }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
 
-    .nav-tabs {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border-color);
-      overflow-x: auto;
-    }
+        .user-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .tab-btn {
-      flex: 1;
-      padding: 10px 15px;
-      background: #21262d;
-      color: #8b949e;
-      border: 2px solid var(--border-color);
-      border-bottom: none;
-      border-radius: 6px 6px 0 0;
-      cursor: pointer;
-      font-size: 20px;
-      text-align: center;
-      white-space: nowrap;
-      margin: 0;
-      box-shadow: none;
-    }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .tab-btn.active {
-      background: var(--user-theme-color);
-      color: #000;
-      font-weight: bold;
-      border-color: var(--user-theme-color);
-    }
+        .avatar-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
 
-    .screen { display: none; }
-    .screen.active { display: block; }
+        .user-details h4 {
+            font-size: 1.2rem;
+            color: #fff;
+        }
 
-    label {
-      font-size: 20px;
-      display: block;
-      margin-top: 10px;
-      color: var(--user-theme-color);
-    }
+        .user-details span {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            display: block;
+        }
 
-    input, select, textarea, button {
-      width: 100%;
-      padding: 10px 14px;
-      margin: 6px 0;
-      border: 2px solid var(--border-color);
-      border-radius: 6px;
-      background-color: #0d1117;
-      color: #fff;
-      font-size: 20px;
-    }
+        .user-phrase {
+            font-size: 0.8rem;
+            font-style: italic;
+            color: #ccc;
+            margin-top: 2px;
+        }
 
-    button {
-      background-color: var(--user-theme-color);
-      color: #000;
-      font-weight: bold;
-      border: 2px solid #000;
-      cursor: pointer;
-      text-transform: uppercase;
-      box-shadow: 3px 3px 0px #000;
-      margin-top: 10px;
-      min-height: 44px;
-    }
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+        }
 
-    button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .screen {
+            display: none;
+        }
 
-    .btn-secondary { background-color: #21262d; color: #fff; border-color: var(--border-color); }
+        .screen.active {
+            display: block;
+        }
 
-    /* Estilos das opções do Quiz */
-    .quiz-opt-btn {
-      transition: background-color 0.2s, border-color 0.2s;
-    }
+        h2.screen-title {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
 
-    .quiz-opt-btn.correct-choice {
-      background-color: #238636 !important;
-      border-color: #2ea043 !important;
-      color: #ffffff !important;
-    }
+        .form-group {
+            margin-bottom: 18px;
+        }
 
-    .quiz-opt-btn.wrong-choice {
-      background-color: #da3633 !important;
-      border-color: #f85149 !important;
-      color: #ffffff !important;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #ddd;
+        }
 
-    .avatar-preview {
-      width: 80px; height: 80px;
-      border: 3px solid var(--user-theme-color);
-      border-radius: 50%; object-fit: cover;
-      display: block; margin: 10px auto;
-      image-rendering: pixelated;
-    }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0d0e15;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s;
+        }
 
-    .area-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 10px; margin-top: 15px;
-      max-height: 400px; overflow-y: auto;
-    }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--secondary-color);
+        }
 
-    .area-card {
-      background: #21262d; border: 2px solid var(--border-color);
-      border-radius: 6px; padding: 15px; text-align: center; cursor: pointer;
-      font-weight: bold;
-    }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
 
-    .area-card:hover { border-color: var(--user-theme-color); background: #30363d; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-pixel);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-    .table-container { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 2px solid var(--border-color); padding: 8px; text-align: center; }
-    th { background-color: #21262d; color: var(--user-theme-color); }
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+        }
 
-    .forms-card {
-      background: #21262d;
-      border: 2px solid var(--border-color);
-      border-left: 6px solid var(--user-theme-color);
-      border-radius: 6px;
-      padding: 15px;
-      margin-bottom: 15px;
-      position: relative;
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
 
-    .option-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 5px;
-    }
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: #0d0e15;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+        }
 
-    .radio-check {
-      width: 25px;
-      height: 25px;
-      cursor: pointer;
-      accent-color: var(--user-theme-color);
-    }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: #00d8e6;
+        }
 
-    .btn-add-question {
-      background-color: #0088ff;
-      color: #fff;
-      font-size: 28px;
-      line-height: 20px;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      margin: 15px auto;
-      display: block;
-    }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            width: auto;
+        }
 
-    @media (max-width: 600px) {
-      .banner-img { height: 110px; }
-      .app-container { padding: 10px; }
-      .tab-btn { font-size: 16px; padding: 8px 10px; }
-    }
-  </style>
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .switch-auth-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+
+        .switch-auth-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .quiz-question {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #202436;
+            border: 2px solid #333a52;
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--secondary-color);
+            background: #2a3047;
+            transform: translateX(4px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
+        .option-btn.selected-correct {
+            background: #054019 !important;
+            border-color: var(--success-color) !important;
+            color: #fff !important;
+        }
+
+        .option-btn.selected-incorrect {
+            background: #4a0c1b !important;
+            border-color: var(--danger-color) !important;
+            color: #fff !important;
+        }
+
+        .option-btn.show-correct {
+            border-color: var(--success-color) !important;
+            background: #0d381b !important;
+        }
+
+        .feedback-box {
+            display: none;
+            background: #111420;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-pixel);
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .feedback-header.correct {
+            color: var(--success-color);
+        }
+
+        .feedback-header.incorrect {
+            color: var(--danger-color);
+        }
+
+        .feedback-text {
+            font-size: 1rem;
+            color: #ddd;
+            line-height: 1.4;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .created-quizzes-list {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-item-card {
+            background: #202436;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #333a52;
+        }
+
+        .badge {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .preview-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="banner-container">
-    <img src="mt.png" alt="MATHQUEST BANNER" class="banner-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'200\' width=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%23161b22\'/><text x=\'50%\' y=\'50%\' fill=\'%2300ff66\' font-size=\'40\' font-family=\'monospace\' dominant-baseline=\'middle\' text-anchor=\'middle\'>MATHQUEST FORMULÁRIO</text></svg>'">
-  </div>
-
-  <div class="app-container">
-
-    <!-- REGISTRO/LOGIN DO ALUNO -->
-    <div id="screen-login" class="screen active">
-      <h2 style="margin-top:0; text-align:center; color: var(--user-theme-color);">🎮 ENTRAR NO MATHQUEST</h2>
-      <label>Seu Apelido:</label>
-      <input type="text" id="player-name" placeholder="Ex: MathMaster">
-
-      <label>Escolha a Cor do Seu Tema:</label>
-      <input type="color" id="player-color" value="#00ff66">
-
-      <label>Foto de Perfil:</label>
-      <input type="file" id="player-photo" accept="image/*">
-      <img id="preview-img" class="avatar-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='65' height='65'><rect width='65' height='65' fill='%23161b22'/></svg>">
-
-      <button onclick="registerStudent()">ENTRAR E SALVAR PERFIL</button>
-      <button class="btn-secondary" onclick="showScreen('screen-prof-login')">🔒 Área do Professor</button>
-    </div>
-
-    <!-- LOGIN DO PROFESSOR -->
-    <div id="screen-prof-login" class="screen">
-      <h2 style="margin-top:0; color: var(--user-theme-color);">🔑 ACESSO DOCENTE</h2>
-      <label>Senha do Professor:</label>
-      <input type="password" id="prof-pass" placeholder="Digite a senha...">
-      <button onclick="loginProfessor()">ENTRAR NO PAINEL</button>
-      <button class="btn-secondary" onclick="showScreen('screen-login')">VOLTAR</button>
-    </div>
-
-    <!-- PAINEL DO ALUNO -->
-    <div id="screen-student-dash" class="screen">
-      <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchStudentTab('tab-auto-quizzes', this)">🤖 QUIZZES AUTOMÁTICOS</button>
-        <button class="tab-btn" onclick="switchStudentTab('tab-prof-quizzes', this)">📋 QUIZZES DO PROFESSOR</button>
-        <button class="tab-btn" onclick="switchStudentTab('tab-ranking', this)">🏆 RANKING GERAL</button>
-        <button class="tab-btn" onclick="switchStudentTab('tab-profile', this)">👤 MEU PERFIL</button>
-      </div>
-
-      <!-- ABA 1: QUIZZES AUTOMÁTICOS DA PLATAFORMA (20 ÁREAS) -->
-      <div id="tab-auto-quizzes" class="tab-content">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">SELECIONE UMA DAS 20 ÁREAS AUTOMÁTICAS (10 QUESTÕES):</h3>
-        <div id="area-grid-container" class="area-grid"></div>
-      </div>
-
-      <!-- ABA 2: QUIZZES DO PROFESSOR -->
-      <div id="tab-prof-quizzes" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">QUIZZES CRIADOS PELO PROFESSOR:</h3>
-        <div id="prof-quizzes-container"></div>
-      </div>
-
-      <!-- ABA 3: RANKING EM TEMPO REAL -->
-      <div id="tab-ranking" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">⚡ RANKING EM TEMPO REAL</h3>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr><th>POS</th><th>ALUNO</th><th>ACERTOS</th><th>PONTOS</th></tr>
-            </thead>
-            <tbody id="student-ranking-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ABA 4: EDITAR PERFIL -->
-      <div id="tab-profile" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">✏️ EDITAR PERFIL</h3>
-        <img id="edit-display-photo" class="avatar-preview" src="">
-        <label>Seu Apelido:</label>
-        <input type="text" id="edit-player-name" disabled>
-
-        <label>Alterar Cor do Tema:</label>
-        <input type="color" id="edit-player-color">
-
-        <label>Alterar Foto:</label>
-        <input type="file" id="edit-player-photo" accept="image/*">
-
-        <button onclick="saveProfileChanges()">SALVAR ALTERAÇÕES</button>
-        <button class="btn-secondary" onclick="logoutStudent()">SAIR DA CONTA</button>
-      </div>
-    </div>
-
-    <!-- TELA DA APLICAÇÃO DO QUIZ -->
-    <div id="screen-quiz" class="screen">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span id="quiz-area-badge" style="color: var(--user-theme-color); font-size:22px;"></span>
-        <span id="quiz-progress" style="font-size:20px; color:#8b949e;"></span>
-      </div>
-      <h3 id="quiz-question-title" style="font-size: 26px; margin-top:10px;"></h3>
-      <div id="quiz-options-container"></div>
-      
-      <!-- FEEDBACK (SÓ APARECE DEPOIS QUE O ALUNO CLICA EM UMA OPÇÃO) -->
-      <div id="quiz-feedback" style="display:none; margin-top: 15px;">
-        <div id="feedback-badge" style="font-size:22px; font-weight:bold;"></div>
-        <p id="feedback-explanation" style="background:#21262d; padding:10px; border-radius:4px; margin-top:8px;"></p>
-        <button onclick="nextQuestionInQuiz()">PRÓXIMA QUESTÃO ➔</button>
-      </div>
-    </div>
-
-    <!-- PAINEL DO PROFESSOR -->
-    <div id="screen-prof-dash" class="screen">
-      <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchProfTab('tab-generator', this)">📝 GERADOR DE QUIZ</button>
-        <button class="tab-btn" onclick="switchProfTab('tab-my-quizzes', this)">📚 QUIZZES QUE EU CRIEI</button>
-        <button class="tab-btn" onclick="switchProfTab('tab-prof-auto-quizzes', this)">🤖 QUIZZES AUTOMÁTICOS</button>
-        <button class="tab-btn" onclick="switchProfTab('tab-accesses', this)">👥 ALUNOS</button>
-        <button class="tab-btn" onclick="switchProfTab('tab-prof-ranking', this)">🏆 RANKING</button>
-      </div>
-
-      <!-- ABA 1: GERADOR DE QUIZ -->
-      <div id="tab-generator" class="tab-content">
-        <label>Título do Formulário / Quiz do Professor:</label>
-        <input type="text" id="forms-title" placeholder="Ex: Prova Mensal de Geometria">
-
-        <label>Selecione a Área da Matemática:</label>
-        <select id="forms-area"></select>
-
-        <div id="forms-questions-container"></div>
-
-        <button type="button" class="btn-add-question" onclick="addQuestionCardForms()" title="Adicionar Pergunta">+</button>
-
-        <button onclick="saveFullQuizForms()" style="background-color: var(--user-theme-color); font-size: 22px;">SALVAR E PUBLICAR QUIZ 🚀</button>
-        <button class="btn-secondary" onclick="showScreen('screen-login')">SAIR</button>
-      </div>
-
-      <!-- ABA 2: QUIZZES QUE O PROFESSOR CRIOU -->
-      <div id="tab-my-quizzes" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">MEUS QUIZZES CRIADOS E PUBLICADOS:</h3>
-        <div id="prof-created-quizzes-list"></div>
-      </div>
-
-      <!-- ABA 3: QUIZZES AUTOMÁTICOS DA PLATAFORMA (VISÃO DO PROFESSOR) -->
-      <div id="tab-prof-auto-quizzes" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">BANCO DE QUIZZES AUTOMÁTICOS (20 ÁREAS DA PLATAFORMA):</h3>
-        <div id="prof-auto-grid-container" class="area-grid"></div>
-      </div>
-
-      <!-- ABA 4: LISTA DE ALUNOS -->
-      <div id="tab-accesses" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">👥 ALUNOS CADASTRADOS</h3>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr><th>FOTO</th><th>APELIDO</th><th>ACERTOS</th><th>PONTUAÇÃO</th></tr>
-            </thead>
-            <tbody id="prof-accesses-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ABA 5: RANKING -->
-      <div id="tab-prof-ranking" class="tab-content" style="display:none;">
-        <h3 style="margin-top:0; color: var(--user-theme-color);">🏆 RANKING GERAL DE DESEMPENHO</h3>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr><th>POS</th><th>ALUNO</th><th>PONTUAÇÃO E ACERTOS</th></tr>
-            </thead>
-            <tbody id="prof-ranking-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
-      authDomain: "mathques.firebaseapp.com",
-      databaseURL: "https://mathques-default-rtdb.firebaseio.com",
-      projectId: "mathques",
-      storageBucket: "mathques.firebasestorage.app",
-      messagingSenderId: "413245852392",
-      appId: "1:413245852392:web:fd9affbddda2f34eed975d"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    /* BANCO DE DADOS DE QUIZZES AUTOMÁTICOS: 10 QUESTÕES EM CADA UMA DAS 20 ÁREAS */
-    const bancoQuizzesAutomaticos = {
-      "Álgebra": [
-        { title: "Resolva: 2x + 6 = 14", options: ["x = 4", "x = 3", "x = 5", "x = 6"], correct: "x = 4", explanation: "2x = 14 - 6 => 2x = 8 => x = 4." },
-        { title: "Fatore: x² - 9", options: ["(x-3)(x+3)", "(x-9)(x+1)", "(x-3)²", "(x+3)²"], correct: "(x-3)(x+3)", explanation: "Diferença de dois quadrados: a² - b² = (a-b)(a+b)." },
-        { title: "Se f(x) = 3x - 2, qual o valor de f(4)?", options: ["10", "12", "8", "14"], correct: "10", explanation: "f(4) = 3(4) - 2 = 12 - 2 = 10." },
-        { title: "Simplifique: (2x³)(4x²)", options: ["8x⁵", "6x⁵", "8x⁶", "6x⁶"], correct: "8x⁵", explanation: "Multiplica os coeficientes (2*4=8) e soma os expoentes (3+2=5)." },
-        { title: "Qual o valor do x na equação 3(x - 2) = 12?", options: ["x = 6", "x = 4", "x = 8", "x = 2"], correct: "x = 6", explanation: "3x - 6 = 12 => 3x = 18 => x = 6." },
-        { title: "O produto (a + b)² é igual a:", options: ["a² + 2ab + b²", "a² + b²", "a² - 2ab + b²", "2a + 2b"], correct: "a² + 2ab + b²", explanation: "Trinômio quadrado perfeito." },
-        { title: "Simplifique: 10x / 2", options: ["5x", "2x", "5", "8x"], correct: "5x", explanation: "10 dividido por 2 resulta em 5, mantendo o x." },
-        { title: "Qual a raiz da equação 5x = 0?", options: ["0", "5", "1", "Indeterminada"], correct: "0", explanation: "x = 0 / 5 = 0." },
-        { title: "Resolva o sistema simples: x + y = 5 e x - y = 1", options: ["x=3, y=2", "x=4, y=1", "x=2, y=3", "x=5, y=0"], correct: "x=3, y=2", explanation: "Somando as equações: 2x = 6 => x=3; então y=2." },
-        { title: "Se x/4 = 3, qual o valor de x?", options: ["12", "7", "1", "0.75"], correct: "12", explanation: "x = 3 * 4 = 12." }
-      ],
-      "Aritmética Básica": [
-        { title: "Qual é o valor de 7 x 8?", options: ["56", "54", "64", "48"], correct: "56", explanation: "Tabuada direta do 7." },
-        { title: "Qual o resto da divisão de 17 por 3?", options: ["2", "1", "0", "3"], correct: "2", explanation: "17 = 3 * 5 + 2." },
-        { title: "Calcule: 15 + 25 / 5", options: ["20", "8", "25", "10"], correct: "20", explanation: "A divisão vem primeiro: 25 / 5 = 5. Depois 15 + 5 = 20." },
-        { title: "Quanto é 3/4 + 1/4?", options: ["1", "4/8", "2/4", "3/16"], correct: "1", explanation: "3/4 + 1/4 = 4/4 = 1." },
-        { title: "Qual é o menor número primo positivo?", options: ["2", "1", "3", "0"], correct: "2", explanation: "2 é o único número primo par e o menor." },
-        { title: "Qual é a raiz quadrada de 144?", options: ["12", "14", "11", "16"], correct: "12", explanation: "12 * 12 = 144." },
-        { title: "Quanto é 100 - 37?", options: ["63", "73", "53", "67"], correct: "63", explanation: "Subtração direta." },
-        { title: "Quanto é 2 elevado à quinta potência (2⁵)?", options: ["32", "10", "16", "64"], correct: "32", explanation: "2 * 2 * 2 * 2 * 2 = 32." },
-        { title: "Qual o valor absoluto de -15?", options: ["15", "-15", "0", "1/15"], correct: "15", explanation: "Módulo ou valor absoluto é a distância até zero, sempre positivo." },
-        { title: "Arredonde 4.87 para o inteiro mais próximo:", options: ["5", "4", "4.8", "4.9"], correct: "5", explanation: "A primeira casa decimal é 8 (maior que 5), arredonda para cima." }
-      ],
-      "Geometria Plana": [
-        { title: "Qual a soma dos ângulos internos de um triângulo?", options: ["180°", "360°", "90°", "270°"], correct: "180°", explanation: "A soma dos ângulos internos de qualquer triângulo é sempre 180°." },
-        { title: "Qual a área de um retângulo de base 8cm e altura 5cm?", options: ["40cm²", "26cm²", "20cm²", "13cm²"], correct: "40cm²", explanation: "Área = base * altura = 8 * 5 = 40cm²." },
-        { title: "Qual a fórmula do perímetro de um círculo de raio r?", options: ["2πr", "πr²", "2πr²", "πd²"], correct: "2πr", explanation: "Comprimento do círculo = 2 * π * r." },
-        { title: "Um quadrado possui lado de 6cm. Qual sua área?", options: ["36cm²", "24cm²", "12cm²", "18cm²"], correct: "36cm²", explanation: "Área = Lado² = 6 * 6 = 36cm²." },
-        { title: "Como se chama um triângulo que tem todos os lados iguais?", options: ["Equilátero", "Isósceles", "Escaleno", "Retângulo"], correct: "Equilátero", explanation: "Equilátero = 3 lados de mesmo comprimento." },
-        { title: "Qual a área de um triângulo de base 10cm e altura 6cm?", options: ["30cm²", "60cm²", "16cm²", "20cm²"], correct: "30cm²", explanation: "Área = (Base * Altura) / 2 = (10 * 6) / 2 = 30cm²." },
-        { title: "Quantos graus mede um ângulo reto?", options: ["90°", "180°", "45°", "360°"], correct: "90°", explanation: "Ângulo reto mede exatamente 90°." },
-        { title: "Qual o nome de um polígono de 6 lados?", options: ["Hexágono", "Pentágono", "Heptágono", "Octógono"], correct: "Hexágono", explanation: "Hexágono tem 6 lados." },
-        { title: "Qual o valor do diâmetro de uma circunferência de raio 7cm?", options: ["14cm", "49cm", "3.5cm", "21cm"], correct: "14cm", explanation: "Diâmetro = 2 * Raio = 2 * 7 = 14cm." },
-        { title: "Dois ângulos que somam 90° são chamados de:", options: ["Complementares", "Suplementares", "Opostos", "Rasos"], correct: "Complementares", explanation: "Soma 90° = Complementares; soma 180° = Suplementares." }
-      ],
-      "Geometria Espacial": [
-        { title: "Qual a fórmula do volume de um cubo de lado 'a'?", options: ["a³", "6a²", "a²", "3a"], correct: "a³", explanation: "Volume do cubo = lado * lado * lado = a³." },
-        { title: "Quantas faces tem um octaedro regular?", options: ["8", "6", "12", "20"], correct: "8", explanation: "Octaedro possui 8 faces triangulares." },
-        { title: "Qual a fórmula do volume do cilindro?", options: ["πr²h", "2πrh", "1/3 πr²h", "4/3 πr³"], correct: "πr²h", explanation: "Área da base (πr²) vezes a altura (h)." },
-        { title: "Quantas arestas tem um cubo?", options: ["12", "8", "6", "16"], correct: "12", explanation: "Um cubo possui 12 arestas." },
-        { title: "Qual o volume de um paralelepípedo com dimensões 2m x 3m x 4m?", options: ["24m³", "9m³", "12m³", "48m³"], correct: "24m³", explanation: "Volume = comprimento * largura * altura = 2 * 3 * 4 = 24m³." },
-        { title: "Pela relação de Euler (V - A + F = 2), se um poliedro tem 6 vértices e 8 faces, quantas arestas ele tem?", options: ["12", "10", "14", "8"], correct: "12", explanation: "6 - A + 8 = 2 => 14 - A = 2 => A = 12." },
-        { title: "Qual figura espacial possui apenas uma superfície curva e nenhum vértice?", options: ["Esfera", "Cone", "Cilindro", "Pirâmide"], correct: "Esfera", explanation: "A esfera é totalmente arredondada sem vértices ou arestas." },
-        { title: "O volume de um cone é qual fração do volume de um cilindro de mesma base e altura?", options: ["1/3", "1/2", "1/4", "2/3"], correct: "1/3", explanation: "Volume do cone = (1/3) * πr²h." },
-        { title: "Quantos vértices possui uma pirâmide de base quadrada?", options: ["5", "4", "6", "8"], correct: "5", explanation: "4 vértices na base + 1 no topo = 5 vértices." },
-        { title: "Qual a área total da superfície de um cubo de lado 3cm?", options: ["54cm²", "27cm²", "36cm²", "18cm²"], correct: "54cm²", explanation: "Área total = 6 * (Lado²) = 6 * 9 = 54cm²." }
-      ],
-      "Geometria Analítica": [
-        { title: "Qual a distância entre os pontos A(0,0) e B(3,4)?", options: ["5", "7", "25", "12"], correct: "5", explanation: "d = √(3² + 4²) = √(9 + 16) = √25 = 5." },
-        { title: "Qual o ponto médio do segmento entre A(2,4) e B(6,8)?", options: ["(4,6)", "(3,5)", "(8,12)", "(4,4)"], correct: "(4,6)", explanation: "M = ((2+6)/2, (4+8)/2) = (8/2, 12/2) = (4,6)." },
-        { title: "Qual o coeficiente angular (m) da reta y = 3x - 5?", options: ["3", "-5", "-3", "5"], correct: "3", explanation: "Na equação y = mx + b, m é o coeficiente angular." },
-        { title: "Se duas retas são paralelas, seus coeficientes angulares são:", options: ["Iguais", "Inversos e opostos", "Diferentes", "Nulos"], correct: "Iguais", explanation: "Retas paralelas possuem a mesma inclinação (m1 = m2)." },
-        { title: "Qual a equação reduzida da reta que passa pela origem com m = 2?", options: ["y = 2x", "y = x + 2", "y = 2", "x = 2y"], correct: "y = 2x", explanation: "Passa na origem (0,0), logo b = 0. Equação: y = 2x." },
-        { title: "O ponto (0,0) é chamado de:", options: ["Origem", "Baricentro", "Foco", "Vértice principal"], correct: "Origem", explanation: "O cruzamento dos eixos cartesiano (0,0) é a origem." },
-        { title: "Em qual quadrante fica o ponto (-3, 4)?", options: ["2º Quadrante", "1º Quadrante", "3º Quadrante", "4º Quadrante"], correct: "2º Quadrante", explanation: "x negativo e y positivo indica o 2º quadrante." },
-        { title: "A equação x² + y² = 9 representa qual figura?", options: ["Circunferência de raio 3", "Circunferência de raio 9", "Parábola", "Reta"], correct: "Circunferência de raio 3", explanation: "x² + y² = r² => r² = 9 => r = 3." },
-        { title: "O produto dos coeficientes angulares de duas retas perpendiculares é:", options: ["-1", "1", "0", "2"], correct: "-1", explanation: "m1 * m2 = -1 para retas perpendiculares." },
-        { title: "O eixos x e y no plano cartesiano são chamados respectivamente de:", options: ["Abscissas e Ordenadas", "Ordenadas e Abscissas", "Verticais e Horizontais", "Coordenadas e Vetores"], correct: "Abscissas e Ordenadas", explanation: "Eixo X = Abscissas; Eixo Y = Ordenadas." }
-      ],
-      "Trigonometria": [
-        { title: "Qual o valor de sen(90°)?", options: ["1", "0", "0.5", "√2/2"], correct: "1", explanation: "No ciclo trigonométrico, no topo (90°) o seno vale 1." },
-        { title: "Qual o valor de cos(0°)?", options: ["1", "0", "-1", "0.5"], correct: "1", explanation: "No ponto inicial do ciclo trigonométrico (0°), o cosseno é 1." },
-        { title: "Tangente é a razão entre quais catetos?", options: ["Oposto / Adjacente", "Adjacente / Oposto", "Oposto / Hipotenusa", "Adjacente / Hipotenusa"], correct: "Oposto / Adjacente", explanation: "tg = Cateto Oposto / Cateto Adjacente." },
-        { title: "Qual é a relação fundamental da trigonometria?", options: ["sen²(x) + cos²(x) = 1", "sen(x) + cos(x) = 1", "tg(x) = sen(x)*cos(x)", "sen²(x) - cos²(x) = 1"], correct: "sen²(x) + cos²(x) = 1", explanation: "Identidade trigonométrica principal baseada em Pitágoras." },
-        { title: "Qual o valor de sen(30°)?", options: ["1/2", "√3/2", "√2/2", "1"], correct: "1/2", explanation: "Seno de 30° vale 0,5 ou 1/2." },
-        { title: "Quantos radianos correspondem a 180°?", options: ["π rad", "2π rad", "π/2 rad", "3π/2 rad"], correct: "π rad", explanation: "180 graus equivale exatamente a π radianos." },
-        { title: "Em um triângulo retângulo, a hipotenusa mede 10 e o cateto oposto mede 5. Qual o sen(θ)?", options: ["0.5", "2", "0.8", "0.25"], correct: "0.5", explanation: "sen(θ) = Oposto / Hipotenusa = 5 / 10 = 0.5." },
-        { title: "A cossecante é a inversa de qual função?", options: ["Seno", "Cosseno", "Tangente", "Cotangente"], correct: "Seno", explanation: "cossec(x) = 1 / sen(x)." },
-        { title: "Qual o valor de tg(45°)?", options: ["1", "0", "√3", "√3/3"], correct: "1", explanation: "sen(45°) = cos(45°), logo tg(45°) = 1." },
-        { title: "Em qual quadrante o seno e o cosseno são ambos negativos?", options: ["3º Quadrante", "1º Quadrante", "2º Quadrante", "4º Quadrante"], correct: "3º Quadrante", explanation: "No 3º quadrante x < 0 (cos < 0) e y < 0 (sen < 0)." }
-      ],
-      "Estatística": [
-        { title: "A média aritmética de 4, 8, 12 e 16 é:", options: ["10", "8", "12", "9"], correct: "10", explanation: "(4 + 8 + 12 + 16) / 4 = 40 / 4 = 10." },
-        { title: "O valor que mais se repete em um conjunto de dados é a:", options: ["Moda", "Mediana", "Média", "Variância"], correct: "Moda", explanation: "Moda representa o dado com maior frequência." },
-        { title: "A mediana do conjunto {2, 5, 8, 12, 19} é:", options: ["8", "5", "12", "8.8"], correct: "8", explanation: "O elemento central do conjunto ordenado é o 8." },
-        { title: "Qual a amplitude do conjunto {3, 7, 15, 22, 40}?", options: ["37", "40", "22", "35"], correct: "37", explanation: "Amplitude = Maior valor - Menor valor = 40 - 3 = 37." },
-        { title: "A raiz quadrada da variância é chamada de:", options: ["Desvio Padrão", "Amplitude", "Média Ponderada", "Frequência Relativa"], correct: "Desvio Padrão", explanation: "Desvio Padrão = √Variância." },
-        { title: "A soma das frequências relativas de uma pesquisa totaliza:", options: ["100% (ou 1)", "50%", "10%", "Varia a cada pesquisa"], correct: "100% (ou 1)", explanation: "A soma de todas as partes do todo equivale a 100%." },
-        { title: "Qual a média ponderada de 6 (peso 2) e 9 (peso 3)?", options: ["7.8", "7.5", "8.0", "7.2"], correct: "7.8", explanation: "[(6*2) + (9*3)] / (2+3) = (12 + 27) / 5 = 39 / 5 = 7.8." },
-        { title: "Se um conjunto tem número par de elementos, a mediana é:", options: ["A média dos dois elementos centrais", "O maior elemento", "O menor elemento", "Não existe mediana"], correct: "A média dos dois elementos centrais", explanation: "Pega-se os dois valores do meio e tira-se a média." },
-        { title: "Gráficos de 'pizza' também são conhecidos como gráficos de:", options: ["Setores", "Colunas", "Linhas", "Histogramas"], correct: "Setores", explanation: "Gráfico circular dividido em setores angulares proporcionais." },
-        { title: "Um conjunto de dados sem nenhuma moda é chamado de:", options: ["Amodal", "Bimodal", "Multimodal", "Nulo"], correct: "Amodal", explanation: "Amodal indica ausência de elementos repetidos." }
-      ],
-      "Probabilidade": [
-        { title: "Qual a probabilidade de tirar 'cara' ao lançar uma moeda honesta?", options: ["50%", "25%", "100%", "33%"], correct: "50%", explanation: "1 caso favorável em 2 possíveis = 1/2 = 50%." },
-        { title: "Qual a chance de tirar o número 6 ao lançar um dado comum de 6 lados?", options: ["1/6", "1/2", "1/3", "6/6"], correct: "1/6", explanation: "Apenas 1 lado tem o número 6 entre os 6 lados." },
-        { title: "A probabilidade de um evento impossível é:", options: ["0", "1", "0.5", "-1"], correct: "0", explanation: "Eventos impossíveis possuem probabilidade igual a 0." },
-        { title: "A soma das probabilidades de todos os eventos possíveis de um espaço amostral é:", options: ["1 (ou 100%)", "0.5", "2", "Depende do evento"], correct: "1 (ou 100%)", explanation: "O espaço amostral completo representa a certeza (100%)." },
-        { title: "Em um baralho de 52 cartas, qual a probabilidade de retirar um Ás?", options: ["4/52 (ou 1/13)", "1/52", "2/52", "13/52"], correct: "4/52 (ou 1/13)", explanation: "Existem 4 Ases no baralho de 52 cartas. 4/52 = 1/13." },
-        { title: "Qual a probabilidade de tirar um número par ao lançar um dado de 6 lados?", options: ["1/2", "1/3", "2/3", "1/6"], correct: "1/2", explanation: "Os números pares são {2, 4, 6} (3 números em 6) = 3/6 = 1/2." },
-        { title: "Dois eventos que não podem ocorrer simultaneamente são chamados de:", options: ["Mutuamente exclusivos", "Independentes", "Complementares", "Depêndentes"], correct: "Mutuamente exclusivos", explanation: "Se um ocorre, o outro obrigatoriamente não pode ocorrer." },
-        { title: "Se a chance de chover hoje é 30%, qual a chance de NÃO chover?", options: ["70%", "30%", "50%", "100%"], correct: "70%", explanation: "Evento complementa: 100% - 30% = 70%." },
-        { title: "Ao lançar duas moedas, qual a probabilidade de obter duas caras?", options: ["1/4", "1/2", "3/4", "1/8"], correct: "1/4", explanation: "Casos: (C,C), (C,K), (K,C), (K,K). Apenas 1 em 4 = 25%." },
-        { title: "Se você retira uma bola de uma urna com 3 vermelhas e 7 azuis, qual a chance de ser vermelha?", options: ["3/10 (30%)", "7/10 (70%)", "1/3", "3/7"], correct: "3/10 (30%)", explanation: "3 bolas vermelhas de um total de 10 bolas = 3/10." }
-      ],
-      "Cálculo Diferencial": [
-        { title: "Qual a derivada de uma função constante f(x) = c?", options: ["0", "1", "c", "x"], correct: "0", explanation: "A taxa de variação de uma constante é zero." },
-        { title: "Qual a derivada de f(x) = x²?", options: ["2x", "x", "2", "x³/3"], correct: "2x", explanation: "Regra do tombo: d/dx(x^n) = n * x^(n-1). d/dx(x²) = 2x." },
-        { title: "Qual a derivada de f(x) = 5x?", options: ["5", "x", "0", "5x²"], correct: "5", explanation: "A derivada de c*x é c." },
-        { title: "Qual a derivada de sen(x)?", options: ["cos(x)", "-cos(x)", "tg(x)", "-sen(x)"], correct: "cos(x)", explanation: "Derivada direta do seno é o cosseno." },
-        { title: "A primeira derivada de uma função posição representa a:", options: ["Velocidade", "Aceleração", "Massa", "Distância"], correct: "Velocidade", explanation: "v(t) = s'(t), taxa de variação do espaço pelo tempo." },
-        { title: "Qual a derivada de e^x?", options: ["e^x", "x*e^(x-1)", "1/x", "0"], correct: "e^x", explanation: "A função exponencial e^x é a sua própria derivada." },
-        { title: "Qual a derivada de ln(x)?", options: ["1/x", "e^x", "1", "x"], correct: "1/x", explanation: "Derivada do logaritmo natural é 1/x para x > 0." },
-        { title: "Qual a derivada de f(x) = x³ + 4?", options: ["3x²", "3x² + 4", "x²", "3x"], correct: "3x²", explanation: "Derivada de x³ é 3x² e a derivada da constante 4 é 0." },
-        { title: "Se f'(c) = 0 e f''(c) > 0, o ponto c é um ponto de:", options: ["Mínimo local", "Máximo local", "Inflexão", "Descontinuidade"], correct: "Mínimo local", explanation: "Pelo teste da segunda derivada, f''(c) > 0 indica concavidade para cima (mínimo)." },
-        { title: "Qual a derivada do cosseno cos(x)?", options: ["-sen(x)", "sen(x)", "-cos(x)", "sec²(x)"], correct: "-sen(x)", explanation: "Derivada direta de cos(x) é -sen(x)." }
-      ],
-      "Cálculo Integral": [
-        { title: "A integral indefinida de f(x) = 2x dx é:", options: ["x² + C", "2x² + C", "2 + C", "x³ + C"], correct: "x² + C", explanation: "∫2x dx = 2*(x²/2) + C = x² + C." },
-        { title: "O Teorema Fundamental do Cálculo relaciona a integral com:", options: ["Derivada (Antiderivada)", "Limites infinitos", "Geometria do espaço", "Álgebra vetorial"], correct: "Derivada (Antiderivada)", explanation: "A integração é a operação inversa da diferenciação." },
-        { title: "Qual a integral indefinida de 1 dx?", options: ["x + C", "0", "1 + C", "x²/2"], correct: "x + C", explanation: "∫1 dx = x + C." },
-        { title: "Geometricamente, a integral definida ∫ f(x)dx representa:", options: ["A área sob a curva de f(x)", "O comprimento da reta", "A inclinação da tangente", "O ponto de máximo"], correct: "A área sob a curva de f(x)", explanation: "A integral definida calcula a área líquida entre a curva e o eixo x." },
-        { title: "Qual a integral de 1/x dx?", options: ["ln|x| + C", "x + C", "-1/x²", "e^x + C"], correct: "ln|x| + C", explanation: "∫(1/x)dx = ln|x| + C." },
-        { title: "Qual a integral de e^x dx?", options: ["e^x + C", "e^(x+1) + C", "x*e^x", "ln(x) + C"], correct: "e^x + C", explanation: "A antiderivada de e^x é e^x + C." },
-        { title: "Qual a integral de cos(x) dx?", options: ["sen(x) + C", "-sen(x) + C", "tg(x) + C", "cos(x) + C"], correct: "sen(x) + C", explanation: "Pois a derivada de sen(x) é cos(x)." },
-        { title: "Calcule a integral definida ∫ de 0 a 1 de x dx:", options: ["1/2", "1", "2", "0"], correct: "1/2", explanation: "[x²/2] de 0 a 1 = (1²/2) - (0²/2) = 1/2." },
-        { title: "O 'C' adicionado nas integrais indefinidas representa:", options: ["Constante de integração", "Coeficiente angular", "Centro de massa", "Comprimento de arco"], correct: "Constante de integração", explanation: "C é uma constante arbitrária real." },
-        { title: "Qual a integral de x² dx?", options: ["x³/3 + C", "2x + C", "x³ + C", "x³/2 + C"], correct: "x³/3 + C", explanation: "∫x^n dx = x^(n+1)/(n+1) + C. Para n=2 resulta em x³/3 + C." }
-      ],
-      "Matemática Financeira": [
-        { title: "Qual a fórmula dos Juros Simples?", options: ["J = C * i * t", "J = C * (1 + i)^t", "M = C / i", "J = C + i"], correct: "J = C * i * t", explanation: "Juros = Capital * Taxa * Tempo." },
-        { title: "O que significa a sigla Montante (M)?", options: ["Capital + Juros", "Capital - Juros", "Juros / Taxa", "Lucro líquido"], correct: "Capital + Juros", explanation: "Montante é o valor total acumulado ao fim do período (M = C + J)." },
-        { title: "Em Juros Compostos, os juros são calculados sobre:", options: ["O montante do período anterior", "Apenas o capital inicial", "A taxa fixa original", "O valor dos impostos"], correct: "O montante do período anterior", explanation: "Conhecido popularmente como 'juros sobre juros'." },
-        { title: "Qual a taxa mensal equivalente a 12% de juros simples ao ano?", options: ["1% ao mês", "2% ao mês", "0.5% ao mês", "12% ao mês"], correct: "1% ao mês", explanation: "Nos juros simples divide-se direto: 12% / 12 meses = 1% ao mês." },
-        { title: "Um investimento de R$ 1.000 render de R$ 200 de juros. Qual o Montante?", options: ["R$ 1.200", "R$ 800", "R$ 2.000", "R$ 1.020"], correct: "R$ 1.200", explanation: "M = C + J = 1000 + 200 = R$ 1.200." },
-        { title: "Qual o valor decimal equivalente a uma taxa de 5%?", options: ["0.05", "0.5", "5.0", "0.005"], correct: "0.05", explanation: "5 / 100 = 0.05." },
-        { title: "A depreciação representa:", options: ["Perda de valor de um bem com o tempo", "Aumento da taxa de juros", "Lucro sobre vendas", "Isenção de imposto"], correct: "Perda de valor de um bem com o tempo", explanation: "Desvalorização natural de ativos pelo uso ou tempo." },
-        { title: "Qual a fórmula do Montante em Juros Compostos?", options: ["M = C(1 + i)^t", "M = C + i*t", "M = C * i^t", "M = J + i"], correct: "M = C(1 + i)^t", explanation: "Fórmula padrão do regime composto." },
-        { title: "O termo inflação refere-se a:", options: ["Aumento geral nos preços", "Queda das taxas de juros", "Aumento do valor do capital", "Desconto em compras à vista"], correct: "Aumento geral nos preços", explanation: "Perda do poder de compra da moeda." },
-        { title: "Se você compra algo de R$ 500 com 10% de desconto à vista, quanto paga?", options: ["R$ 450", "R$ 400", "R$ 490", "R$ 480"], correct: "R$ 450", explanation: "Desconto de R$ 50 (10% de 500). Paga 500 - 50 = 450." }
-      ],
-      "Raciocínio Lógico": [
-        { title: "Se todo homem é mortal e Sócrates é homem, então:", options: ["Sócrates é mortal", "Sócrates é imortal", "Todo mortal é Sócrates", "Nada se pode concluir"], correct: "Sócrates é mortal", explanation: "Silogismo clássico dedutivo." },
-        { title: "Qual a negação da proposição 'Hoje está chovendo'?", options: ["Hoje NÃO está chovendo", "Hoje está fazendo sol", "Ontem choveu", "Amanhã choverá"], correct: "Hoje NÃO está chovendo", explanation: "A negação troca a afirmação por uma negação do mesmo fato." },
-        { title: "Qual o próximo número da sequência: 2, 4, 8, 16, ...?", options: ["32", "24", "20", "64"], correct: "32", explanation: "Sequência onde cada número multiplica por 2 (dobro)." },
-        { title: "O conectivo lógico 'E' (conjunção ∧) só é verdadeiro quando:", options: ["Ambas as proposições forem verdadeiras", "Uma for verdadeira", "Ambas forem falsas", "A primeira for falsa"], correct: "Ambas as proposições forem verdadeiras", explanation: "Tabela verdade da conjunção exige V e V para dar V." },
-        { title: "O conectivo 'OU' (disjunção ∨) é falso apenas quando:", options: ["Ambas forem falsas", "Ambas forem verdadeiras", "A primeira for verdadeira", "A segunda for verdadeira"], correct: "Ambas forem falsas", explanation: "Basta uma proposição ser verdadeira para o 'OU' ser verdadeiro." },
-        { title: "Se P é verdadeiro e Q é falso, a condicional 'P -> Q' é:", options: ["Falsa", "Verdadeira", "Inconclusiva", "Nula"], correct: "Falsa", explanation: "V -> F é o único caso em que a condicional é Falsa." },
-        { title: "Qual o próximo termo da sequência de Fibonacci: 1, 1, 2, 3, 5, 8, ...?", options: ["13", "11", "10", "12"], correct: "13", explanation: "Soma dos dois anteriores: 5 + 8 = 13." },
-        { title: "Uma contradição na lógica proposicional é uma proposição que:", options: ["É sempre falsa", "É sempre verdadeira", "Às vezes é verdadeira", "Depende do contexto"], correct: "É sempre falsa", explanation: "Contradição tem tabela verdade resultante 100% falsa." },
-        { title: "Uma Tautologia é uma proposição que:", options: ["É sempre verdadeira", "É sempre falsa", "Contém dúvidas", "Não tem valor lógico"], correct: "É sempre verdadeira", explanation: "Tautologia resulta em verdadeiro em todas as combinações." },
-        { title: "Ana é mais alta que Bia. Bia é mais alta que Carla. Quem é a mais baixa?", options: ["Carla", "Ana", "Bia", "Todas têm a mesma altura"], correct: "Carla", explanation: "Ana > Bia > Carla." }
-      ],
-      "Teoria dos Números": [
-        { title: "Qual o MDC (Máximo Divisor Comum) entre 12 e 18?", options: ["6", "3", "2", "36"], correct: "6", explanation: "Divisores de 12={1,2,3,4,6,12}, de 18={1,2,3,6,9,18}. Maior comum = 6." },
-        { title: "Qual o MMC (Mínimo Múltiplo Comum) entre 4 e 6?", options: ["12", "24", "10", "2"], correct: "12", explanation: "Múltiplos de 4={4,8,12..}, de 6={6,12..}. Menor comum = 12." },
-        { title: "Um número é divisível por 3 se:", options: ["A soma dos seus algarismos for múltiplo de 3", "Terminar em 3", "For um número ímpar", "Terminar em 0"], correct: "A soma dos seus algarismos for múltiplo de 3", explanation: "Regra clássica de divisibilidade por 3." },
-        { title: "Qual destes números é um número primo?", options: ["13", "15", "9", "21"], correct: "13", explanation: "13 possui apenas dois divisores: 1 e ele mesmo." },
-        { title: "O número 1 é considerado um número primo?", options: ["Não", "Sim", "Apenas em números complexos", "Depende"], correct: "Não", explanation: "Por definição, números primos são maiores que 1 e possuem exatamente 2 divisores." },
-        { title: "Um número é divisível por 5 se termina em:", options: ["0 ou 5", "Apenas 5", "Apenas 0", "Qualquer número par"], correct: "0 ou 5", explanation: "Regra de divisibilidade por 5." },
-        { title: "Qual o único número primo par?", options: ["2", "0", "4", "Não existe"], correct: "2", explanation: "Todos os outros pares são divisíveis por 2, logo não são primos." },
-        { title: "Como se chama um número positivo maior que 1 que NÃO é primo?", options: ["Composto", "Racional", "Irracional", "Perfeito"], correct: "Composto", explanation: "Números com mais de 2 divisores são números compostos." },
-        { title: "Dois números cujo MDC é igual a 1 são chamados de:", options: ["Primos entre si", "Números perfeitos", "Primos gêmeos", "Números pares"], correct: "Primos entre si", explanation: "Exemplo: 8 e 9 são primos entre si pois MDC(8,9) = 1." },
-        { title: "Qual o resultado de (-1) elevado a um número par?", options: ["1", "-1", "0", "2"], correct: "1", explanation: "Qualquer base negativa elevada a expoente par resulta em sinal positivo." }
-      ],
-      "Equações do 1º e 2º Grau": [
-        { title: "Qual a fórmula de Bhaskara para encontrar raízes da equação do 2º grau?", options: ["x = (-b ± √Δ) / 2a", "x = -b / a", "x = b² - 4ac", "x = (a + b) / c"], correct: "x = (-b ± √Δ) / 2a", explanation: "Fórmula clássica de Bhaskara." },
-        { title: "Qual a fórmula do Discriminante (Delta Δ)?", options: ["Δ = b² - 4ac", "Δ = b + 4ac", "Δ = a² - 4bc", "Δ = -b ± 2a"], correct: "Δ = b² - 4ac", explanation: "Δ determina a quantidade de raízes reais." },
-        { title: "Se Δ < 0 (Delta negativo), a equação do 2º grau possui:", options: ["Nenhuma raiz real", "Duas raízes reais iguais", "Duas raízes reais diferentes", "Infinitas raízes"], correct: "Nenhuma raiz real", explanation: "Não existe raiz quadrada real de número negativo." },
-        { title: "As raízes da equação x² - 5x + 6 = 0 são:", options: ["2 e 3", "1 e 5", "-2 e -3", "0 e 6"], correct: "2 e 3", explanation: "Soma = 5 e Produto = 6. Raízes = 2 e 3." },
-        { title: "Em ax² + bx + c = 0, se a > 0, a parábola tem concavidade para:", options: ["Cima", "Baixo", "Direita", "Esquerda"], correct: "Cima", explanation: "Coeficiente 'a' positivo = concavidade voltada para cima." },
-        { title: "Resolva a equação do 1º grau: 4x - 8 = 0", options: ["x = 2", "x = 4", "x = -2", "x = 0"], correct: "x = 2", explanation: "4x = 8 => x = 8 / 4 = 2." },
-        { title: "A soma das raízes de ax² + bx + c = 0 é dada por:", options: ["-b / a", "c / a", "b / a", "-c / a"], correct: "-b / a", explanation: "Relações de Girard: x1 + x2 = -b/a." },
-        { title: "O produto das raízes de ax² + bx + c = 0 é dado por:", options: ["c / a", "-b / a", "b / c", "a / c"], correct: "c / a", explanation: "Relações de Girard: x1 * x2 = c/a." },
-        { title: "Qual o grau da equação 3x³ + 2x² - 5 = 0?", options: ["3º Grau", "2º Grau", "1º Grau", "5º Grau"], correct: "3º Grau", explanation: "Determinado pelo maior expoente da incógnita (3)." },
-        { title: "Se Δ = 0, a equação do 2º grau possui:", options: ["Duas raízes reais e iguais", "Duas raízes reais diferentes", "Nenhuma raiz", "Três raízes"], correct: "Duas raízes reais e iguais", explanation: "Δ = 0 indica uma única raiz real com multiplicidade 2." }
-      ],
-      "Porcentagem e Proporção": [
-        { title: "Quanto é 20% de 150?", options: ["30", "20", "15", "35"], correct: "30", explanation: "0.20 * 150 = 30." },
-        { title: "Se 3 canetas custam R$ 6, quanto custam 5 canetas?", options: ["R$ 10", "R$ 8", "R$ 12", "R$ 15"], correct: "R$ 10", explanation: "Cada caneta custa R$ 2 (6/3). Logo 5 * 2 = R$ 10." },
-        { title: "Como se escreve 50% em forma de fração simplificada?", options: ["1/2", "1/5", "5/100", "2/5"], correct: "1/2", explanation: "50/100 = 1/2." },
-        { title: "Um produto de R$ 80 aumentou 25%. Qual o novo preço?", options: ["R$ 100", "R$ 90", "R$ 105", "R$ 120"], correct: "R$ 100", explanation: "25% de 80 = 20. Novo preço = 80 + 20 = 100." },
-        { title: "Se duas grandezas são inversamente proporcionais, quando uma dobra a outra:", options: ["Cai pela metade", "Dobra também", "Quadruplica", "Permanece igual"], correct: "Cai pela metade", explanation: "Proporcionalidade inversa: o aumento de uma gera a redução proporcional da outra." },
-        { title: "Qual é a razão entre 40 e 100?", options: ["2/5", "4/5", "1/4", "3/5"], correct: "2/5", explanation: "40/100 simplificado por 20 resulta em 2/5." },
-        { title: "Em uma turma de 40 alunos, 10 foram aprovados. Qual a porcentagem de aprovados?", options: ["25%", "10%", "40%", "20%"], correct: "25%", explanation: "(10 / 40) * 100 = 0.25 * 100 = 25%." },
-        { title: "Na regra de três simples, se 2 pedreiros constroem um muro em 6 dias, 4 pedreiros constroem em:", options: ["3 dias", "12 dias", "4 dias", "2 dias"], correct: "3 dias", explanation: "Grandezas inversas: dobrando os pedreiros, cai a metade os dias (6 / 2 = 3)." },
-        { title: "0.08 equivale a qual porcentagem?", options: ["8%", "80%", "0.8%", "800%"], correct: "8%", explanation: "0.08 * 100 = 8%." },
-        { title: "Se x/2 = 10/4, qual o valor de x?", options: ["5", "10", "2.5", "20"], correct: "5", explanation: "x = (2 * 10) / 4 = 20 / 4 = 5." }
-      ],
-      "Matrizes e Determinantes": [
-        { title: "Uma matriz de ordem 2x3 possui:", options: ["2 linhas e 3 colunas", "3 linhas e 2 colunas", "6 linhas", "5 elementos no total"], correct: "2 linhas e 3 colunas", explanation: "Notação m x n representa sempre Linhas x Colunas." },
-        { title: "O determinante de uma matriz 2x2 [[a, b], [c, d]] é dado por:", options: ["ad - bc", "ab - cd", "ac - bd", "ad + bc"], correct: "ad - bc", explanation: "Multiplicação da diagonal principal menos a diagonal secundária." },
-        { title: "Qual o determinante da matriz [[3, 2], [1, 4]]?", options: ["10", "14", "12", "8"], correct: "10", explanation: "Det = (3*4) - (2*1) = 12 - 2 = 10." },
-        { title: "Uma matriz quadrada é aquela que possui:", options: ["Mesmo número de linhas e colunas", "Apenas 1 linha", "Apenas elementos iguais a zero", "Determinante nulo"], correct: "Mesmo número de linhas e colunas", explanation: "Exemplo: 2x2, 3x3, 4x4." },
-        { title: "A matriz Identidade possui na diagonal principal apenas elementos iguais a:", options: ["1", "0", "-1", "Depende da ordem"], correct: "1", explanation: "Matriz identidade tem 1 na diagonal principal e 0 nos demais elementos." },
-        { title: "A transposta da matriz A (notada por A^T) é obtida:", options: ["Trocando linhas por colunas", "Multiplicando por -1", "Invertendo os sinais", "Calculando o determinante"], correct: "Trocando linhas por colunas", explanation: "Linhas viram colunas e colunas viram linhas." },
-        { title: "Se o determinante de uma matriz é ZERO, ela é:", options: ["Não invertível (singular)", "Invertível", "Identidade", "Nula"], correct: "Não invertível (singular)", explanation: "Uma matriz só possui inversa se seu determinante for diferente de 0." },
-        { title: "Uma matriz nula possui todos os seus elementos iguais a:", options: ["0", "1", "-1", "Qualquer número"], correct: "0", explanation: "Por definição todos os elementos são 0." },
-        { title: "Duas matrizes só podem ser somadas se tiverem:", options: ["A mesma dimensão (ordem)", "Determinante igual", "Sinais opostos", "O mesmo número de colunas que a outra tem de linhas"], correct: "A mesma dimensão (ordem)", explanation: "A soma é feita elemento a elemento correspondente." },
-        { title: "Qual a regra utilizada para calcular determinantes de ordem 3x3?", options: ["Regra de Sarrus", "Regra de Cramer", "Teorema de Pitágoras", "Método de Bhaskara"], correct: "Regra de Sarrus", explanation: "Regra clássica de repetição das duas primeiras colunas." }
-      ],
-      "Funções Matemáticas": [
-        { title: "Em uma função f: A -> B, o conjunto A é chamado de:", options: ["Domínio", "Contradomínio", "Imagem", "Gráfico"], correct: "Domínio", explanation: "O conjunto de partida com os valores de x é o Domínio." },
-        { title: "O conjunto formado pelos valores de saída (y) efetivamente atingidos é o:", options: ["Conjunto Imagem", "Domínio", "Contradomínio", "Eixo X"], correct: "Conjunto Imagem", explanation: "Imagem é o subconjunto do contradomínio atingido pelas flechas." },
-        { title: "Uma função é injetora quando elementos distintos do domínio possuem:", options: ["Imagens distintas", "Mesma imagem", "Imagens nulas", "Domínios opostos"], correct: "Imagens distintas", explanation: "x1 ≠ x2 implica f(x1) ≠ f(x2)." },
-        { title: "O gráfico de uma função do 1º grau f(x) = ax + b é sempre:", options: ["Uma reta", "Uma parábola", "Uma curva hipérbole", "Um círculo"], correct: "Uma reta", explanation: "Funções afins formam linhas retas no plano cartesiano." },
-        { title: "O gráfico de uma função quadrática f(x) = ax² + bx + c é:", options: ["Uma parábola", "Uma reta", "Uma senóide", "Uma elipse"], correct: "Uma parábola", explanation: "Toda função do 2º grau gera uma curva parabólica." },
-        { title: "Na função f(x) = 2^x (exponencial), se x = 3, f(x) vale:", options: ["8", "6", "9", "5"], correct: "8", explanation: "f(3) = 2³ = 8." },
-        { title: "Uma função f(x) é par se:", options: ["f(-x) = f(x)", "f(-x) = -f(x)", "f(x) = 0", "f(x) = x"], correct: "f(-x) = f(x)", explanation: "Simetria em relação ao eixo y (ex: f(x) = x²)." },
-        { title: "Qual a função inversa de f(x) = x + 3?", options: ["f⁻¹(x) = x - 3", "f⁻¹(x) = 3 - x", "f⁻¹(x) = 1/(x+3)", "f⁻¹(x) = 3x"], correct: "f⁻¹(x) = x - 3", explanation: "Isolando x: y = x + 3 => x = y - 3 => f⁻¹(x) = x - 3." },
-        { title: "Qual o valor do ponto onde a reta f(x) = 4x - 8 cruza o eixo Y?", options: ["-8", "4", "2", "0"], correct: "-8", explanation: "O ponto no eixo Y ocorre quando x = 0. f(0) = -8 (coeficiente b)." },
-        { title: "A função logarítmica f(x) = log_b(x) é a inversa de qual função?", options: ["Exponencial", "Quadrática", "Trigonométrica", "Modular"], correct: "Exponencial", explanation: "Logaritmo é a operação inversa da exponencial." }
-      ],
-      "Análise Combinatória": [
-        { title: "Qual o valor de 4! (4 fatorial)?", options: ["24", "12", "16", "10"], correct: "24", explanation: "4! = 4 * 3 * 2 * 1 = 24." },
-        { title: "Por convenção, qual o valor de 0! (zero fatorial)?", options: ["1", "0", "Indefinido", "-1"], correct: "1", explanation: "Por definição matemática 0! = 1." },
-        { title: "Nos Arranjos, a ordem dos elementos importa?", options: ["Sim", "Não", "Apenas em números pares", "Depende"], correct: "Sim", explanation: "Em Arranjos a ordem altera o agrupamento (ex: senhas)." },
-        { title: "Nas Combinações, a ordem dos elementos importa?", options: ["Não", "Sim", "Sempre", "Raras vezes"], correct: "Não", explanation: "Em Combinações a ordem não altera o grupo (ex: comissões, times)." },
-        { title: "De quantas maneiras 3 pessoas podem se sentar em uma fileira de 3 cadeiras? (Permutação)", options: ["6", "3", "9", "12"], correct: "6", explanation: "P3 = 3! = 3 * 2 * 1 = 6." },
-        { title: "Qual o número de combinações simples de 5 elementos tomados 2 a 2: C(5,2)?", options: ["10", "20", "25", "12"], correct: "10", explanation: "C(5,2) = (5*4)/(2*1) = 20 / 2 = 10." },
-        { title: "Qual o valor de 5! / 4! ?", options: ["5", "1", "20", "1.2"], correct: "5", explanation: "(5 * 4!) / 4! = 5." },
-        { title: "Quantas comissões de 2 pessoas podem ser formadas com 4 voluntários?", options: ["6", "12", "8", "4"], correct: "6", explanation: "C(4,2) = (4*3)/(2*1) = 6." },
-        { title: "Em um código de 2 letras distintas escolhidas entre A, B e C, quantos códigos são possíveis?", options: ["6", "3", "9", "4"], correct: "6", explanation: "Arranjo A(3,2) = 3 * 2 = 6." },
-        { title: "O Princípio Fundamental da Contagem (PFC) baseia-se na operação de:", options: ["Multiplicação", "Soma", "Divisão", "Subtração"], correct: "Multiplicação", explanation: "Multiplica-se o número de opções de cada etapa." }
-      ],
-      "Progressão Aritmética (PA)": [
-        { title: "Qual a razão da P.A. (2, 5, 8, 11, ...)?", options: ["3", "2", "5", "4"], correct: "3", explanation: "Razão r = 5 - 2 = 3." },
-        { title: "Qual a fórmula do termo geral de uma P.A.?", options: ["an = a1 + (n - 1)r", "an = a1 * r^(n-1)", "an = a1 + nr", "Sn = n(a1 + an)/2"], correct: "an = a1 + (n - 1)r", explanation: "Fórmula clássica do termo geral da PA." },
-        { title: "Qual o 10º termo da P.A. de a1 = 3 e razão r = 4?", options: ["39", "40", "36", "43"], correct: "39", explanation: "a10 = 3 + (10 - 1)*4 = 3 + 36 = 39." },
-        { title: "Uma P.A. em que a razão r > 0 é chamada de:", options: ["Crescente", "Decrescente", "Constante", "Oscilante"], correct: "Crescente", explanation: "r > 0 faz com que os termos aumentem continuamente." },
-        { title: "Qual a soma dos 5 primeiros termos da P.A. (2, 4, 6, 8, 10)?", options: ["30", "20", "25", "35"], correct: "30", explanation: "2 + 4 + 6 + 8 + 10 = 30." },
-        { title: "Qual a razão de uma P.A. constante?", options: ["0", "1", "Maior que 1", "Menor que 0"], correct: "0", explanation: "Na PA constante a razão r = 0 (os termos não mudam)." },
-        { title: "Qual a fórmula da soma dos n primeiros termos de uma P.A.?", options: ["Sn = n(a1 + an) / 2", "Sn = a1 + an / 2", "Sn = n * r", "Sn = a1 * (r^n - 1)"], correct: "Sn = n(a1 + an) / 2", explanation: "Fórmula da soma idealizada por Gauss." },
-        { title: "Se a1 = 10 e a2 = 7, qual a razão da P.A.?", options: ["-3", "3", "17", "0.7"], correct: "-3", explanation: "r = a2 - a1 = 7 - 10 = -3." },
-        { title: "Em uma P.A., o termo médio entre 4 e 12 é:", options: ["8", "6", "10", "16"], correct: "8", explanation: "Média aritmética dos extremos: (4 + 12) / 2 = 8." },
-        { title: "Qual o terceiro termo da P.A. onde a1 = 5 e r = -2?", options: ["1", "3", "0", "-1"], correct: "1", explanation: "a1 = 5, a2 = 3, a3 = 1." }
-      ],
-      "Progressão Geométrica (PG)": [
-        { title: "Qual a razão da P.G. (3, 6, 12, 24, ...)?", options: ["2", "3", "6", "4"], correct: "2", explanation: "Razão q = 6 / 3 = 2." },
-        { title: "Qual a fórmula do termo geral de uma P.G.?", options: ["an = a1 * q^(n-1)", "an = a1 + (n-1)q", "an = a1 * q^n", "Sn = a1 / (1 - q)"], correct: "an = a1 * q^(n-1)", explanation: "Fórmula clássica do termo geral da PG." },
-        { title: "Qual o 4º termo da P.G. onde a1 = 2 e q = 3?", options: ["54", "18", "24", "162"], correct: "54", explanation: "a4 = 2 * 3³ = 2 * 27 = 54." },
-        { title: "Uma P.G. com razão q = 1 é uma P.G.:", options: ["Constante", "Crescente", "Decrescente", "Alternada"], correct: "Constante", explanation: "Multiplicar por 1 mantém os termos idênticos." },
-        { title: "Qual a soma da P.G. infinita (1, 1/2, 1/4, 1/8, ...) com |q| < 1?", options: ["2", "1", "1.5", "Infinito"], correct: "2", explanation: "S = a1 / (1 - q) = 1 / (1 - 0.5) = 1 / 0.5 = 2." },
-        { title: "Uma P.G. em que os termos alternam o sinal (positivo e negativo) tem razão q:", options: ["Negativa (q < 0)", "Positiva (q > 0)", "Igual a zero", "Maior que 1"], correct: "Negativa (q < 0)", explanation: "Multiplicar sucessivamente por número negativo alterna o sinal." },
-        { title: "Se a1 = 5 e a2 = 5, qual a razão q da P.G.?", options: ["1", "0", "5", "Infinita"], correct: "1", explanation: "q = 5 / 5 = 1." },
-        { title: "O termo médio da P.G. entre 2 e 8 (com termos positivos) é:", options: ["4", "5", "6", "3"], correct: "4", explanation: "Média geométrica: √(2 * 8) = √16 = 4." },
-        { title: "Qual a fórmula da soma da P.G. infinita para |q| < 1?", options: ["S = a1 / (1 - q)", "S = a1(q^n - 1) / (q - 1)", "S = a1 * q", "S = n(a1 + an)/2"], correct: "S = a1 / (1 - q)", explanation: "Fórmula do limite da soma infinita para |q| < 1." },
-        { title: "Se a1 = 1 e q = 10, qual o 3º termo?", options: ["100", "10", "1000", "30"], correct: "100", explanation: "a3 = 1 * 10² = 100." }
-      ]
-    };
-
-    const areasMatematica = Object.keys(bancoQuizzesAutomaticos);
-
-    let currentUser = null;
-    let questionCardCount = 0;
-    let currentQuizList = [];
-    let currentQuizIndex = 0;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      populateAreaSelects();
-      checkSavedProfile();
-    });
-
-    function populateAreaSelects() {
-      const select = document.getElementById('forms-area');
-      select.innerHTML = '';
-      areasMatematica.forEach(a => {
-        let opt = document.createElement('option');
-        opt.value = a; opt.innerText = a;
-        select.appendChild(opt);
-      });
-    }
-
-    function checkSavedProfile() {
-      const savedUser = localStorage.getItem('mathquest_student');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        applyUserTheme(currentUser.color);
-        loadStudentProfileUI();
-        listenToRealtimeData();
-        renderAutoAreaCards();
-        showScreen('screen-student-dash');
-      }
-    }
-
-    function applyUserTheme(color) {
-      document.documentElement.style.setProperty('--user-theme-color', color || '#00ff66');
-    }
-
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    /* NAVEGAÇÃO DE ABAS */
-    function switchStudentTab(tabId, btn) {
-      document.querySelectorAll('#screen-student-dash .tab-content').forEach(c => c.style.display = 'none');
-      document.querySelectorAll('#screen-student-dash .tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabId).style.display = 'block';
-      btn.classList.add('active');
-    }
-
-    function switchProfTab(tabId, btn) {
-      document.querySelectorAll('#screen-prof-dash .tab-content').forEach(c => c.style.display = 'none');
-      document.querySelectorAll('#screen-prof-dash .tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabId).style.display = 'block';
-      btn.classList.add('active');
-    }
-
-    /* RENDERIZAÇÃO DOS QUIZZES AUTOMÁTICOS */
-    function renderAutoAreaCards() {
-      const container = document.getElementById('area-grid-container');
-      const profContainer = document.getElementById('prof-auto-grid-container');
-      container.innerHTML = '';
-      profContainer.innerHTML = '';
-
-      areasMatematica.forEach(area => {
-        let card = document.createElement('div');
-        card.className = 'area-card';
-        card.innerHTML = `📘 ${area}<br><small style="color:#8b949e;">(10 Questões)</small>`;
-        card.onclick = () => startAutoQuiz(area);
-        container.appendChild(card);
-
-        let profCard = document.createElement('div');
-        profCard.className = 'area-card';
-        profCard.innerHTML = `📘 ${area}<br><small style="color:#8b949e;">(10 Questões)</small>`;
-        profCard.onclick = () => startAutoQuiz(area);
-        profContainer.appendChild(profCard);
-      });
-    }
-
-    function startAutoQuiz(areaName) {
-      const questions = bancoQuizzesAutomaticos[areaName];
-      if (questions && questions.length > 0) {
-        currentQuizList = questions;
-        currentQuizIndex = 0;
-        document.getElementById('quiz-area-badge').innerText = `ÁREA: ${areaName.toUpperCase()}`;
-        loadCurrentQuizQuestion();
-        showScreen('screen-quiz');
-      } else {
-        alert('Nenhuma questão encontrada nesta área!');
-      }
-    }
-
-    function startTeacherQuiz(quizObj) {
-      currentQuizList = quizObj.questions;
-      currentQuizIndex = 0;
-      document.getElementById('quiz-area-badge').innerText = `QUIZ DO PROFESSOR: ${quizObj.title}`;
-      loadCurrentQuizQuestion();
-      showScreen('screen-quiz');
-    }
-
-    function loadCurrentQuizQuestion() {
-      const q = currentQuizList[currentQuizIndex];
-      document.getElementById('quiz-progress').innerText = `Questão ${currentQuizIndex + 1} de ${currentQuizList.length}`;
-      document.getElementById('quiz-question-title').innerText = `${currentQuizIndex + 1}. ${q.title}`;
-      
-      // Esconde o painel de correção/feedback até o clique do aluno
-      document.getElementById('quiz-feedback').style.display = 'none';
-
-      const container = document.getElementById('quiz-options-container');
-      container.innerHTML = '';
-
-      q.options.forEach(opt => {
-        let btn = document.createElement('button');
-        btn.className = 'btn-secondary quiz-opt-btn';
-        btn.innerText = opt;
-        // Chama o método passando a opção clicada e o próprio botão
-        btn.onclick = () => selectOptionAndValidate(opt, q, btn);
-        container.appendChild(btn);
-      });
-    }
-
-    /* SISTEMA DE REVELAÇÃO PÓS-RESPOSTA */
-    function selectOptionAndValidate(selectedOpt, questionObj, clickedBtn) {
-      const allOptBtns = document.querySelectorAll('.quiz-opt-btn');
-      
-      // 1. Trava todas as opções para o aluno não alterar a resposta
-      allOptBtns.forEach(btn => btn.disabled = true);
-
-      const isCorrect = (selectedOpt === questionObj.correct);
-
-      // 2. Destaca visualmente no clique o resultado da escolha do aluno
-      allOptBtns.forEach(btn => {
-        if (btn.innerText === questionObj.correct) {
-          btn.classList.add('correct-choice'); // Destaca a correta em verde
-        } else if (btn === clickedBtn && !isCorrect) {
-          btn.classList.add('wrong-choice'); // Destaca a escolha errada em vermelho
-        }
-      });
-
-      // 3. Exibe a validação, pontos e explicação
-      const feedback = document.getElementById('quiz-feedback');
-      const badge = document.getElementById('feedback-badge');
-      const exp = document.getElementById('feedback-explanation');
-
-      if (isCorrect) {
-        badge.innerText = "RESPOSTA CORRETA! 🎉 (+10 PTS)";
-        badge.style.color = "#00ff66";
-        
-        if (currentUser) {
-          currentUser.score = (currentUser.score || 0) + 10;
-          db.ref('students/' + currentUser.name + '/score').set(currentUser.score);
-          localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
-        }
-      } else {
-        badge.innerText = `RESPOSTA INCORRETA! ❌ (Correta: ${questionObj.correct})`;
-        badge.style.color = "#ff0055";
-      }
-
-      exp.innerText = questionObj.explanation || "Sem explicação disponível.";
-      feedback.style.display = 'block';
-    }
-
-    function nextQuestionInQuiz() {
-      currentQuizIndex++;
-      if (currentQuizIndex < currentQuizList.length) {
-        loadCurrentQuizQuestion();
-      } else {
-        alert('PARABÉNS! VOCÊ CONCLUIU ESTE QUIZ! 🏆');
-        showScreen('screen-student-dash');
-      }
-    }
-
-    /* OUVE E SINCRONIZA DADOS DO FIREBASE EM TEMPO REAL */
-    function listenToRealtimeData() {
-      db.ref('students').on('value', snapshot => {
-        const sBody = document.getElementById('student-ranking-body');
-        const pRankBody = document.getElementById('prof-ranking-body');
-        const pAccBody = document.getElementById('prof-accesses-body');
-        
-        sBody.innerHTML = ''; pRankBody.innerHTML = ''; pAccBody.innerHTML = '';
-
-        let players = [];
-        snapshot.forEach(c => players.push(c.val()));
-        players.sort((a,b) => (b.score||0) - (a.score||0));
-
-        players.forEach((p, i) => {
-          let pos = i + 1;
-          let medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : `${pos}º`;
-          let correctAnswers = Math.floor((p.score || 0) / 10);
-
-          sBody.innerHTML += `<tr>
-            <td><strong>${medal}</strong></td>
-            <td style="color:${p.color}; font-weight:bold;">${p.name}</td>
-            <td>${correctAnswers} acertos</td>
-            <td><strong>${p.score || 0} PTS</strong></td>
-          </tr>`;
-
-          pRankBody.innerHTML += `<tr>
-            <td><strong>${medal}</strong></td>
-            <td style="color:${p.color}">${p.name}</td>
-            <td>${p.score||0} PTS (${correctAnswers} acertos)</td>
-          </tr>`;
-
-          pAccBody.innerHTML += `<tr>
-            <td><img src="${p.photo || ''}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;"></td>
-            <td style="color:${p.color}">${p.name}</td>
-            <td>${correctAnswers} acertos</td>
-            <td>${p.score||0} PTS</td>
-          </tr>`;
-        });
-      });
-
-      /* SINCRONIZA QUIZZES CRIADOS PELO PROFESSOR */
-      db.ref('teacher_quizzes').on('value', snapshot => {
-        const studentContainer = document.getElementById('prof-quizzes-container');
-        const profListContainer = document.getElementById('prof-created-quizzes-list');
-        studentContainer.innerHTML = '';
-        profListContainer.innerHTML = '';
-
-        snapshot.forEach(child => {
-          const quiz = child.val();
-          
-          let btnStudent = document.createElement('button');
-          btnStudent.className = 'btn-secondary';
-          btnStudent.style.borderLeft = '6px solid var(--user-theme-color)';
-          btnStudent.innerText = `📋 QUIZ DO PROFESSOR: ${quiz.title} (${quiz.area}) - ${quiz.questions.length} Pergunta(s)`;
-          btnStudent.onclick = () => startTeacherQuiz(quiz);
-          studentContainer.appendChild(btnStudent);
-
-          let itemProf = document.createElement('div');
-          itemProf.className = 'forms-card';
-          itemProf.innerHTML = `<strong>${quiz.title}</strong> - Área: ${quiz.area} (${quiz.questions.length} Pergunta(s))`;
-          profListContainer.appendChild(itemProf);
-        });
-      });
-    }
-
-    /* GERADOR DE QUIZ ESTILO GOOGLE FORMS DO PROFESSOR */
-    function addQuestionCardForms() {
-      questionCardCount++;
-      const id = questionCardCount;
-      const container = document.getElementById('forms-questions-container');
-
-      const card = document.createElement('div');
-      card.className = 'forms-card';
-      card.id = `qcard-${id}`;
-      card.innerHTML = `
-        <label>Pergunta ${id}:</label>
-        <input type="text" class="q-title" placeholder="Digite o enunciado da questão...">
-
-        <label>Tipo de Resposta:</label>
-        <select class="q-type" onchange="renderOptionsByFormsType(${id})">
-          <option value="multiple">Múltipla Escolha</option>
-          <option value="tf">Verdadeiro ou Falso</option>
-        </select>
-
-        <label>Opções (Marque com o ✔️ a resposta correta):</label>
-        <div id="q-options-box-${id}"></div>
-
-        <label>Explicação / Passo a Passo:</label>
-        <textarea class="q-explanation" rows="2" placeholder="Explicação da resposta..."></textarea>
-      `;
-      container.appendChild(card);
-      renderOptionsByFormsType(id);
-    }
-
-    function renderOptionsByFormsType(cardId) {
-      const card = document.getElementById(`qcard-${cardId}`);
-      const type = card.querySelector('.q-type').value;
-      const box = document.getElementById(`q-options-box-${cardId}`);
-      box.innerHTML = '';
-
-      if (type === 'multiple') {
-        for (let i = 1; i <= 4; i++) {
-          box.innerHTML += `
-            <div class="option-row">
-              <input type="radio" name="correct-${cardId}" class="radio-check" value="${i-1}" ${i===1?'checked':''} title="Marque a resposta correta ✔️">
-              <input type="text" class="q-opt-text" placeholder="Opção ${i}">
+    <header id="main-header">
+        <h1>MATHQUEST</h1>
+        <p>A Gamificação da Matemática</p>
+    </header>
+
+    <div class="container">
+        <!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
+        <div id="user-nav" class="user-nav" style="display: none;">
+            <div class="user-info">
+                <img id="nav-avatar" src="" alt="Foto" class="avatar-img">
+                <div class="user-details">
+                    <h4 id="nav-username">Usuário</h4>
+                    <span id="nav-grade">Série não informada</span>
+                    <p id="nav-phrase" class="user-phrase"></p>
+                </div>
             </div>
-          `;
-        }
-      } else {
-        box.innerHTML = `
-          <div class="option-row">
-            <input type="radio" name="correct-${cardId}" class="radio-check" value="Verdadeiro" checked>
-            <span>Verdadeiro ✔️</span>
-          </div>
-          <div class="option-row">
-            <input type="radio" name="correct-${cardId}" class="radio-check" value="Falso">
-            <span>Falso ✔️</span>
-          </div>
-        `;
-      }
-    }
+            <div class="nav-buttons">
+                <button class="btn btn-outline" onclick="showScreen('screen-profile')">Perfil</button>
+                <button class="btn btn-outline" onclick="logout()">Sair</button>
+            </div>
+        </div>
 
-    function saveFullQuizForms() {
-      const title = document.getElementById('forms-title').value.trim();
-      const area = document.getElementById('forms-area').value;
-      const cards = document.querySelectorAll('.forms-card');
+        <!-- TELA 1: LOGIN -->
+        <div id="screen-login" class="screen active">
+            <h2 class="screen-title">Entrar na Conta</h2>
+            <form id="form-login" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-name">Seu Nome de Usuário / E-mail</label>
+                    <input type="text" id="login-name" placeholder="Digite seu nome ou e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Sua Senha</label>
+                    <input type="password" id="login-password" placeholder="Digite sua senha" required>
+                </div>
+                <button type="submit" class="btn btn-primary">ENTRAR AGORA 🚀</button>
+            </form>
+            <div class="switch-auth-link">
+                Ainda não tem conta? <a onclick="showScreen('screen-register')">Cadastre-se aqui</a>
+            </div>
+        </div>
 
-      if (!title) return alert('DIGITE O TÍTULO DO QUIZ!');
-      if (cards.length === 0) return alert('ADICIONE PELO MENOS UMA PERGUNTA CLICANDO NO BOTÃO +');
+        <!-- TELA 2: CADASTRO -->
+        <div id="screen-register" class="screen">
+            <h2 class="screen-title">Criar Sua Conta</h2>
+            <form id="form-register" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="reg-name">Seu Nome Completo</label>
+                    <input type="text" id="reg-name" placeholder="Ex: Maria Eduarda ou Prof. Lucas" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-role">Tipo de Conta</label>
+                    <select id="reg-role" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0d0e15; color: #fff;">
+                        <option value="Aluno">Aluno</option>
+                        <option value="Professor">Professor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reg-grade">Série / Ano / Matéria</label>
+                    <input type="text" id="reg-grade" placeholder="Ex: 8º Ano Fundamental ou Prof. Matemática" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Crie uma Senha</label>
+                    <input type="password" id="reg-password" placeholder="Mínimo de 4 dígitos" required minlength="4">
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm-password">Confirme a Senha</label>
+                    <input type="password" id="reg-confirm-password" placeholder="Digite novamente a senha" required minlength="4">
+                </div>
+                <button type="submit" class="btn btn-secondary">CRIAR CONTA E ENTRAR ✨</button>
+            </form>
+            <div class="switch-auth-link">
+                Já possui conta? <a onclick="showScreen('screen-login')">Faça login</a>
+            </div>
+        </div>
 
-      let questions = [];
+        <!-- TELA 3: MENU PRINCIPAL -->
+        <div id="screen-menu" class="screen">
+            <h2 class="screen-title">Escolha o Modo de Jogo</h2>
+            <div class="menu-grid">
+                <button class="btn btn-primary" onclick="startAutomaticQuiz()">🎮 QUIZ AUTOMÁTICO DE MATEMÁTICA</button>
+                <button class="btn btn-secondary" onclick="showScreen('screen-teacher-quizzes')">📚 QUIZZES DOS PROFESSORES</button>
+                <button class="btn btn-outline" style="width:100%; padding:12px;" onclick="showScreen('screen-create-quiz')">✏️ ÁREA DO PROFESSOR (CRIAR QUIZ)</button>
+            </div>
+        </div>
 
-      cards.forEach(card => {
-        const qTitle = card.querySelector('.q-title').value.trim();
-        const type = card.querySelector('.q-type').value;
-        const explanation = card.querySelector('.q-explanation').value.trim();
-        let correctVal = "";
-        let optionsArr = [];
+        <!-- TELA 4: PERFIL E PERSONALIZAÇÃO -->
+        <div id="screen-profile" class="screen">
+            <h2 class="screen-title">Seu Perfil & Personalização</h2>
+            <form id="form-profile" onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label for="profile-photo-file">Escolher Foto de Perfil (Galeria):</label>
+                    <input type="file" id="profile-photo-file" accept="image/*" onchange="previewImage(event)">
+                    <img id="avatar-preview" src="" alt="Pré-visualização" class="preview-avatar hidden">
+                </div>
 
-        if (type === 'multiple') {
-          const optInputs = card.querySelectorAll('.q-opt-text');
-          const selectedRadio = card.querySelector(`input[name="correct-${card.id.split('-')[1]}"]:checked`).value;
-          
-          optInputs.forEach((inp, idx) => {
-            const val = inp.value.trim() || `Opção ${idx+1}`;
-            optionsArr.push(val);
-            if (idx == selectedRadio) correctVal = val;
-          });
-        } else {
-          correctVal = card.querySelector(`input[name="correct-${card.id.split('-')[1]}"]:checked`).value;
-          optionsArr = ["Verdadeiro", "Falso"];
-        }
+                <div class="form-group">
+                    <label for="profile-phrase-input">Frase de Efeito / Apresentação</label>
+                    <input type="text" id="profile-phrase-input" maxlength="100" placeholder="Ex: O conhecimento transforma o mundo!">
+                </div>
 
-        if (qTitle) {
-          questions.push({ title: qTitle, options: optionsArr, correct: correctVal, explanation: explanation });
-        }
-      });
+                <div class="form-group">
+                    <label>Cor Principal do Painel (Tema Individual)</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="profile-color-input" value="#ff007f">
+                        <span id="color-code-display">#ff007f</span>
+                    </div>
+                </div>
 
-      db.ref('teacher_quizzes').push({ title, area, questions }, err => {
-        if (!err) {
-          alert('QUIZ CRIADO E PUBLICADO COM SUCESSO! ✔️');
-          document.getElementById('forms-questions-container').innerHTML = '';
-          document.getElementById('forms-title').value = '';
-          questionCardCount = 0;
-          addQuestionCardForms();
-        }
-      });
-    }
+                <div class="form-group">
+                    <label for="profile-grade-input">Série / Ano Escolar ou Cargo</label>
+                    <input type="text" id="profile-grade-input" required>
+                </div>
 
-    /* EDIÇÃO DE PERFIL DO ALUNO */
-    function registerStudent() {
-      const name = document.getElementById('player-name').value.trim();
-      const color = document.getElementById('player-color').value;
-      const photo = document.getElementById('preview-img').src;
+                <button type="submit" class="btn btn-primary" style="margin-bottom:10px;">SALVAR ALTERAÇÕES 💾</button>
+                <button type="button" class="btn btn-outline" style="width:100%; padding:12px;" onclick="showScreen('screen-menu')">VOLTAR AO MENU</button>
+            </form>
+        </div>
 
-      if (!name) return alert('Informe seu apelido!');
+        <!-- TELA 5: CRIAR QUIZ (PROFESSOR) -->
+        <div id="screen-create-quiz" class="screen">
+            <h2 class="screen-title">Criar Novo Quiz (Professor)</h2>
+            <form id="form-create-quiz" onsubmit="handleCreateQuiz(event)">
+                <div class="form-group">
+                    <label for="quiz-title">Título do Quiz</label>
+                    <input type="text" id="quiz-title" placeholder="Ex: Desafio de Geometria Plana" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quiz-area">Área / Matéria</label>
+                    <input type="text" id="quiz-area" placeholder="Ex: Raciocínio Lógico, Álgebra, Geometria..." required>
+                </div>
 
-      currentUser = { name, color, photo, score: 0 };
-      localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
-      db.ref('students/' + name).set({ name, color, photo, score: 0 });
+                <div class="form-group">
+                    <label for="quiz-question-text">Pergunta / Enunciado</label>
+                    <input type="text" id="quiz-question-text" placeholder="Digite o enunciado da questão" required>
+                </div>
 
-      applyUserTheme(color);
-      loadStudentProfileUI();
-      listenToRealtimeData();
-      renderAutoAreaCards();
-      showScreen('screen-student-dash');
-    }
+                <div class="form-group">
+                    <label>Opções de Resposta</label>
+                    <input type="text" id="opt-0" placeholder="Opção 1" style="margin-bottom:6px;" required>
+                    <input type="text" id="opt-1" placeholder="Opção 2" style="margin-bottom:6px;" required>
+                    <input type="text" id="opt-2" placeholder="Opção 3" style="margin-bottom:6px;" required>
+                    <input type="text" id="opt-3" placeholder="Opção 4" style="margin-bottom:6px;" required>
+                </div>
 
-    function loadStudentProfileUI() {
-      document.getElementById('edit-player-name').value = currentUser.name;
-      document.getElementById('edit-player-color').value = currentUser.color;
-      document.getElementById('edit-display-photo').src = currentUser.photo;
-    }
+                <div class="form-group">
+                    <label for="correct-index">Qual é a Opção Correta?</label>
+                    <select id="correct-index" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0d0e15; color: #fff;">
+                        <option value="0">Opção 1</option>
+                        <option value="1">Opção 2</option>
+                        <option value="2">Opção 3</option>
+                        <option value="3">Opção 4</option>
+                    </select>
+                </div>
 
-    function saveProfileChanges() {
-      const newColor = document.getElementById('edit-player-color').value;
-      currentUser.color = newColor;
+                <div class="form-group">
+                    <label for="quiz-explanation">Explicação Detalhada da Resposta</label>
+                    <textarea id="quiz-explanation" placeholder="Escreva aqui o passo a passo da resolução..." required></textarea>
+                </div>
 
-      const fileInp = document.getElementById('edit-player-photo');
-      if (fileInp.files[0]) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          currentUser.photo = reader.result;
-          updateProfileInFirebase();
+                <button type="submit" class="btn btn-secondary" style="margin-bottom:10px;">SALVAR E PUBLICAR QUIZ 📌</button>
+                <button type="button" class="btn btn-outline" style="width:100%; padding:12px;" onclick="showScreen('screen-menu')">VOLTAR</button>
+            </form>
+        </div>
+
+        <!-- TELA 6: LISTA DE QUIZZES -->
+        <div id="screen-teacher-quizzes" class="screen">
+            <h2 class="screen-title">Quizzes dos Professores</h2>
+            <div id="teacher-quizzes-container" class="created-quizzes-list"></div>
+            <button type="button" class="btn btn-outline" style="width:100%; padding:12px; margin-top:20px;" onclick="showScreen('screen-menu')">VOLTAR AO MENU</button>
+        </div>
+
+        <!-- TELA 7: EXECUÇÃO DO QUIZ -->
+        <div id="screen-game" class="screen">
+            <div class="quiz-header">
+                <span id="game-area-tag">ÁREA: MATEMÁTICA</span>
+                <span id="game-progress">Questão 1 de 10</span>
+            </div>
+
+            <div id="game-question" class="quiz-question"></div>
+
+            <div id="game-options" class="options-list"></div>
+
+            <div id="game-feedback" class="feedback-box">
+                <div id="feedback-header" class="feedback-header"></div>
+                <div id="feedback-text" class="feedback-text"></div>
+            </div>
+
+            <button id="btn-next-question" class="btn btn-primary" style="display: none;" onclick="nextQuestion()">PRÓXIMA QUESTÃO ➔</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentGameQuizzes = [];
+        let currentQuestionIndex = 0;
+        let userScore = 0;
+        let tempBase64Photo = "";
+
+        const defaultQuizzes = [
+            {
+                area: "RACIOCÍNIO LÓGICO",
+                question: "1. Qual o próximo número da sequência: 2, 4, 8, 16, ...?",
+                options: ["32", "24", "20", "64"],
+                correctIndex: 0,
+                explanation: "Sequência geométrica onde cada número multiplica por 2 (dobro do anterior)."
+            },
+            {
+                area: "RACIOCÍNIO LÓGICO",
+                question: "2. O conectivo lógico 'E' (conjunção ^) só é verdadeiro quando:",
+                options: ["Ambas as proposições forem verdadeiras", "Uma for verdadeira", "Ambas forem falsas", "A primeira for falsa"],
+                correctIndex: 0,
+                explanation: "Na Tabela Verdade, a conjunção exige que ambas as proposições sejam verdadeiras."
+            },
+            {
+                area: "ÁLGEBRA",
+                question: "3. Qual o valor de x na equação 2x + 10 = 20?",
+                options: ["5", "10", "15", "20"],
+                correctIndex: 0,
+                explanation: "Subtraindo 10 de ambos os lados: 2x = 10. Dividindo por 2: x = 5."
+            },
+            {
+                area: "GEOMETRIA",
+                question: "4. Qual é a soma dos ângulos internos de qualquer triângulo?",
+                options: ["180°", "360°", "90°", "270°"],
+                correctIndex: 0,
+                explanation: "A soma dos três ângulos internos de todo triângulo é igual a 180°."
+            }
+        ];
+
+        window.onload = function() {
+            const colorPicker = document.getElementById('profile-color-input');
+            if(colorPicker) {
+                colorPicker.addEventListener('input', function(e) {
+                    document.getElementById('color-code-display').innerText = e.target.value;
+                });
+            }
+            checkActiveSession();
         };
-        reader.readAsDataURL(fileInp.files[0]);
-      } else {
-        updateProfileInFirebase();
-      }
-    }
 
-    function updateProfileInFirebase() {
-      localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
-      db.ref('students/' + currentUser.name).update({
-        color: currentUser.color,
-        photo: currentUser.photo
-      });
-      applyUserTheme(currentUser.color);
-      loadStudentProfileUI();
-      alert('Perfil atualizado com sucesso!');
-    }
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) targetScreen.classList.add('active');
 
-    function loginProfessor() {
-      if (document.getElementById('prof-pass').value === 'professor72') {
-        showScreen('screen-prof-dash');
-        listenToRealtimeData();
-        renderAutoAreaCards();
-        if(questionCardCount === 0) addQuestionCardForms();
-      } else {
-        alert('Senha incorreta!');
-      }
-    }
+            if (screenId === 'screen-teacher-quizzes') renderTeacherQuizzes();
+            if (screenId === 'screen-profile') prepareProfileScreen();
+        }
 
-    function logoutStudent() {
-      localStorage.removeItem('mathquest_student');
-      currentUser = null;
-      showScreen('screen-login');
-    }
-  </script>
+        function checkActiveSession() {
+            const loggedUsername = localStorage.getItem('mathquest_logged_user');
+            const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            if (loggedUsername && users[loggedUsername]) {
+                currentUser = { name: loggedUsername, ...users[loggedUsername] };
+                applyUserProfileTheme(currentUser);
+                document.getElementById('user-nav').style.display = 'flex';
+                showScreen('screen-menu');
+            } else {
+                document.getElementById('user-nav').style.display = 'none';
+                showScreen('screen-login');
+            }
+        }
+
+        function applyUserProfileTheme(user) {
+            document.getElementById('nav-username').innerText = user.name;
+            document.getElementById('nav-grade').innerText = user.grade || "Série não informada";
+            document.getElementById('nav-phrase').innerText = user.phrase ? `"${user.phrase}"` : "";
+            
+            const avatarImg = document.getElementById('nav-avatar');
+            if (user.photo && user.photo.trim() !== '') {
+                avatarImg.src = user.photo;
+            } else {
+                avatarImg.src = 'https://via.placeholder.com/150/00f0ff/808080?text=' + encodeURIComponent(user.name.charAt(0).toUpperCase());
+            }
+
+            if (user.themeColor) {
+                document.documentElement.style.setProperty('--primary-color', user.themeColor);
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const role = document.getElementById('reg-role').value;
+            const grade = document.getElementById('reg-grade').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert("As senhas informadas não coincidem. Por favor, verifique!");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            if (users[name]) {
+                alert("Já existe uma conta com esse nome! Faça login.");
+                showScreen('screen-login');
+                return;
+            }
+
+            users[name] = {
+                password: password,
+                role: role,
+                grade: grade,
+                photo: "",
+                phrase: "",
+                themeColor: "#ff007f"
+            };
+
+            localStorage.setItem('mathquest_users', JSON.stringify(users));
+            localStorage.setItem('mathquest_logged_user', name);
+
+            alert("Conta cadastrada com sucesso! Bem-vindo(a), " + name);
+            checkActiveSession();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            if (!users[name]) {
+                alert("Usuário não encontrado! Crie sua conta primeiro.");
+                return;
+            }
+
+            if (users[name].password !== password) {
+                alert("Senha incorreta! Tente novamente.");
+                return;
+            }
+
+            localStorage.setItem('mathquest_logged_user', name);
+            checkActiveSession();
+        }
+
+        function logout() {
+            localStorage.removeItem('mathquest_logged_user');
+            currentUser = null;
+            document.documentElement.style.setProperty('--primary-color', '#ff007f');
+            document.getElementById('user-nav').style.display = 'none';
+            showScreen('screen-login');
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    tempBase64Photo = e.target.result;
+                    const imgPreview = document.getElementById('avatar-preview');
+                    imgPreview.src = tempBase64Photo;
+                    imgPreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function prepareProfileScreen() {
+            if (!currentUser) return;
+            document.getElementById('profile-phrase-input').value = currentUser.phrase || '';
+            document.getElementById('profile-color-input').value = currentUser.themeColor || '#ff007f';
+            document.getElementById('color-code-display').innerText = currentUser.themeColor || '#ff007f';
+            document.getElementById('profile-grade-input').value = currentUser.grade || '';
+
+            const imgPreview = document.getElementById('avatar-preview');
+            if (currentUser.photo) {
+                imgPreview.src = currentUser.photo;
+                imgPreview.classList.remove('hidden');
+            } else {
+                imgPreview.classList.add('hidden');
+            }
+            tempBase64Photo = currentUser.photo || '';
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const phrase = document.getElementById('profile-phrase-input').value.trim();
+            const themeColor = document.getElementById('profile-color-input').value;
+            const grade = document.getElementById('profile-grade-input').value.trim();
+
+            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            users[currentUser.name].photo = tempBase64Photo;
+            users[currentUser.name].phrase = phrase;
+            users[currentUser.name].themeColor = themeColor;
+            users[currentUser.name].grade = grade;
+
+            localStorage.setItem('mathquest_users', JSON.stringify(users));
+            
+            currentUser.photo = tempBase64Photo;
+            currentUser.phrase = phrase;
+            currentUser.themeColor = themeColor;
+            currentUser.grade = grade;
+
+            applyUserProfileTheme(currentUser);
+            alert("Perfil salvo com sucesso!");
+            showScreen('screen-menu');
+        }
+
+        function handleCreateQuiz(e) {
+            e.preventDefault();
+            const title = document.getElementById('quiz-title').value.trim();
+            const area = document.getElementById('quiz-area').value.trim();
+            const questionText = document.getElementById('quiz-question-text').value.trim();
+            const opt0 = document.getElementById('opt-0').value.trim();
+            const opt1 = document.getElementById('opt-1').value.trim();
+            const opt2 = document.getElementById('opt-2').value.trim();
+            const opt3 = document.getElementById('opt-3').value.trim();
+            const correctIndex = parseInt(document.getElementById('correct-index').value);
+            const explanation = document.getElementById('quiz-explanation').value.trim();
+
+            const newQuiz = {
+                id: Date.now(),
+                title: title,
+                area: area.toUpperCase(),
+                question: questionText,
+                options: [opt0, opt1, opt2, opt3],
+                correctIndex: correctIndex,
+                explanation: explanation,
+                author: currentUser ? currentUser.name : "Professor"
+            };
+
+            let customQuizzes = JSON.parse(localStorage.getItem('mathquest_custom_quizzes') || '[]');
+            customQuizzes.push(newQuiz);
+            localStorage.setItem('mathquest_custom_quizzes', JSON.stringify(customQuizzes));
+
+            alert("Quiz publicado com sucesso!");
+            document.getElementById('form-create-quiz').reset();
+            showScreen('screen-menu');
+        }
+
+        function renderTeacherQuizzes() {
+            const container = document.getElementById('teacher-quizzes-container');
+            const customQuizzes = JSON.parse(localStorage.getItem('mathquest_custom_quizzes') || '[]');
+
+            if (customQuizzes.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#aaa; padding:20px;">Nenhum quiz cadastrado pelos professores ainda.</p>`;
+                return;
+            }
+
+            container.innerHTML = customQuizzes.map((q, idx) => `
+                <div class="quiz-item-card">
+                    <div>
+                        <strong style="color:#fff; font-size:1.1rem;">${q.title}</strong><br>
+                        <span class="badge" style="margin-top:5px; display:inline-block;">${q.area}</span>
+                        <small style="color:#aaa; margin-left:8px;">Por: ${q.author}</small>
+                    </div>
+                    <button class="btn btn-secondary" style="width:auto; padding:8px 14px;" onclick="playTeacherQuiz(${idx})">JOGAR</button>
+                </div>
+            `).join('');
+        }
+
+        function playTeacherQuiz(quizIndex) {
+            const customQuizzes = JSON.parse(localStorage.getItem('mathquest_custom_quizzes') || '[]');
+            const quiz = customQuizzes[quizIndex];
+            if (!quiz) return;
+
+            currentGameQuizzes = [quiz];
+            currentQuestionIndex = 0;
+            userScore = 0;
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        function startAutomaticQuiz() {
+            currentGameQuizzes = JSON.parse(JSON.stringify(defaultQuizzes));
+            currentQuestionIndex = 0;
+            userScore = 0;
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        function shuffleOptions(optionsArray, correctIndex) {
+            let mapped = optionsArray.map((optText, index) => ({
+                text: optText,
+                isCorrect: index === correctIndex
+            }));
+
+            for (let i = mapped.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mapped[i], mapped[j]] = [mapped[j], mapped[i]];
+            }
+
+            return mapped;
+        }
+
+        function loadQuestion() {
+            const currentQuiz = currentGameQuizzes[currentQuestionIndex];
+
+            document.getElementById('game-feedback').style.display = 'none';
+            document.getElementById('btn-next-question').style.display = 'none';
+
+            document.getElementById('game-area-tag').innerText = `ÁREA: ${currentQuiz.area || 'MATEMÁTICA'}`;
+            document.getElementById('game-progress').innerText = `Questão ${currentQuestionIndex + 1} de ${currentGameQuizzes.length}`;
+            document.getElementById('game-question').innerText = currentQuiz.question;
+
+            const shuffled = shuffleOptions(currentQuiz.options, currentQuiz.correctIndex);
+
+            const optionsContainer = document.getElementById('game-options');
+            optionsContainer.innerHTML = '';
+
+            shuffled.forEach((optObj) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = optObj.text;
+                btn.onclick = () => selectOption(btn, optObj, shuffled, currentQuiz);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(clickedBtn, selectedObj, allShuffledOptions, quizData) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            const feedbackBox = document.getElementById('game-feedback');
+            const feedbackHeader = document.getElementById('feedback-header');
+            const feedbackText = document.getElementById('feedback-text');
+
+            if (selectedObj.isCorrect) {
+                clickedBtn.classList.add('selected-correct');
+                userScore += 10;
+                feedbackHeader.className = 'feedback-header correct';
+                feedbackHeader.innerHTML = `RESPOSTA CORRETA! 🎉 (+10 PTS)`;
+            } else {
+                clickedBtn.classList.add('selected-incorrect');
+                feedbackHeader.className = 'feedback-header incorrect';
+                feedbackHeader.innerHTML = `RESPOSTA INCORRETA! ❌`;
+
+                allButtons.forEach((btn, idx) => {
+                    if (allShuffledOptions[idx].isCorrect) {
+                        btn.classList.add('show-correct');
+                    }
+                });
+            }
+
+            feedbackText.innerText = quizData.explanation || "Sem explicação cadastrada.";
+            feedbackBox.style.display = 'block';
+
+            document.getElementById('btn-next-question').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentGameQuizzes.length) {
+                loadQuestion();
+            } else {
+                alert(`Fim do Quiz! Você obteve: ${userScore} PONTOS 🎉`);
+                showScreen('screen-menu');
+            }
+        }
+    </script>
 </body>
 </html>
