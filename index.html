@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathQuest - A Gamificação da Matemática</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- SDKs DO FIREBASE (v9/v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #ff007f;
+            --secondary-color: #00f0ff;
+            --bg-dark: #0d0e15;
+            --card-bg: #161824;
+            --text-color: #ffffff;
+            --success-color: #00ff66;
+            --danger-color: #ff3366;
+            --font-pixel: 'Press Start 2P', cursive;
+            --font-main: 'Rajdhani', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 40px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* BANNER CABEÇALHO ESTILO GOOGLE FORMS */
+        .forms-header-banner {
+            width: 100%;
+            max-width: 900px;
+            height: 180px;
+            background: #202436;
+            border-radius: 0 0 16px 16px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--primary-color);
+            border-top: none;
+            box-shadow: 0 5px 25px rgba(255, 0, 127, 0.4);
+            margin-bottom: 25px;
+        }
+
+        .forms-header-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .forms-banner-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #161824, #ff007f);
+            font-family: var(--font-pixel);
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            text-shadow: 2px 2px #000;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .user-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-avatar-small {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-online { 
+            background-color: var(--success-color); 
+            box-shadow: 0 0 8px var(--success-color);
+            animation: pulse 2s infinite;
+        }
+        .status-offline { background-color: #777; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(0, 255, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); }
+        }
+
+        .main-tabs {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: #202436;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            font-family: var(--font-pixel);
+            font-size: 0.6rem;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        h2.screen-title {
+            font-family: var(--font-pixel);
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #ddd; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0d0e15;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-pixel);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.1s, filter 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary { background: var(--primary-color); color: #fff; }
+        .btn-secondary { background: var(--secondary-color); color: #0d0e15; font-weight: bold; }
+
+        .area-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .area-card {
+            background: #202436;
+            border: 1px solid #333a52;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .area-card:hover { transform: translateY(-3px); border-color: var(--secondary-color); }
+
+        .question-builder-card {
+            background: #1c1f30;
+            border: 1px solid var(--secondary-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .opt-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .opt-radio { width: 22px; height: 22px; cursor: pointer; }
+
+        .btn-add-opt {
+            background: #282c42;
+            border: 1px dashed var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .btn-add-question {
+            background: #202436;
+            border: 2px dashed var(--primary-color);
+            color: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            font-family: var(--font-pixel);
+            font-size: 0.85rem;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .teacher-quiz-card {
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 14px;
+            font-size: 1rem;
+            width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn-correct {
+            background: rgba(0, 255, 102, 0.2) !important;
+            border-color: var(--success-color) !important;
+            color: var(--success-color) !important;
+            font-weight: bold;
+        }
+
+        .btn-wrong {
+            background: rgba(255, 51, 102, 0.2) !important;
+            border-color: var(--danger-color) !important;
+            color: var(--danger-color) !important;
+        }
+
+        .explanation-box {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #202436;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .chart-box {
+            background: #1c1f30;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .chat-box {
+            background: #1c1f30;
+            border: 1px solid #333a52;
+            border-radius: 12px;
+            height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            background: #202436;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border-left: 3px solid var(--secondary-color);
+            max-width: 85%;
+        }
+
+        .chat-message.my-message {
+            align-self: flex-end;
+            border-left: none;
+            border-right: 3px solid var(--primary-color);
+            background: #2a1b30;
+        }
+
+        .chat-user {
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-bottom: 3px;
+        }
+
+        .chat-text {
+            font-size: 0.95rem;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        .chat-time {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid var(--secondary-color);
+            border-radius: 16px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+            text-align: center;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .ranking-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #202436;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .ranking-card:hover {
+            background: #2a2e45;
+            transform: scale(1.01);
+        }
+
+        .hidden { display: none !important; }
+
+        /* NOVOS ESTILOS INCREMENTADOS PARA AS NOVAS FUNCIONALIDADES */
+        .hud-counters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-family: var(--font-pixel);
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ANIMAÇÃO DE SHAKE PARA ERRO */
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* MASCOTE INTERATIVO FLUTUANTE */
+        .mascot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .mascot-bubble {
+            background: #fff;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            max-width: 180px;
+            text-align: center;
+            position: relative;
+        }
+        .mascot-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            border-width: 8px 8px 0;
+            border-style: solid;
+            border-color: #fff transparent;
+            display: block;
+            width: 0;
+        }
+
+        .mascot-avatar {
+            width: 65px;
+            height: 65px;
+            background: #202436;
+            border: 2px solid var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 15px var(--secondary-color);
+            transition: transform 0.2s;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        .mascot-avatar:hover { transform: scale(1.1); }
+
+        /* BARRA DE PROGRESSO DE VIDA E COMBO */
+        .game-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #111;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid #333;
+        }
+
+        .game-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* MAPA DE FASES ESTILO RPG */
+        .rpg-map {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .map-node {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #202436;
+            border: 3px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-pixel);
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .map-node.unlocked {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, #161824, #00f0ff33);
+            box-shadow: 0 0 15px var(--secondary-color);
+        }
+
+        .map-node.current {
+            border-color: var(--primary-color);
+            animation: pulse-node 1.5s infinite;
+        }
+
+        @keyframes pulse-node {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 127, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(255, 0, 127, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 127, 0); }
+        }
+
+        .map-node.boss {
+            width: 90px;
+            height: 90px;
+            border-color: #ffaa00;
+            font-size: 1.8rem;
+        }
+
+        /* CARTÕES DA LOJA */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: #202436;
+            border: 1px solid #333a52;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .title-badge {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.15);
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
+        /* QUESTS CONTAINER */
+        .quest-card {
+            background: #1c1f30;
+            border-left: 4px solid var(--secondary-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* MODO ESCURO / CLARO CONTROL */
+        body.light-mode {
+            --bg-dark: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+        body.light-mode .form-group input, 
+        body.light-mode .form-group select {
+            background: #e4e6eb;
+            color: #000;
+        }
+        body.light-mode .btn-outline { color: #000; border-color: #ccc; }
+        body.light-mode .ranking-card { background: #e9ecef; }
+        body.light-mode .ranking-card:hover { background: #dee2e6; }
+        body.light-mode .chat-message { background: #e9ecef; color: #000; }
+        body.light-mode .chat-text { color: #000; }
+    </style>
+</head>
+<body>
+
+    <!-- CABEÇALHO DO GOOGLE FORMS COM LOGO COM FALLBACK -->
+    <div class="forms-header-banner">
+        <img src="mt.png" alt="MathQuest Logo Banner" onerror="this.style.display='none'; document.getElementById('banner-fallback').style.display='flex';">
+        <div id="banner-fallback" class="forms-banner-fallback" style="display: none;">
+            📐 MATHQUEST - PLATAFORMA DE MATEMÁTICA
+        </div>
+    </div>
+
+    <div class="container" id="main-container">
+        <!-- CONTROLE MUTE ÁUDIO E MODO ESCURO -->
+        <div style="position: absolute; top: 10px; right: 15px; display: flex; gap: 8px; z-index: 10;">
+            <button onclick="toggleAudioMute()" id="btn-audio-mute" title="Ligar/Desligar Som" style="background:transparent; border:none; color:#fff; cursor:pointer; font-size:1.2rem;">🔊</button>
+            <button onclick="toggleLightMode()" id="btn-light-mode" title="Mudar Tema" style="background:transparent; border:none; color:#fff; cursor:pointer; font-size:1.2rem;">🌙</button>
+        </div>
+
+        <!-- NAVEGAÇÃO DE USUÁRIO LOGADO COM HUD DE GAMIFICAÇÃO -->
+        <div id="user-nav" class="user-nav" style="display: none;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <img id="nav-avatar" src="" class="user-avatar-small" alt="Avatar">
+                <div>
+                    <h4 id="nav-username" style="display:flex; align-items:center; gap:6px;">
+                        <span id="nav-status-indicator" class="status-badge status-online"></span>
+                        <span id="nav-name-text">Usuário</span>
+                        <span id="nav-title-badge" class="title-badge">Novato</span>
+                    </h4>
+                    <span id="nav-grade" style="color:var(--secondary-color); font-size:0.85rem;"></span>
+                </div>
+            </div>
+
+            <!-- RECURSOS DO JOGADOR (STREAK, MOEDAS, XP) -->
+            <div class="hud-counters">
+                <div class="hud-item" title="Ofensiva Diária (Streak)"><span style="color:#ffaa00;">🔥</span> <span id="hud-streak">0</span>d</div>
+                <div class="hud-item" title="Moedas Virtuais"><span style="color:#ffd700;">🪙</span> <span id="hud-coins">0</span></div>
+                <div class="hud-item" title="Nível de XP"><span style="color:#00f0ff;">⭐</span> Lvl <span id="hud-level">1</span></div>
+            </div>
+
+            <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #ff3366; color:#ff3366;" onclick="logout()">Sair</button>
+        </div>
+
+        <!-- MENU DE ABAS EXPANDIDO COM NOVAS OPÇÕES -->
+        <div id="main-tabs" class="main-tabs" style="display: none;">
+            <button id="tab-btn-quizzes" class="tab-btn active" onclick="switchTab('screen-quizzes')">📚 QUIZZES</button>
+            <button id="tab-btn-map" class="tab-btn" onclick="switchTab('screen-map')">🗺️ MAPA RPG</button>
+            <button id="tab-btn-shop" class="tab-btn" onclick="switchTab('screen-shop')">🛍️ LOJA</button>
+
+            <button id="tab-btn-interaction" class="tab-btn" onclick="switchTab('screen-interaction')">💬 INTERAÇÃO</button>
+            <button id="tab-btn-ranking" class="tab-btn" onclick="switchTab('screen-ranking')">🏆 RANKING</button>
+            <button id="tab-btn-profile" class="tab-btn" onclick="switchTab('screen-profile')">👤 MEU PERFIL</button>
+            <button id="tab-btn-teacher" class="tab-btn hidden" onclick="switchTab('screen-teacher-dash')">🎓 ÁREA DO PROFESSOR</button>
+        </div>
+
+        <!-- TELA 1: LOGIN -->
+        <div id="screen-login" class="screen active">
+            <h2 class="screen-title">Acessar a Plataforma</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Nome de Usuário</label>
+                    <input type="text" id="login-name" required placeholder="Digite seu usuário cadastrado">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="login-password" required placeholder="Digite sua senha">
+                </div>
+                <button type="submit" class="btn btn-primary">ENTRAR AGORA 🚀</button>
+            </form>
+            <p style="text-align:center; margin-top:15px; color:#aaa;">
+                Não tem uma conta? <a href="#" onclick="showScreen('screen-register')" style="color:var(--secondary-color);">Cadastre-se</a>
+            </p>
+        </div>
+
+        <!-- TELA 2: CADASTRO -->
+        <div id="screen-register" class="screen">
+            <h2 class="screen-title">Criar Nova Conta</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="reg-name" required placeholder="Seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Conta</label>
+                    <select id="reg-role" required>
+                        <option value="Aluno">Aluno</option>
+                        <option value="Professor">Professor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Série / Ano Letivo (ou Disciplina se Professor)</label>
+                    <input type="text" id="reg-grade" placeholder="Ex: 9º Ano A ou Matemática" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="reg-password" required minlength="4">
+                </div>
+                <button type="submit" class="btn btn-secondary">CRIAR MINHA CONTA ✨</button>
+            </form>
+            <p style="text-align:center; margin-top:15px; color:#aaa;">
+                Já tem conta? <a href="#" onclick="showScreen('screen-login')" style="color:var(--secondary-color);">Fazer Login</a>
+            </p>
+        </div>
+
+        <!-- TELA 3: QUIZZES -->
+        <div id="screen-quizzes" class="screen">
+            <!-- PAINEL DE MODOS ESPECIAIS (DESAFIO DIÁRIO, RELÂMPAGO & DUELO) -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:20px;">
+                <div style="background: linear-gradient(135deg, #202436, #ff007f55); border:1px solid var(--primary-color); border-radius:12px; padding:15px; text-align:center; cursor:pointer;" onclick="startDailyChallenge()">
+                    <h3 style="font-size:0.8rem; font-family:var(--font-pixel); color:#fff;">🎁 DESAFIO DIÁRIO</h3>
+                    <small style="color:#ddd;">Quiz fixo de hoje (+50 Bônus)</small>
+                </div>
+                <div style="background: linear-gradient(135deg, #202436, #00f0ff55); border:1px solid var(--secondary-color); border-radius:12px; padding:15px; text-align:center; cursor:pointer;" onclick="startSpeedRunMode()">
+                    <h3 style="font-size:0.8rem; font-family:var(--font-pixel); color:#fff;">⚡ RELÂMPAGO (60s)</h3>
+                    <small style="color:#ddd;">Responda o máximo no tempo</small>
+                </div>
+            </div>
+
+            <!-- SELETOR DE DIFICULDADE -->
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#1c1f30; padding:10px 15px; border-radius:8px; margin-bottom:20px;">
+                <span style="font-weight:bold; font-size:0.9rem;">🎯 Nível de Dificuldade:</span>
+                <select id="quiz-difficulty-select" style="width:auto; padding:5px 10px;" onchange="currentDifficulty = this.value">
+                    <option value="easy">Fácil (Iniciante)</option>
+                    <option value="medium" selected>Médio (Padrão)</option>
+                    <option value="hard">Difícil (Desafio)</option>
+                </select>
+            </div>
+
+            <div id="teacher-quizzes-section" style="margin-bottom:25px;">
+                <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📌 QUIZZES DO PROFESSOR</h3>
+                <div id="teacher-quizzes-container"></div>
+            </div>
+
+            <h2 class="screen-title">20 Áreas Temáticas Padrão</h2>
+            <div id="area-grid-container" class="area-grid"></div>
+        </div>
+
+        <!-- TELA DE MAPA RPG (PROGRESSÃO POR FASES) -->
+        <div id="screen-map" class="screen">
+            <h2 class="screen-title">🗺️ Jornada Matemática</h2>
+            <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-bottom:20px;">Derrote cada fase para avançar e liberar os chefões do conhecimento!</p>
+            <div id="rpg-map-container" class="rpg-map"></div>
+        </div>
+
+        <!-- TELA DA LOJA VIRTUAL -->
+        <div id="screen-shop" class="screen">
+            <h2 class="screen-title">🛍️ Loja de Itens & Poções</h2>
+            <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-bottom:20px;">Gaste suas moedas ganhas jogando para adquirir vantagens únicas!</p>
+            <div class="shop-grid" id="shop-items-container"></div>
+        </div>
+
+        <!-- TELA INTERAÇÃO / MURAL DO CONHECIMENTO -->
+        <div id="screen-interaction" class="screen">
+            <h2 class="screen-title">💬 Mural de Interação e Dúvidas</h2>
+            <div id="chat-messages-container" class="chat-box"></div>
+            <form onsubmit="handleSendMessage(event)" class="chat-input-area">
+                <input type="text" id="chat-input-message" placeholder="Compartilhe uma dúvida ou ideia..." required style="flex:1;">
+                <button type="submit" class="btn btn-primary" style="width:auto; padding:0 20px;">Enviar 🚀</button>
+            </form>
+        </div>
+
+        <!-- TELA 4: RANKING & COLEGAS -->
+        <div id="screen-ranking" class="screen">
+            <h2 class="screen-title">🏆 Ranking Geral da Turma</h2>
+            <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-bottom:15px;">💡 Clique em um aluno para ver o perfil completo e suas medalhas!</p>
+            <div id="ranking-list-container"></div>
+        </div>
+
+        <!-- TELA 5: MEU PERFIL -->
+        <div id="screen-profile" class="screen">
+            <h2 class="screen-title">👤 Configurações do Meu Perfil</h2>
+            <div style="text-align:center; margin-bottom:20px;">
+                <img id="profile-img-preview" src="https://via.placeholder.com/100" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--primary-color);">
+                <br>
+                <input type="file" id="profile-photo-input" accept="image/*" style="display:none;" onchange="uploadProfilePhoto(event)">
+                <button class="btn btn-secondary" style="width:auto; margin-top:10px; font-size:0.6rem;" onclick="document.getElementById('profile-photo-input').click()">Alterar Foto</button>
+            </div>
+            <div class="form-group">
+                <label>Sua Frase de Perfil / Status</label>
+                <input type="text" id="profile-status-input" placeholder="Ex: Rumo ao topo da matemática!">
+            </div>
+            <div class="form-group">
+                <label>Cor Personalizada do Tema</label>
+                <input type="color" id="profile-color-input" value="#ff007f" style="height:45px;">
+            </div>
+            <button class="btn btn-primary" onclick="saveProfileChanges()">SALVAR PERFIL</button>
+
+            <!-- MISSÕES / QUESTS DIÁRIAS -->
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-top:25px; margin-bottom:10px;">📜 Missões Diárias (Quests)</h3>
+            <div id="daily-quests-container"></div>
+
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-top:25px; margin-bottom:10px;">🏅 Minhas Medalhas Recebidas</h3>
+            <div id="my-medals-container" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+        </div>
+
+        <!-- TELA 6: ÁREA DO PROFESSOR -->
+        <div id="screen-teacher-dash" class="screen">
+            <h2 class="screen-title">🎓 Painel de Controle do Professor</h2>
+
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📊 Nível de Desempenho dos Alunos</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <small>Média Geral da Turma</small>
+                    <h2 id="stat-avg-score" style="color:var(--secondary-color);">0 pts</h2>
+                </div>
+                <div class="stat-card">
+                    <small>Alunos em Alto Desempenho</small>
+                    <h2 id="stat-high-performers" style="color:var(--success-color);">0</h2>
+                </div>
+                <div class="stat-card">
+                    <small>Alunos que Precisam de Apoio</small>
+                    <h2 id="stat-low-performers" style="color:var(--danger-color);">0</h2>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="performanceChart" height="140"></canvas>
+            </div>
+
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-top:25px; margin-bottom:12px;">🏅 Premiar Aluno com Medalha</h3>
+            <form onsubmit="handleSendMedal(event)" style="background:#1c1f30; padding:15px; border-radius:12px; margin-bottom:25px;">
+                <div class="form-group">
+                    <label>Selecionar Aluno</label>
+                    <select id="medal-student-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Medalha / Selo</label>
+                    <select id="medal-type-select" required>
+                        <option value="🏆 Destaque da Turma">🏆 Destaque da Turma</option>
+                        <option value="💡 Gênio da Lógica">💡 Gênio da Lógica</option>
+                        <option value="⭐ Excelente Desempenho">⭐ Excelente Desempenho</option>
+                        <option value="🚀 Superação & Dedicação">🚀 Superação & Dedicação</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mensagem / Elogio do Professor</label>
+                    <input type="text" id="medal-msg-input" placeholder="Parabéns pelo excelente resultado!" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">ENVIAR MEDALHA DA CONQUISTA</button>
+            </form>
+
+            <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📝 Construtor de Quizzes (Estilo Google Forms)</h3>
+            <form onsubmit="saveCustomQuiz(event)">
+                <div class="form-group">
+                    <label>Título / Nome do Quiz</label>
+                    <input type="text" id="form-quiz-title" placeholder="Ex: Avaliação Bimestral de Geometria" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Área / Tema do Quiz (Digite livremente ou escolha uma opção)</label>
+                    <input type="text" id="form-quiz-area" list="area-suggestions" placeholder="Ex: Equações de 1º Grau, Geometria Espacial, Desafio Logico..." required>
+                    <datalist id="area-suggestions"></datalist>
+                </div>
+
+                <div id="questions-builder-container"></div>
+
+                <button type="button" class="btn-add-question" onclick="addQuestionCard()">➕ ADICIONAR NOVA PERGUNTA</button>
+
+                <button type="submit" class="btn btn-primary">PUBLICAR QUIZ PARA A TURMA 🚀</button>
+            </form>
+        </div>
+
+        <!-- TELA 7: EXECUÇÃO DO QUIZ COM HUD COMPLETO DE GAMIFICAÇÃO -->
+        <div id="screen-game" class="screen">
+            <div style="display:flex; justify-content:space-between; align-items:center; color:var(--primary-color); font-weight:bold; margin-bottom:5px;">
+                <span id="game-area-tag"></span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span id="game-lives-display" style="color:var(--danger-color);">❤️❤️❤️</span>
+                    <span id="game-combo-tag" style="color:#ffd700; font-family:var(--font-pixel); font-size:0.75rem;"></span>
+                </div>
+            </div>
+
+            <!-- BARRA DE TEMPO OU PROGRESSO -->
+            <div class="game-bar-container">
+                <div id="game-bar-fill" class="game-bar-fill"></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; color:#aaa; font-size:0.85rem; margin-bottom:10px;">
+                <span id="game-progress"></span>
+                <span id="game-timer-display"></span>
+            </div>
+
+            <div id="game-author-tag" style="color:var(--secondary-color); font-size:0.85rem; margin-bottom:15px; font-weight:bold;"></div>
+
+            <div id="game-question" style="font-size:1.15rem; font-weight:700; margin-bottom:20px; line-height:1.4;"></div>
+            <div id="game-options"></div>
+
+            <div id="game-explanation" class="explanation-box">
+                <strong style="color:var(--secondary-color);">💡 Resolvendo Passo a Passo:</strong>
+                <p id="explanation-text" style="margin-top:5px;"></p>
+            </div>
+
+            <button id="btn-next-question" class="btn btn-primary" style="display:none; margin-top:20px;" onclick="nextQuestion()">PRÓXIMA QUESTÃO ➔</button>
+        </div>
+
+        <!-- TELA DE RESULTADO FINAL E REVANCHE -->
+        <div id="screen-results" class="screen" style="text-align:center;">
+            <h2 class="screen-title">🎉 Rodada Concluída!</h2>
+            <div style="font-size:3rem; margin:10px 0;">🏆</div>
+            <h3 id="res-score-text" style="color:var(--success-color); font-size:1.5rem; margin-bottom:10px;">+0 Pontos</h3>
+            <p id="res-stats-text" style="color:#ccc; margin-bottom:20px;"></p>
+
+            <div style="display:flex; flex-direction:column; gap:10px; max-width:300px; margin:0 auto;">
+                <button id="btn-rematch" class="btn btn-secondary" style="display:none;" onclick="startRematchMode()">🔄 MODO REVANCHE (Refazer Erros)</button>
+                <button class="btn btn-primary" onclick="switchTab('screen-quizzes')">VOLTAR AOS QUIZZES</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MASCOTE INTERATIVO FLUTUANTE NA TELA -->
+    <div class="mascot-container" id="mascot-widget">
+        <div class="mascot-bubble" id="mascot-bubble">Olá! Vamos praticar matemática hoje?</div>
+        <div class="mascot-avatar" id="mascot-avatar" onclick="interactMascot()">🧙‍♂️</div>
+    </div>
+
+    <!-- MODAL DO BAÚ DIÁRIO -->
+    <div id="daily-chest-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 style="font-family:var(--font-pixel); color:var(--secondary-color); margin-bottom:15px;">🎁 RECOMPENSA DIÁRIA</h2>
+            <div style="font-size:4rem; margin:20px 0; cursor:pointer;" onclick="openDailyChest()" id="chest-icon">📦</div>
+            <p id="chest-msg">Toque no baú para resgatar o seu bônus diário de acesso!</p>
+            <button class="btn btn-primary" id="btn-close-chest" style="margin-top:20px; display:none;" onclick="closeDailyChestModal()">INCRÍVEL!</button>
+        </div>
+    </div>
+
+    <!-- MODAL PARA VISUALIZAR PERFIL DO ALUNO -->
+    <div id="user-profile-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeUserProfileModal()">&times;</button>
+            <img id="modal-user-img" src="https://via.placeholder.com/120" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid var(--secondary-color); margin-bottom:15px;">
+            
+            <h3 id="modal-user-name" style="font-size:1.3rem; color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <span id="modal-user-status-dot" class="status-badge status-offline"></span>
+                Nome do Aluno
+            </h3>
+            <p id="modal-user-role-grade" style="color:var(--secondary-color); font-size:0.9rem; margin-bottom:10px;"></p>
+            
+            <div style="background:#1c1f30; padding:10px 15px; border-radius:8px; margin-bottom:15px;">
+                <em id="modal-user-status-text" style="color:#ddd; font-size:0.9rem;">"Frase do aluno"</em>
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
+                <div>
+                    <small style="color:#aaa;">Pontuação Total</small>
+                    <h3 id="modal-user-score" style="color:var(--success-color);">0 pts</h3>
+                </div>
+            </div>
+
+            <h4 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.7rem; margin-bottom:10px; text-align:left;">🏅 Medalhas e Conquistas:</h4>
+            <div id="modal-user-medals" style="display:flex; flex-direction:column; gap:8px; max-height:150px; overflow-y:auto; text-align:left;"></div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
+            authDomain: "mathques.firebaseapp.com",
+            databaseURL: "https://mathques-default-rtdb.firebaseio.com",
+            projectId: "mathques",
+            storageBucket: "mathques.firebasestorage.app",
+            messagingSenderId: "413245852392",
+            appId: "1:413245852392:web:fd9affbddda2f34eed975d",
+            measurementId: "G-NJ9D8QV749"
+        };
+
+        let isFirebaseActive = false;
+        try {
+            if (firebaseConfig.apiKey !== "SUA_API_KEY") {
+                firebase.initializeApp(firebaseConfig);
+                isFirebaseActive = true;
+            }
+        } catch (e) {
+            console.log("Firebase não configurado, operando em modo local storage.");
+        }
+
+        /* VARIÁVEIS DE ESTADO E GAMEPLAY INCREMENTADAS */
+        let currentUser = null;
+        let globalUsers = {};
+        let questionCount = 0;
+        let currentGameQuizzes = [];
+        let currentQuestionIndex = 0;
+        let userScore = 0;
+        let answeredCurrent = false;
+        let chartInstance = null;
+
+        let isAudioMuted = false;
+        let audioCtx = null;
+        let currentCombo = 0;
+        let currentLives = 3;
+        let currentDifficulty = "medium";
+        let wrongQuestionsPool = [];
+        let isSpeedRun = false;
+        let speedRunTimer = null;
+        let speedRunSeconds = 60;
+        let activePotionSecondChance = false;
+
+        const allAreas = [
+            "Álgebra", "Geometria Plana", "Geometria Espacial", "Raciocínio Lógico", "Trigonometria",
+            "Aritmética", "Estatística", "Probabilidade", "Funções", "Matemática Financeira",
+            "Matrizes e Determinantes", "Análise Combinatória", "Sistemas Lineares", "Geometria Analítica",
+            "Progressão Aritmética (PA)", "Progressão Geométrica (PG)", "Cálculo Mental", "Equações do 2º Grau",
+            "Porcentagem e Juros", "Conjuntos Numéricos"
+        ];
+
+        /* SÍNTESE DE SOM VIA WEB AUDIO API (SEM DEPENDÊNCIA EXTERNA) */
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.2); // A2
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'fanfare') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.15);
+                    osc.frequency.setValueAtTime(783.99, now + 0.3);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.45);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                    osc.start(now);
+                    osc.stop(now + 0.7);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function toggleAudioMute() {
+            isAudioMuted = !isAudioMuted;
+            document.getElementById('btn-audio-mute').innerText = isAudioMuted ? "🔇" : "🔊";
+        }
+
+        function toggleLightMode() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            document.getElementById('btn-light-mode').innerText = isLight ? "☀️" : "🌙";
+        }
+
+        window.onload = function() {
+            renderAreaCards();
+            populateAreaSuggestions();
+            syncUsersData();
+            checkActiveSession();
+            loadChatMessages();
+            setupRealtimePresenceListeners();
+            renderShopItems();
+            renderRPGMap();
+        };
+
+        function setupPresenceSystem() {
+            if (!currentUser) return;
+            setOnlineStatus(true);
+
+            if (isFirebaseActive) {
+                const userStatusRef = firebase.database().ref('users/' + currentUser.name + '/online');
+                const connectedRef = firebase.database().ref('.info/connected');
+
+                connectedRef.on('value', (snap) => {
+                    if (snap.val() === true) {
+                        userStatusRef.onDisconnect().set(false);
+                        userStatusRef.set(true);
+                    }
+                });
+            }
+        }
+
+        function setupRealtimePresenceListeners() {
+            document.addEventListener("visibilitychange", () => {
+                if (!currentUser) return;
+                if (document.hidden) setOnlineStatus(false);
+                else setOnlineStatus(true);
+            });
+
+            window.addEventListener("beforeunload", () => {
+                if (currentUser) setOnlineStatus(false);
+            });
+        }
+
+        function setOnlineStatus(isOnline) {
+            if (!currentUser) return;
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name].online = isOnline;
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+            }
+
+            if (isFirebaseActive) {
+                firebase.database().ref('users/' + currentUser.name + '/online').set(isOnline);
+            }
+
+            const indicator = document.getElementById('nav-status-indicator');
+            if (indicator) {
+                indicator.className = `status-badge ${isOnline ? 'status-online' : 'status-offline'}`;
+            }
+        }
+
+        function syncUsersData() {
+            if (isFirebaseActive) {
+                firebase.database().ref('users').on('value', (snapshot) => {
+                    globalUsers = snapshot.val() || {};
+                    localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                    updateCurrentView();
+                });
+            } else {
+                globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            }
+        }
+
+        function updateCurrentView() {
+            const activeScreen = document.querySelector('.screen.active');
+            if (!activeScreen) return;
+            if (activeScreen.id === 'screen-ranking') renderRanking();
+            if (activeScreen.id === 'screen-interaction') loadChatMessages();
+            if (activeScreen.id === 'screen-teacher-dash') loadTeacherDashboard();
+        }
+
+        function renderAreaCards() {
+            const container = document.getElementById('area-grid-container');
+            container.innerHTML = allAreas.map(area => `
+                <div class="area-card" onclick="playSound('click'); startStandardAreaQuiz('${area}')">
+                    <h4 style="color:#fff; margin-bottom:5px;">${area}</h4>
+                    <small style="color:var(--secondary-color);">10 Questões Dinâmicas</small>
+                </div>
+            `).join('');
+        }
+
+        function populateAreaSuggestions() {
+            document.getElementById('area-suggestions').innerHTML = allAreas.map(a => `<option value="${a}">`).join('');
+        }
+
+        function switchTab(screenId) {
+            playSound('click');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (screenId === 'screen-quizzes') document.getElementById('tab-btn-quizzes').classList.add('active');
+            if (screenId === 'screen-map') { document.getElementById('tab-btn-map').classList.add('active'); renderRPGMap(); }
+            if (screenId === 'screen-shop') { document.getElementById('tab-btn-shop').classList.add('active'); renderShopItems(); }
+            if (screenId === 'screen-interaction') document.getElementById('tab-btn-interaction').classList.add('active');
+            if (screenId === 'screen-ranking') { document.getElementById('tab-btn-ranking').classList.add('active'); renderRanking(); }
+            if (screenId === 'screen-profile') { document.getElementById('tab-btn-profile').classList.add('active'); loadProfileData(); }
+            if (screenId === 'screen-teacher-dash') { document.getElementById('tab-btn-teacher').classList.add('active'); loadTeacherDashboard(); }
+            showScreen(screenId);
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId === 'screen-quizzes') renderTeacherQuizzesList();
+            if (screenId === 'screen-teacher-dash' && questionCount === 0) addQuestionCard();
+        }
+
+        function checkActiveSession() {
+            const loggedUsername = localStorage.getItem('mathquest_logged_user');
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            if (loggedUsername && globalUsers[loggedUsername]) {
+                currentUser = { name: loggedUsername, ...globalUsers[loggedUsername] };
+                
+                // Garantir campos padrão de gamificação
+                if (currentUser.streak === undefined) currentUser.streak = 1;
+                if (currentUser.coins === undefined) currentUser.coins = 50;
+                if (currentUser.level === undefined) currentUser.level = 1;
+                if (currentUser.inventory === undefined) currentUser.inventory = [];
+                if (currentUser.mapLevel === undefined) currentUser.mapLevel = 1;
+                if (currentUser.lastAccess === undefined) currentUser.lastAccess = new Date().toDateString();
+
+                setupPresenceSystem();
+                checkDailyStreakAndChest();
+                updateHUD();
+
+                document.getElementById('user-nav').style.display = 'flex';
+                document.getElementById('main-tabs').style.display = 'flex';
+                document.getElementById('nav-name-text').innerText = currentUser.name;
+                document.getElementById('nav-grade').innerText = `${currentUser.role} - ${currentUser.grade}`;
+                document.getElementById('nav-avatar').src = currentUser.photo || 'https://via.placeholder.com/45';
+
+                if (currentUser.themeColor) {
+                    document.documentElement.style.setProperty('--primary-color', currentUser.themeColor);
+                }
+
+                if (currentUser.role === 'Professor') {
+                    document.getElementById('tab-btn-teacher').classList.remove('hidden');
+                    switchTab('screen-teacher-dash');
+                } else {
+                    document.getElementById('tab-btn-teacher').classList.add('hidden');
+                    switchTab('screen-quizzes');
+                }
+            } else {
+                document.getElementById('user-nav').style.display = 'none';
+                document.getElementById('main-tabs').style.display = 'none';
+                showScreen('screen-login');
+            }
+        }
+
+        function updateHUD() {
+            if (!currentUser) return;
+            document.getElementById('hud-streak').innerText = currentUser.streak || 0;
+            document.getElementById('hud-coins').innerText = currentUser.coins || 0;
+            document.getElementById('hud-level').innerText = currentUser.level || 1;
+
+            const titleBadge = document.getElementById('nav-title-badge');
+            let title = "Novato";
+            if (currentUser.level >= 3) title = "Mago dos Números";
+            if (currentUser.level >= 5) title = "Mestre das Equações";
+            if (currentUser.level >= 10) title = "Lenda Suprema";
+            titleBadge.innerText = title;
+        }
+
+        function checkDailyStreakAndChest() {
+            const today = new Date().toDateString();
+            if (currentUser.lastAccess !== today) {
+                const lastDate = new Date(currentUser.lastAccess);
+                const currDate = new Date();
+                const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) {
+                    currentUser.streak = (currentUser.streak || 0) + 1;
+                } else if (diffDays > 1) {
+                    currentUser.streak = 1; // Reseta se perdeu um dia
+                }
+                currentUser.lastAccess = today;
+                saveUserData();
+
+                // Abrir modal de recompensa diária
+                document.getElementById('daily-chest-modal').classList.remove('hidden');
+            }
+        }
+
+        function openDailyChest() {
+            playSound('fanfare');
+            document.getElementById('chest-icon').innerText = '💎';
+            const bonusCoins = 30 + Math.floor(Math.random() * 40);
+            currentUser.coins = (currentUser.coins || 0) + bonusCoins;
+            saveUserData();
+            updateHUD();
+
+            document.getElementById('chest-msg').innerText = `Parabéns! Você ganhou +${bonusCoins} Moedas pelo seu acesso diário!`;
+            document.getElementById('btn-close-chest').style.display = 'inline-block';
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        function closeDailyChestModal() {
+            document.getElementById('daily-chest-modal').classList.add('hidden');
+        }
+
+        function saveUserData() {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name] = { ...globalUsers[currentUser.name], ...currentUser };
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + currentUser.name).set(globalUsers[currentUser.name]);
+                }
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const role = document.getElementById('reg-role').value;
+            const grade = document.getElementById('reg-grade').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            
+            if (globalUsers[name]) {
+                alert("Já existe uma conta cadastrada com esse nome de usuário!");
+                return;
+            }
+
+            globalUsers[name] = { 
+                password, 
+                role, 
+                grade, 
+                score: 0, 
+                status: role === 'Professor' ? "Professor de Matemática" : "Aprendendo Matemática!", 
+                photo: "https://via.placeholder.com/100", 
+                themeColor: "#ff007f", 
+                medals: [],
+                online: true,
+                streak: 1,
+                coins: 100,
+                level: 1,
+                inventory: [],
+                mapLevel: 1,
+                lastAccess: new Date().toDateString()
+            };
+
+            localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+            localStorage.setItem('mathquest_logged_user', name);
+
+            if (isFirebaseActive) {
+                firebase.database().ref('users/' + name).set(globalUsers[name]);
+            }
+
+            checkActiveSession();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value.trim();
+            const password = document.getElementById('login-password').value;
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+
+            if (!globalUsers[name] || globalUsers[name].password !== password) {
+                alert("Usuário ou senha inválidos!");
+                return;
+            }
+
+            localStorage.setItem('mathquest_logged_user', name);
+            checkActiveSession();
+        }
+
+        function logout() {
+            setOnlineStatus(false);
+            localStorage.removeItem('mathquest_logged_user');
+            currentUser = null;
+            checkActiveSession();
+        }
+
+        function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input-message');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            const messageObj = {
+                user: currentUser.name,
+                role: currentUser.role,
+                text: text,
+                time: timeStr,
+                timestamp: Date.now()
+            };
+
+            if (isFirebaseActive) {
+                firebase.database().ref('chat_messages').push(messageObj);
+            } else {
+                let messages = JSON.parse(localStorage.getItem('mathquest_chat') || '[]');
+                messages.push(messageObj);
+                localStorage.setItem('mathquest_chat', JSON.stringify(messages));
+                loadChatMessages();
+            }
+
+            input.value = '';
+        }
+
+        function loadChatMessages() {
+            if (isFirebaseActive) {
+                firebase.database().ref('chat_messages').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const messages = data ? Object.values(data) : [];
+                    renderChatMessages(messages);
+                });
+            } else {
+                renderChatMessages();
+            }
+        }
+
+        function renderChatMessages(remoteMessages = null) {
+            const container = document.getElementById('chat-messages-container');
+            const messages = remoteMessages || JSON.parse(localStorage.getItem('mathquest_chat') || '[]');
+
+            if (messages.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center; font-size:0.85rem;">Nenhuma mensagem compartilhada ainda. Seja o primeiro a interagir!</p>`;
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => {
+                const isMe = currentUser && currentUser.name === msg.user;
+                const userObj = globalUsers[msg.user] || {};
+                const isOnline = userObj.online !== undefined ? userObj.online : false;
+                return `
+                    <div class="chat-message ${isMe ? 'my-message' : ''}">
+                        <div class="chat-user">
+                            <span class="status-badge ${isOnline ? 'status-online' : 'status-offline'}"></span>
+                            ${msg.user} <span style="font-size:0.7rem; color:var(--primary-color);">(${msg.role})</span>
+                        </div>
+                        <div class="chat-text">${msg.text}</div>
+                        <div class="chat-time">${msg.time}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addQuestionCard() {
+            questionCount++;
+            const qId = questionCount;
+            const container = document.getElementById('questions-builder-container');
+
+            const card = document.createElement('div');
+            card.className = 'question-builder-card';
+            card.id = `q-card-${qId}`;
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <strong style="color:var(--secondary-color);">Pergunta #${qId}</strong>
+                    <button type="button" style="background:transparent; border:none; color:var(--danger-color); cursor:pointer;" onclick="removeQuestionCard(${qId})">🗑️ Remover</button>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="q-title-input" placeholder="Digite o enunciado da questão..." required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Resposta</label>
+                    <select onchange="handleQuestionTypeChange(${qId}, this.value)">
+                        <option value="multiple">Múltipla Escolha</option>
+                        <option value="tf">Verdadeiro ou Falso</option>
+                    </select>
+                </div>
+                <label style="display:block; margin-bottom:8px; font-weight:bold;">Alternativas (Marque a bolinha ao lado da correta):</label>
+                <div class="options-list-container" id="opts-container-${qId}"></div>
+                
+                <button type="button" class="btn-add-opt" id="add-opt-btn-${qId}" onclick="addOptionRow(${qId})">+ Adicionar Alternativa</button>
+
+                <div class="form-group" style="margin-top:15px;">
+                    <label>Explicação Passo a Passo (Passo de Resolução):</label>
+                    <input type="text" class="q-exp-input" placeholder="Explique a resolução correta...">
+                </div>
+            `;
+
+            container.appendChild(card);
+            addOptionRow(qId, "Alternativa 1");
+            addOptionRow(qId, "Alternativa 2");
+        }
+
+        function removeQuestionCard(qId) {
+            const card = document.getElementById(`q-card-${qId}`);
+            if (card) card.remove();
+        }
+
+        function addOptionRow(qId, defaultText = "") {
+            const optsContainer = document.getElementById(`opts-container-${qId}`);
+            const optIndex = optsContainer.children.length;
+
+            const row = document.createElement('div');
+            row.className = 'opt-input-row';
+            row.innerHTML = `
+                <input type="radio" name="correct-opt-${qId}" class="opt-radio" ${optIndex === 0 ? 'checked' : ''} required>
+                <input type="text" class="opt-text-input" placeholder="Texto da opção..." value="${defaultText}" required>
+                <button type="button" style="background:transparent; border:none; color:#ff3366; cursor:pointer;" onclick="this.parentElement.remove()">✕</button>
+            `;
+            optsContainer.appendChild(row);
+        }
+
+        function handleQuestionTypeChange(qId, type) {
+            const optsContainer = document.getElementById(`opts-container-${qId}`);
+            const addBtn = document.getElementById(`add-opt-btn-${qId}`);
+            optsContainer.innerHTML = '';
+
+            if (type === 'tf') {
+                addBtn.style.display = 'none';
+                addOptionRow(qId, "Verdadeiro");
+                addOptionRow(qId, "Falso");
+            } else {
+                addBtn.style.display = 'inline-block';
+                addOptionRow(qId, "Alternativa 1");
+                addOptionRow(qId, "Alternativa 2");
+            }
+        }
+
+        function saveCustomQuiz(e) {
+            e.preventDefault();
+            const title = document.getElementById('form-quiz-title').value.trim();
+            const area = document.getElementById('form-quiz-area').value.trim();
+            const cards = document.querySelectorAll('.question-builder-card');
+
+            if (cards.length === 0) {
+                alert("Adicione pelo menos uma pergunta!");
+                return;
+            }
+
+            const questions = [];
+            cards.forEach(card => {
+                const qTitle = card.querySelector('.q-title-input').value.trim();
+                const qExp = card.querySelector('.q-exp-input').value.trim();
+                const rows = card.querySelectorAll('.opt-input-row');
+
+                const opts = [];
+                let correctAns = "";
+
+                rows.forEach(row => {
+                    const text = row.querySelector('.opt-text-input').value.trim();
+                    const isCorrect = row.querySelector('.opt-radio').checked;
+                    opts.push(text);
+                    if (isCorrect) correctAns = text;
+                });
+
+                questions.push({
+                    q: qTitle,
+                    opts: opts,
+                    ans: correctAns,
+                    exp: qExp || "Resolução fornecida pelo professor."
+                });
+            });
+
+            let teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            teacherQuizzes.push({
+                id: Date.now(),
+                title: title,
+                area: area,
+                author: currentUser.name,
+                questions: questions
+            });
+
+            localStorage.setItem('mathquest_teacher_quizzes', JSON.stringify(teacherQuizzes));
+            alert("Quiz cadastrado e enviado com sucesso para todos os alunos!");
+            document.getElementById('questions-builder-container').innerHTML = '';
+            document.getElementById('form-quiz-title').value = '';
+            document.getElementById('form-quiz-area').value = '';
+            questionCount = 0;
+            switchTab('screen-quizzes');
+        }
+
+        function renderTeacherQuizzesList() {
+            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            const container = document.getElementById('teacher-quizzes-container');
+
+            if (teacherQuizzes.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; font-size:0.85rem;">Nenhum quiz publicado pelos professores até o momento.</p>`;
+                return;
+            }
+
+            container.innerHTML = teacherQuizzes.map(q => `
+                <div class="teacher-quiz-card" onclick="startTeacherCustomQuiz(${q.id})">
+                    <h4 style="color:#fff;">${q.title}</h4>
+                    <p style="font-size:0.85rem; color:#ccc; margin-top:4px;">
+                        👨‍🏫 Professor: <strong style="color:var(--secondary-color);">${q.author}</strong> | Área: ${q.area} | ${q.questions.length} Questões
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function startTeacherCustomQuiz(quizId) {
+            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+            const quiz = teacherQuizzes.find(q => q.id === quizId);
+            if (!quiz) return;
+
+            currentGameQuizzes = quiz.questions.map(q => ({
+                area: quiz.area,
+                author: quiz.author,
+                title: quiz.title,
+                question: q.q,
+                shuffledOptions: shuffleArray(q.opts),
+                correctAnswer: q.ans,
+                explanation: q.exp
+            }));
+
+            resetGameStats();
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        /* LÓGICA QUE GARANTE OPÇÕES ÚNICAS E DIFICULDADES AJUSTADAS */
+        function generateUniqueOptions(correctVal, formatFn = (x) => `${x}`) {
+            let optionsSet = new Set();
+            optionsSet.add(formatFn(correctVal));
+
+            let mult = currentDifficulty === 'easy' ? 2 : (currentDifficulty === 'hard' ? 10 : 5);
+
+            while (optionsSet.size < 4) {
+                let offset = (Math.floor(Math.random() * mult) + 1) * (Math.random() > 0.5 ? 1 : -1);
+                let wrongVal = correctVal + offset;
+                if (wrongVal !== correctVal) {
+                    optionsSet.add(formatFn(wrongVal));
+                }
+            }
+            return shuffleArray(Array.from(optionsSet));
+        }
+
+        function resetGameStats() {
+            currentQuestionIndex = 0;
+            userScore = 0;
+            currentCombo = 0;
+            currentLives = 3;
+            wrongQuestionsPool = [];
+            isSpeedRun = false;
+            clearInterval(speedRunTimer);
+            updateGameBar(0);
+        }
+
+        /* GERADOR AUTOMÁTICO DE QUESTÕES AJUSTADO POR DIFICULDADE */
+        function startStandardAreaQuiz(area) {
+            let questions = [];
+            let multDiff = currentDifficulty === 'easy' ? 5 : (currentDifficulty === 'hard' ? 25 : 12);
+
+            for (let i = 1; i <= 10; i++) {
+                let n1 = Math.floor(Math.random() * multDiff) + 2;
+                let n2 = Math.floor(Math.random() * multDiff) + 1;
+                let qText = "", correctNum = 0, expText = "", opts = [];
+
+                if (area === "Álgebra") {
+                    let val = n1 * i;
+                    qText = `Qual é o valor de x na equação: ${n1}x = ${val}?`;
+                    correctNum = i;
+                    expText = `Divida ambos os lados por ${n1}: x = ${val} / ${n1} = ${i}.`;
+                    opts = generateUniqueOptions(i, x => `x = ${x}`);
+                } 
+                else if (area === "Geometria Plana") {
+                    let lado = n1;
+                    correctNum = lado * lado;
+                    qText = `Qual é a área de um quadrado cujo lado mede ${lado} cm?`;
+                    expText = `A área do quadrado calcula-se multiplicando lado por lado (${lado} × ${lado} = ${correctNum}).`;
+                    opts = generateUniqueOptions(correctNum, x => `${x} cm²`);
+                }
+                else if (area === "Geometria Espacial") {
+                    let arq = Math.min(n1, 10);
+                    correctNum = arq * arq * arq;
+                    qText = `Qual é o volume de um cubo com aresta de ${arq} cm?`;
+                    expText = `O volume do cubo é aresta ao cubo (${arq}³ = ${correctNum}).`;
+                    opts = generateUniqueOptions(correctNum, x => `${x} cm³`);
+                }
+                else if (area === "Raciocínio Lógico") {
+                    let seq = n1;
+                    correctNum = seq + (i * 3);
+                    qText = `Dada a sequência lógica: ${seq}, ${seq + 3}, ${seq + 6}, ${seq + 9}, ... Qual é o próximo termo?`;
+                    expText = `A sequência avança somando 3 unidades a cada passo. O próximo valor é ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Trigonometria") {
+                    let ang = [30, 45, 60][i % 3];
+                    let valTrig = ang === 30 ? "0.5" : (ang === 45 ? "0.71" : "0.87");
+                    qText = `Qual é o valor aproximado do seno de ${ang}°?`;
+                    expText = `O valor tabelado e aproximado para o seno de ${ang}° é ${valTrig}.`;
+                    opts = shuffleArray([valTrig, "0.25", "0.95", "1.00"]);
+                }
+                else if (area === "Aritmética") {
+                    correctNum = n1 + n2 * i;
+                    qText = `Qual é o resultado da expressão aritmética: ${n1} + ${n2} × ${i}?`;
+                    expText = `Pela ordem das operações, faça primeiro a multiplicação (${n2} × ${i} = ${n2 * i}) e depois some ${n1} (${correctNum}).`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Estatística") {
+                    correctNum = n1 + i;
+                    qText = `Em um conjunto de dados, se a soma total de ${n2 + 5} valores resulta em ${(n2 + 5) * correctNum}, qual é a média aritmética?`;
+                    expText = `A média é a soma total dividida pela quantidade de elementos: ${(n2 + 5) * correctNum} / ${n2 + 5} = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Probabilidade") {
+                    let total = 10 + i;
+                    let fav = 2;
+                    qText = `Em uma urna com ${total} bolas, sendo ${fav} premiadas, qual é a probabilidade de retirar uma premiada?`;
+                    expText = `A probabilidade é o número de casos favoráveis (${fav}) dividido pelo total de casos (${total}).`;
+                    opts = shuffleArray([`${fav}/${total}`, `1/${total}`, `${fav + 1}/${total}`, `2/5`]);
+                }
+                else if (area === "Funções") {
+                    let a = i;
+                    let b = 3;
+                    let xVal = 2;
+                    correctNum = a * xVal + b;
+                    qText = `Dada a função afim f(x) = ${a}x + ${b}, qual é o valor de f(${xVal})?`;
+                    expText = `Substitua x por ${xVal}: ${a}(${xVal}) + ${b} = ${a * xVal} + ${b} = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Matemática Financeira") {
+                    let capital = 100 * i;
+                    correctNum = capital * 0.1;
+                    qText = `Qual é o valor dos juros simples de um capital de R$ ${capital} aplicados a uma taxa de 10% ao mês?`;
+                    expText = `Multiplique o capital pela taxa percentual: ${capital} × 0.1 = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum, x => `R$ ${x}`);
+                }
+                else if (area === "Matrizes e Determinantes") {
+                    correctNum = (n1 * i) - (n2 * 2);
+                    qText = `Qual é o determinante de uma matriz 2x2 com diagonal principal ${n1 * i} e secundária ${n2 * 2}? (Principal - Secundária)`;
+                    expText = `O determinante é o produto da diagonal principal menos o produto da secundária: ${n1 * i} - ${n2 * 2} = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Análise Combinatória") {
+                    let comb = n1 + i;
+                    correctNum = comb * 2;
+                    qText = `De quantas maneiras podemos organizar ${comb} elementos distintos em fila (Arranjo Base)?`;
+                    expText = `Aplicando o conceito combinatório para o fator ${comb}, obtemos o total estruturado de ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum, x => `${x} combinações`);
+                }
+                else if (area === "Sistemas Lineares") {
+                    let valX = i;
+                    let valY = 2;
+                    correctNum = valX + valY;
+                    qText = `No sistema linear, se x = ${valX} e y = ${valY}, quanto vale a soma x + y?`;
+                    expText = `Basta somar os valores dados: ${valX} + ${valY} = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Geometria Analítica") {
+                    let d = i * 2;
+                    correctNum = d;
+                    qText = `Qual é a distância no eixo cartesiano se o deslocamento horizontal for ${d} unidades?`;
+                    expText = `A distância direta equivale ao módulo do deslocamento informado (${d} unidades).`;
+                    opts = generateUniqueOptions(correctNum, x => `${x} unidades`);
+                }
+                else if (area === "Progressão Aritmética (PA)") {
+                    let a1 = 2;
+                    let r = i;
+                    correctNum = a1 + (5 - 1) * r;
+                    qText = `Dada uma PA com primeiro termo a1 = ${a1} e razão r = ${r}, qual é o 5º termo (a5)?`;
+                    expText = `Fórmula do termo geral: an = a1 + (n - 1)r -> 2 + (5 - 1)(${r}) = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Progressão Geométrica (PG)") {
+                    let a1 = 2;
+                    let qR = 2;
+                    correctNum = a1 * Math.pow(qR, Math.min(i, 5) - 1);
+                    qText = `Dada uma PG com a1 = ${a1} e razão q = ${qR}, qual é o termo na posição ${Math.min(i, 5)}?`;
+                    expText = `Fórmula do termo geral da PG: an = a1 * q^(n-1) -> ${a1} * 2^(${Math.min(i, 5)}-1) = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Cálculo Mental") {
+                    let valMental = 50 + (i * 10);
+                    correctNum = (valMental / 2) + 5;
+                    qText = `Cálculo Rápido: Quanto é ${valMental} dividido por 2 e somado com 5?`;
+                    expText = `Divida ${valMental} por 2 (${valMental / 2}) e some 5, resultando em ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Equações do 2º Grau") {
+                    let raiz = i;
+                    correctNum = - (raiz * raiz);
+                    qText = `Se uma equação do 2º grau possui raízes x = ${raiz} e x = -${raiz}, qual é o produto das raízes?`;
+                    expText = `Multiplicando as raízes: (${raiz}) × (-${raiz}) = ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else if (area === "Porcentagem e Juros") {
+                    let pct = i * 5;
+                    correctNum = 200 * (pct / 100);
+                    qText = `Quanto equivale ${pct}% de 200?`;
+                    expText = `Transforme a porcentagem em decimal (${pct / 100}) e multiplique por 200, resultando em ${correctNum}.`;
+                    opts = generateUniqueOptions(correctNum);
+                }
+                else {
+                    let numGen = n1 * i;
+                    qText = `Questão ${i} de Conjuntos Numéricos: O elemento ${numGen} pertence ao conjunto dos números inteiros?`;
+                    expText = `O número ${numGen} é um valor inteiro positivo pertencente ao conjunto Z.`;
+                    opts = ["Sim, é inteiro", "Não, é irracional", "Apenas decimal", "Pertence aos complexos"];
+                }
+
+                questions.push({
+                    area: area,
+                    author: null,
+                    question: qText,
+                    shuffledOptions: opts,
+                    correctAnswer: opts.find(o => o.includes(String(correctNum)) || o === "Sim, é inteiro" || o.includes("0.5") || o.includes("0.71") || o.includes("0.87")),
+                    explanation: expText
+                });
+            }
+
+            currentGameQuizzes = questions;
+            resetGameStats();
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        /* MODOS ESPECIAIS: DESAFIO DIÁRIO & RELÂMPAGO */
+        function startDailyChallenge() {
+            startStandardAreaQuiz("Raciocínio Lógico");
+            updateMascotBubble("Bem-vindo ao Desafio Diário! Complete para ganhar +50 Bônus!");
+        }
+
+        function startSpeedRunMode() {
+            startStandardAreaQuiz("Cálculo Mental");
+            isSpeedRun = true;
+            speedRunSeconds = 60;
+            document.getElementById('game-timer-display').innerText = `⏱️ ${speedRunSeconds}s`;
+
+            speedRunTimer = setInterval(() => {
+                speedRunSeconds--;
+                document.getElementById('game-timer-display').innerText = `⏱️ ${speedRunSeconds}s`;
+                if (speedRunSeconds <= 0) {
+                    clearInterval(speedRunTimer);
+                    finishQuizRound();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            answeredCurrent = false;
+            const q = currentGameQuizzes[currentQuestionIndex];
+
+            document.getElementById('game-area-tag').innerText = q.area;
+            document.getElementById('game-progress').innerText = `Questão ${currentQuestionIndex + 1}/${currentGameQuizzes.length}`;
+            document.getElementById('game-lives-display').innerText = '❤️'.repeat(currentLives);
+            document.getElementById('game-combo-tag').innerText = currentCombo > 1 ? `${currentCombo}x COMBO!` : '';
+
+            updateGameBar(((currentQuestionIndex) / currentGameQuizzes.length) * 100);
+
+            if (q.author) {
+                document.getElementById('game-author-tag').innerText = `👨‍🏫 Quiz do Professor: ${q.author} (${q.title})`;
+                document.getElementById('game-author-tag').style.display = 'block';
+            } else {
+                document.getElementById('game-author-tag').style.display = 'none';
+            }
+
+            document.getElementById('game-question').innerText = q.question;
+            document.getElementById('btn-next-question').style.display = 'none';
+            document.getElementById('game-explanation').style.display = 'none';
+
+            const container = document.getElementById('game-options');
+            container.innerHTML = q.shuffledOptions.map((opt, idx) => `
+                <button class="btn-outline option-btn" id="opt-btn-${idx}" onclick="checkAnswer(${idx})">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        function updateGameBar(percent) {
+            document.getElementById('game-bar-fill').style.width = `${percent}%`;
+        }
+
+        /* CHECAGEM COM FEEDBACK INSTANTÂNEO, ÁUDIO, SHAKE E MASCOTE */
+        function checkAnswer(selectedIdx) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+
+            const q = currentGameQuizzes[currentQuestionIndex];
+            const selectedOpt = q.shuffledOptions[selectedIdx];
+            const buttons = document.querySelectorAll('.option-btn');
+            const mainContainer = document.getElementById('main-container');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedOpt === q.correctAnswer) {
+                playSound('correct');
+                currentCombo++;
+                let comboBonus = currentCombo * 2;
+                userScore += 10 + comboBonus;
+
+                document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-correct');
+                document.getElementById(`opt-btn-${selectedIdx}`).innerHTML += ' ✔';
+
+                updateMascotBubble("Excelente! Resposta exata!", "🎉");
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+            } else {
+                playSound('wrong');
+                currentCombo = 0;
+                wrongQuestionsPool.push(q);
+
+                // Efeito Shake no Container
+                mainContainer.classList.add('shake');
+                setTimeout(() => mainContainer.classList.remove('shake'), 400);
+
+                document.getElementById(`opt-btn-${selectedIdx}`).classList.add('btn-wrong');
+                document.getElementById(`opt-btn-${selectedIdx}`).innerHTML += ' ✖';
+
+                q.shuffledOptions.forEach((opt, idx) => {
+                    if (opt === q.correctAnswer) {
+                        document.getElementById(`opt-btn-${idx}`).classList.add('btn-correct');
+                    }
+                });
+
+                if (activePotionSecondChance) {
+                    activePotionSecondChance = false;
+                    updateMascotBubble("Sua Poção te protegeu da perda de vida!", "🛡️");
+                } else {
+                    currentLives--;
+                    document.getElementById('game-lives-display').innerText = '❤️'.repeat(Math.max(0, currentLives));
+                    updateMascotBubble("Ops! Não desanime, veja a explicação abaixo.", "🤔");
+                }
+            }
+
+            document.getElementById('explanation-text').innerText = q.explanation;
+            document.getElementById('game-explanation').style.display = 'block';
+
+            if (currentLives <= 0) {
+                setTimeout(() => finishQuizRound(), 1500);
+            } else {
+                document.getElementById('btn-next-question').style.display = 'block';
+            }
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentGameQuizzes.length) {
+                loadQuestion();
+            } else {
+                finishQuizRound();
+            }
+        }
+
+        function finishQuizRound() {
+            clearInterval(speedRunTimer);
+            playSound('fanfare');
+
+            // Recompensas em Moedas e XP
+            let coinsEarned = Math.floor(userScore / 2);
+            let xpEarned = userScore;
+
+            currentUser.coins = (currentUser.coins || 0) + coinsEarned;
+            currentUser.score = (currentUser.score || 0) + userScore;
+
+            // Sistema de Level Up
+            let newLevel = Math.floor(currentUser.score / 100) + 1;
+            if (newLevel > (currentUser.level || 1)) {
+                currentUser.level = newLevel;
+                updateMascotBubble(`PARABÉNS! Você subiu para o Nível ${newLevel}!`, "🌟");
+            }
+
+            saveUserData();
+            updateHUD();
+
+            document.getElementById('res-score-text').innerText = `+${userScore} Pontos!`;
+            document.getElementById('res-stats-text').innerText = `Você ganhou 🪙 ${coinsEarned} Moedas e 🌟 ${xpEarned} XP nesta partida!`;
+
+            if (wrongQuestionsPool.length > 0) {
+                document.getElementById('btn-rematch').style.display = 'inline-block';
+            } else {
+                document.getElementById('btn-rematch').style.display = 'none';
+            }
+
+            showScreen('screen-results');
+            confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+        }
+
+        /* MODO REVANCHE */
+        function startRematchMode() {
+            currentGameQuizzes = [...wrongQuestionsPool];
+            resetGameStats();
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        /* SISTEMA DO MAPA DO MUNDO (RPG POR FASES) */
+        function renderRPGMap() {
+            const container = document.getElementById('rpg-map-container');
+            const totalStages = 8;
+            let currentUnlocked = currentUser ? (currentUser.mapLevel || 1) : 1;
+
+            let html = '';
+            for (let i = 1; i <= totalStages; i++) {
+                let isBoss = i % 4 === 0;
+                let isUnlocked = i <= currentUnlocked;
+                let isCurrent = i === currentUnlocked;
+
+                html += `
+                    <div class="map-node ${isBoss ? 'boss' : ''} ${isUnlocked ? 'unlocked' : ''} ${isCurrent ? 'current' : ''}" 
+                         onclick="${isUnlocked ? `playMapLevel(${i})` : 'alert(\"Fase Bloqueada!\")'}">
+                        ${isBoss ? '👑' : i}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function playMapLevel(levelNum) {
+            playSound('click');
+            let area = allAreas[(levelNum - 1) % allAreas.length];
+            startStandardAreaQuiz(area);
+            updateMascotBubble(`Fase ${levelNum}: Enfrentando desafios de ${area}!`, "⚔️");
+        }
+
+        /* SISTEMA DA LOJA DE ITENS E POÇÕES */
+        function renderShopItems() {
+            const container = document.getElementById('shop-items-container');
+            const items = [
+                { id: 'second_chance', name: '🧪 Poção da Segunda Chance', desc: 'Perdoa 1 erro durante o quiz.', cost: 50, icon: '🧪' },
+                { id: 'streak_shield', name: '🛡️ Escudo de Ofensiva', desc: 'Protege seu streak por 1 dia offline.', cost: 80, icon: '🛡️' },
+                { id: 'theme_neon', name: '🎨 Tema Cyberpunk', desc: 'Libera cores vibrantes no seu perfil.', cost: 120, icon: '🎨' }
+            ];
+
+            container.innerHTML = items.map(item => `
+                <div class="shop-item">
+                    <div style="font-size:2.5rem; margin-bottom:8px;">${item.icon}</div>
+                    <h4 style="color:#fff;">${item.name}</h4>
+                    <p style="font-size:0.8rem; color:#aaa; margin:8px 0;">${item.desc}</p>
+                    <button class="btn btn-secondary" onclick="buyShopItem('${item.id}', ${item.cost})" style="font-size:0.65rem;">
+                        COMPRAR (🪙 ${item.cost})
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function buyShopItem(itemId, cost) {
+            if ((currentUser.coins || 0) < cost) {
+                alert("Moedas insuficientes!");
+                return;
+            }
+
+            currentUser.coins -= cost;
+            if (!currentUser.inventory) currentUser.inventory = [];
+            currentUser.inventory.push(itemId);
+
+            if (itemId === 'second_chance') activePotionSecondChance = true;
+
+            saveUserData();
+            updateHUD();
+            playSound('fanfare');
+            alert("Item adquirido com sucesso e ativado!");
+        }
+
+        /* INTERAÇÃO COM O MASCOTE */
+        function interactMascot() {
+            playSound('click');
+            const phrases = [
+                "Você sabia? A matemática está em toda parte na natureza!",
+                "Estudar 10 minutos por dia aumenta sua retenção em até 80%!",
+                "Precisa de ajuda? Tente usar a explicação passo a passo!",
+                "Que tal tentar o Desafio Relâmpago hoje?"
+            ];
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            updateMascotBubble(randomPhrase, "🧙‍♂️");
+        }
+
+        function updateMascotBubble(text, emoji = "🧙‍♂️") {
+            document.getElementById('mascot-bubble').innerText = text;
+            document.getElementById('mascot-avatar').innerText = emoji;
+        }
+
+        function saveUserScore(pts) {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name].score = (globalUsers[currentUser.name].score || 0) + pts;
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                currentUser.score = globalUsers[currentUser.name].score;
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + currentUser.name + '/score').set(currentUser.score);
+                }
+            }
+        }
+
+        function renderRanking() {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const students = Object.keys(globalUsers)
+                .map(u => ({ name: u, ...globalUsers[u] }))
+                .filter(u => u.role === 'Aluno')
+                .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            const container = document.getElementById('ranking-list-container');
+            if (students.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center; font-size:0.85rem;">Nenhum aluno cadastrado no momento.</p>`;
+                return;
+            }
+
+            container.innerHTML = students.map((s, idx) => `
+                <div class="ranking-card" onclick="openUserProfileModal('${s.name}')">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <strong style="color:var(--primary-color); width:20px;">#${idx + 1}</strong>
+                        <img src="${s.photo || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <strong style="color:#fff; display:flex; align-items:center;">
+                                <span class="status-badge ${s.online ? 'status-online' : 'status-offline'}"></span>
+                                ${s.name}
+                            </strong>
+                            <div style="font-size:0.8rem; color:#aaa;">"${s.status || ''}"</div>
+                        </div>
+                    </div>
+                    <span style="color:var(--secondary-color); font-weight:bold;">${s.score || 0} pts</span>
+                </div>
+            `).join('');
+        }
+
+        function openUserProfileModal(studentName) {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const user = globalUsers[studentName];
+            if (!user) return;
+
+            document.getElementById('modal-user-img').src = user.photo || 'https://via.placeholder.com/120';
+            document.getElementById('modal-user-name').innerHTML = `
+                <span class="status-badge ${user.online ? 'status-online' : 'status-offline'}"></span>
+                ${studentName}
+            `;
+            document.getElementById('modal-user-role-grade').innerText = `${user.role || 'Aluno'} - ${user.grade || 'N/A'}`;
+            document.getElementById('modal-user-status-text').innerText = `"${user.status || 'Sem status definido.'}"`;
+            document.getElementById('modal-user-score').innerText = `${user.score || 0} pts`;
+
+            const medalsContainer = document.getElementById('modal-user-medals');
+            const medals = user.medals || [];
+            if (medals.length === 0) {
+                medalsContainer.innerHTML = `<span style="color:#aaa; font-size:0.85rem;">Nenhuma medalha conquistada ainda.</span>`;
+            } else {
+                medalsContainer.innerHTML = medals.map(m => `
+                    <div style="background:#202436; border:1px solid var(--secondary-color); padding:8px 12px; border-radius:8px; font-size:0.85rem;">
+                        <strong>${m.type}</strong><br>
+                        <small style="color:#ccc;">"${m.msg}" - Prof. ${m.from}</small>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('user-profile-modal').classList.remove('hidden');
+        }
+
+        function closeUserProfileModal() {
+            document.getElementById('user-profile-modal').classList.add('hidden');
+        }
+
+        function loadProfileData() {
+            document.getElementById('profile-img-preview').src = currentUser.photo || 'https://via.placeholder.com/100';
+            document.getElementById('profile-status-input').value = currentUser.status || '';
+            document.getElementById('profile-color-input').value = currentUser.themeColor || '#ff007f';
+
+            // Carregar Quests Diárias
+            const questsContainer = document.getElementById('daily-quests-container');
+            questsContainer.innerHTML = `
+                <div class="quest-card">
+                    <div>
+                        <strong>🎯 Conclua 1 Quiz hoje</strong><br>
+                        <small style="color:#aaa;">Recompensa: 🪙 +20 Moedas</small>
+                    </div>
+                    <span style="color:var(--success-color); font-weight:bold;">Ativa</span>
+                </div>
+                <div class="quest-card">
+                    <div>
+                        <strong>🔥 Alcance um Combo de 3x</strong><br>
+                        <small style="color:#aaa;">Recompensa: 🌟 +30 XP</small>
+                    </div>
+                    <span style="color:var(--success-color); font-weight:bold;">Ativa</span>
+                </div>
+            `;
+
+            const container = document.getElementById('my-medals-container');
+            const medals = currentUser.medals || [];
+            if (medals.length === 0) {
+                container.innerHTML = `<span style="color:#aaa; font-size:0.85rem;">Nenhuma medalha recebida até agora.</span>`;
+            } else {
+                container.innerHTML = medals.map(m => `
+                    <div style="background:#202436; border:1px solid var(--secondary-color); padding:10px; border-radius:8px; font-size:0.85rem;">
+                        <strong>${m.type}</strong><br>
+                        <small style="color:#ccc;">"${m.msg}" - Prof. ${m.from}</small>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function uploadProfilePhoto(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('profile-img-preview').src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveProfileChanges() {
+            const newPhoto = document.getElementById('profile-img-preview').src;
+            const newStatus = document.getElementById('profile-status-input').value.trim();
+            const newColor = document.getElementById('profile-color-input').value;
+
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name].photo = newPhoto;
+                globalUsers[currentUser.name].status = newStatus;
+                globalUsers[currentUser.name].themeColor = newColor;
+
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                currentUser.photo = newPhoto;
+                currentUser.status = newStatus;
+                currentUser.themeColor = newColor;
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + currentUser.name).set(globalUsers[currentUser.name]);
+                }
+
+                document.documentElement.style.setProperty('--primary-color', newColor);
+                document.getElementById('nav-avatar').src = newPhoto;
+                alert("Perfil atualizado com sucesso!");
+            }
+        }
+
+        function loadTeacherDashboard() {
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            const students = Object.keys(globalUsers)
+                .map(u => ({ name: u, ...globalUsers[u] }))
+                .filter(u => u.role === 'Aluno');
+
+            const select = document.getElementById('medal-student-select');
+            select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score || 0} pts)</option>`).join('');
+
+            const scores = students.map(s => s.score || 0);
+            const totalAvg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+            const highPerformers = students.filter(s => (s.score || 0) >= 50).length;
+            const lowPerformers = students.filter(s => (s.score || 0) < 50).length;
+
+            document.getElementById('stat-avg-score').innerText = `${totalAvg} pts`;
+            document.getElementById('stat-high-performers').innerText = highPerformers;
+            document.getElementById('stat-low-performers').innerText = lowPerformers;
+
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: students.map(s => s.name),
+                    datasets: [{
+                        label: 'Pontuação de Desempenho dos Alunos',
+                        data: students.map(s => s.score || 0),
+                        backgroundColor: '#00f0ff',
+                        borderColor: '#ff007f',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function handleSendMedal(e) {
+            e.preventDefault();
+            const studentName = document.getElementById('medal-student-select').value;
+            const medalType = document.getElementById('medal-type-select').value;
+            const msg = document.getElementById('medal-msg-input').value.trim();
+
+            globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            if (globalUsers[studentName]) {
+                if (!globalUsers[studentName].medals) globalUsers[studentName].medals = [];
+                globalUsers[studentName].medals.push({
+                    type: medalType,
+                    msg: msg,
+                    from: currentUser.name
+                });
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + studentName).set(globalUsers[studentName]);
+                }
+
+                alert(`Medalha enviada para o aluno ${studentName}!`);
+                document.getElementById('medal-msg-input').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
