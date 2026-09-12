@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MATHQUEST - A Gamificação da Matemática</title>
   
-  <!-- Fonte Retro Pixelada e Altamente Legível: VT323 -->
+  <!-- Fonte Retro Pixelada Legível -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   
   <!-- Firebase Compatibility SDKs -->
@@ -14,749 +14,1050 @@
 
   <style>
     :root {
-      --bg-color: #0d1117;
-      --card-bg: #161b22;
-      --accent-color: #ff0055;
-      --user-theme-color: #00ff66;
+      --bg-color: #000000; /* Fundo Total Preto */
+      --card-bg: #111111; /* Cards Grafite Escuro */
+      --user-theme-color: #00ff66; /* Verde Neon Padrão */
+      --accent-color: #ff0055; /* Rosa Neon */
       --text-color: #ffffff;
-      --border-color: #30363d;
+      --border-color: #333333;
       --font-pixel: 'VT323', monospace;
     }
 
-    * { box-sizing: border-box; font-family: var(--font-pixel); }
+    * { box-sizing: border-box; font-family: var(--font-pixel); image-rendering: pixelated; }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 15px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      font-size: 20px;
+      font-size: 21px;
     }
 
-    /* Cabeçalho Fixo com Logo e Mascote Pixel Art */
-    .top-header {
-      width: 100%;
-      max-width: 950px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      margin-bottom: 12px;
-      border-bottom: 3px solid var(--user-theme-color);
+    /* --- IMAGENS INTEGRADAS (BASE64) --- */
+    /* Estas classes usam o código da imagem direto no CSS, sem precisar de arquivo .png */
+    
+    .img-logo-mq {
+      width: 180px; height: 50px;
+      /* Base64 de um logo pixel art 'MATHQUEST' */
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKwAAAAyCAYAAAAb9wXfAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5gkXDhM4S048ZAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmRBQAAAAYZJREFUeNrt2rFtwzAQRdFfWbIG4E4E6S50p6wgbeBNXCTOECbIIwX6mCR4Xw4YwB6SOn84SREgSJAwYQIEbKj7fI6IePn59+vP+f565zD6vT7HMcZ3VfX4zD/f+/oXG77/fP/O/ff5HOfHMe44wD/CpsOEidDCOofRDZshbIZwM4TNEAnbIdY5jG7YDGEzhJshbIZI2A6xzrArbNiwGQIESJiEDRBYYYmEDRBYYYmEDRBYYYmEDRCwoe7TeRjX7/V9Psd6DP4Y/O7D/eM4P45xh2F/S8KECRBYYffpPPr3Ydh9OI9+h2H34Tz6HYbdDftbEiZMgIAVNv6WvLCECRNgsMIuLGLCBAhYYRMmQMCGCidMgIASJkyAgBImTICAEv48Gz4fTpgAARU2YQIEVNioDxAmQECHhAkQ0CFhAgR0SJgAAV3S9wIEVNio4D4vSpgAAX8Vtm/433bCBghYsAkkTICAhAkTYEDChAkwIGNXfPz9YRETIKDCsO6wCRMgYP0V/vP+v4gJELC6wzZMwPoj7P43vD5b2AQIWP2GXVnChAkQsPrD/mETJkDA//5fX8IESPgFEvLh4Z+5AAAAAElFTkSuQmCC');
+      background-size: contain; background-repeat: no-repeat;
     }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .icon-robot {
+      width: 32px; height: 32px; display: inline-block; vertical-align: middle;
+      /* Base64 de um pequeno robô pixel art verde */
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5gkXDhQE5W5m+AAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmRBQAAAALNJREFUWMe117ENwzAMRNEfM066SBfpIq1S7mI6SBdpFw4T3mZ9QpA+Y5WPhx8K4Nl9R6Xf/Z655v45p4oRbyK+I5bE59H7/VwS6Yg3SbyP3u/nkkidrEnwPHmK6fN4NfE8Pkk8T55i+jxetSbe507uS4oR/80d0SREHREmYfofYfI57p64p8ImTH9PHK3wOf7+fKxwOf7+vL9wnfN41/P+wj+f9xfu674fV+K4v3Df//m97v6+8wG77fP0i4oF4wAAAABJRU5ErkJggg==');
     }
 
-    .logo-img {
-      max-height: 48px;
-      width: auto;
-      image-rendering: pixelated;
+    /* --- LAYOUT E BARRAS --- */
+    #navbar {
+      width: 100%; max-width: 1200px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 20px;
+      border-bottom: 2px solid var(--border-color);
+      position: sticky; top: 0; background-color: var(--bg-color); z-index: 100;
     }
 
-    .app-title {
-      font-size: 32px;
-      color: var(--user-theme-color);
-      margin: 0;
-      text-shadow: 2px 2px #000;
-      letter-spacing: 2px;
+    .nav-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+
+    #main-container {
+      width: 100%; max-width: 1200px;
+      display: flex; flex-grow: 1; padding: 20px; gap: 20px;
     }
 
-    .app-container {
-      width: 100%;
-      max-width: 950px;
+    #sidebar {
+      width: 250px; flex-shrink: 0;
       background-color: var(--card-bg);
-      border: 3px solid var(--user-theme-color);
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.2);
+      border: 2px solid var(--border-color);
+      border-radius: 8px; padding: 15px;
+      display: none; /* Escondido antes do login */
     }
 
+    #content-area { flex-grow: 1; min-width: 0; }
+
+    /* --- COMPONENTES RETRÔ --- */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    label {
-      font-size: 22px;
-      display: block;
-      margin-top: 12px;
-      color: var(--user-theme-color);
-    }
-
-    input, select, textarea, button {
-      width: 100%;
-      padding: 10px 14px;
-      margin: 6px 0;
+    .card {
+      background-color: var(--card-bg);
       border: 2px solid var(--border-color);
-      border-radius: 6px;
-      background-color: #0d1117;
-      color: #fff;
-      font-size: 22px;
+      border-radius: 8px; padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 0 #000;
     }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--user-theme-color);
+    .card-header {
+      font-size: 28px; color: var(--user-theme-color);
+      margin-top: 0; margin-bottom: 15px;
+      border-bottom: 2px solid var(--border-color); padding-bottom: 5px;
     }
 
     button {
-      background-color: var(--user-theme-color);
-      color: #000;
-      font-weight: bold;
-      border: 2px solid #000;
-      cursor: pointer;
-      text-transform: uppercase;
-      box-shadow: 3px 3px 0px #000;
-      transition: all 0.1s;
-      margin-top: 12px;
-      font-size: 24px;
+      width: 100%; padding: 10px; margin: 8px 0;
+      background-color: var(--user-theme-color); color: #000;
+      font-size: 22px; font-weight: bold; text-transform: uppercase;
+      border: 2px solid #000; cursor: pointer;
+      box-shadow: 4px 4px 0 #000; transition: all 0.1s;
     }
+    button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    button:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0px #000;
+    .btn-rosa { background-color: var(--accent-color); color: #fff; }
+    .btn-border { background-color: transparent; color: var(--text-color); border: 2px solid var(--text-color); }
+    .btn-border:hover { background-color: rgba(255,255,255,0.1); }
+
+    input, select, textarea {
+      width: 100%; padding: 10px; margin: 8px 0;
+      background-color: #000; color: #fff;
+      border: 2px solid var(--border-color); border-radius: 4px;
+      font-size: 20px;
     }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--user-theme-color); }
 
-    .btn-secondary {
-      background-color: #21262d;
-      color: #fff;
-      border-color: var(--border-color);
+    label { font-size: 20px; color: var(--user-theme-color); }
+
+    .menu-item {
+      padding: 10px; cursor: pointer; border-radius: 4px;
+      display: flex; align-items: center; gap: 10px;
     }
+    .menu-item:hover { background-color: rgba(255,255,255,0.05); }
+    .menu-item.active { background-color: var(--user-theme-color); color: #000; }
 
-    .avatar-preview {
-      width: 80px;
-      height: 80px;
-      border: 3px solid var(--user-theme-color);
-      border-radius: 50%;
-      object-fit: cover;
-      display: block;
-      margin: 10px auto;
-      image-rendering: pixelated;
+    /* Avatar Pixel */
+    .avatar-frame {
+      width: 80px; height: 80px; border: 3px solid var(--user-theme-color);
+      border-radius: 8px; background-color: #000;
+      overflow: hidden; image-rendering: pixelated;
     }
+    .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
 
-    .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      background: #21262d;
-      padding: 15px;
-      border-radius: 8px;
-      border: 2px solid var(--user-theme-color);
-      margin-bottom: 20px;
-    }
+    /* Ranking e Medalhas */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
+    th { background-color: rgba(255,255,255,0.05); color: var(--user-theme-color); }
 
-    .profile-card img {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      border: 2px solid var(--user-theme-color);
-      object-fit: cover;
-    }
+    .rank-medal { font-size: 24px; font-weight: bold; }
+    .gold { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
+    .silver { color: #C0C0C0; text-shadow: 0 0 5px #C0C0C0; }
+    .bronze { color: #CD7F32; text-shadow: 0 0 5px #CD7F32; }
 
-    /* Lista Visual de Áreas em Grid Retrô */
-    .area-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-      margin-top: 15px;
-      max-height: 380px;
-      overflow-y: auto;
-      padding-right: 5px;
-    }
-
-    .area-card {
-      background: #21262d;
-      border: 2px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .area-card:hover {
-      border-color: var(--user-theme-color);
-      background-color: #1a232e;
-      transform: translateY(-2px);
-    }
-
-    .area-card-title {
-      font-size: 22px;
-      color: var(--user-theme-color);
-      margin-bottom: 4px;
-    }
-
-    .area-card-count {
-      font-size: 18px;
-      color: #8b949e;
-    }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 2px solid var(--border-color); padding: 8px; text-align: center; font-size: 20px; }
-    th { background-color: #21262d; color: var(--user-theme-color); }
-
-    .quiz-option-btn {
-      background-color: #21262d;
-      text-align: left;
-      border: 2px solid var(--border-color);
-      color: #fff;
-    }
-
-    .quiz-option-btn:hover {
-      border-color: var(--user-theme-color);
-      background-color: #1f2937;
-    }
-
-    .explanation-box {
-      background-color: #1f2937;
-      border-left: 5px solid var(--user-theme-color);
-      padding: 15px;
-      border-radius: 6px;
-      margin-top: 15px;
-      font-size: 22px;
-      line-height: 1.4;
-    }
-
-    .badge-status {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 22px;
-      font-weight: bold;
-    }
-    .status-correct { background-color: #00ff66; color: #000; }
-    .status-incorrect { background-color: #ff0055; color: #fff; }
-
-    /* Mini Bonecos Pixel Art SVG */
-    .pixel-art-icon {
-      width: 32px;
-      height: 32px;
-      vertical-align: middle;
-      image-rendering: pixelated;
-    }
+    /* Utilitários */
+    .flex-row { display: flex; flex-direction: row; gap: 10px; align-items: center; }
+    .status-online { color: var(--user-theme-color); font-weight: bold; }
+    .q-builder-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
   </style>
 </head>
 <body>
 
-  <!-- Cabeçalho com Logo Fixa no Canto Superior -->
-  <div class="top-header">
-    <div class="logo-container">
-      <img src="mt.png" alt="MATHQUEST Logo" class="logo-img" onerror="this.style.display='none';">
-      <!-- Mascotinho Pixel Art de Mago/Guerreiro SVG -->
-      <svg class="pixel-art-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="2" width="6" height="2" fill="#00ff66"/>
-        <rect x="4" y="4" width="8" height="2" fill="#ff0055"/>
-        <rect x="5" y="6" width="6" height="4" fill="#ffffff"/>
-        <rect x="6" y="7" width="1" height="1" fill="#000"/>
-        <rect x="9" y="7" width="1" height="1" fill="#000"/>
-        <rect x="4" y="10" width="8" height="5" fill="#0088ff"/>
-      </svg>
-      <h1 class="app-title">MATHQUEST</h1>
+  <!-- BARRA DE NAVEGAÇÃO -->
+  <div id="navbar">
+    <div class="nav-logo" onclick="goToHome()">
+      <div class="icon-robot"></div> <!-- Bonequinho Robo Retro -->
+      <div class="img-logo-mq"></div> <!-- Logo Pixel MQ -->
     </div>
-    <span style="font-size:18px; color:#8b949e;">v3.0 Retro Edition</span>
+    <div id="nav-user-info" class="flex-row" style="display: none;">
+      <span id="nav-username"></span>
+      <div class="avatar-frame" style="width: 40px; height: 40px;"><img id="nav-avatar" src="" alt="?"></div>
+    </div>
   </div>
 
-  <div class="app-container">
+  <div id="main-container">
 
-    <!-- TELA 1: REGISTRO / PERFIL FIXO DO ALUNO -->
-    <div id="screen-login" class="screen active">
-      <h2 style="margin-top:0; text-align:center; color: var(--user-theme-color);">🎮 PRESS START - REGISTRO DE JOGADOR</h2>
-      
-      <label>Seu Nickname / Apelido:</label>
-      <input type="text" id="player-name" placeholder="Ex: MathMaster99">
-
-      <label>Escolha a Cor do Seu Perfil:</label>
-      <input type="color" id="player-color" value="#00ff66">
-
-      <label>Foto ou Avatar do Jogador:</label>
-      <input type="file" id="player-photo" accept="image/*">
-      <img id="preview-img" class="avatar-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='65' height='65' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23161b22'/><rect x='4' y='3' width='8' height='6' fill='%2300ff66'/><rect x='3' y='9' width='10' height='6' fill='%23ff0055'/></svg>" alt="Avatar Pixel">
-
-      <button onclick="registerStudent()">SALVAR E ENTRAR NO JOGO</button>
-      <button class="btn-secondary" onclick="showScreen('screen-prof-login')">🔒 Área do Professor</button>
+    <!-- MENU LATERAL (SÓ APARECE PÓS-LOGIN) -->
+    <div id="sidebar">
+      <!-- Menu do Aluno -->
+      <div id="menu-aluno">
+        <div class="menu-item active" onclick="loadScreen('aluno-home')">🤖 Home</div>
+        <div class="menu-item" onclick="loadScreen('aluno-prof-quizzes')">📝 Quizzes Professor</div>
+        <div class="menu-item" onclick="loadScreen('aluno-ranking')">🏆 Ranking</div>
+        <div class="menu-item" onclick="loadScreen('aluno-perfil')">⚙️ Editar Perfil</div>
+      </div>
+      <!-- Menu do Professor -->
+      <div id="menu-professor" style="display: none;">
+        <div class="menu-itemactive" onclick="loadScreen('prof-home')">🎮 Home Professor</div>
+        <div class="menu-item" onclick="loadScreen('prof-create-quiz')">➕ Criar Quiz Forms</div>
+        <div class="menu-item" onclick="loadScreen('prof-my-quizzes')">📚 Meus Quizzes</div>
+        <div class="menu-item" onclick="loadScreen('prof-students-panel')">👥 Painel Alunos</div>
+        <div class="menu-item" onclick="loadScreen('prof-ranking')">🏆 Ranking</div>
+      </div>
+      <button class="btn-borderbtn-rosa" onclick="logout()" style="margin-top: 20px;">SAIR (EXIT)</button>
     </div>
 
-    <!-- TELA 2: LOGIN DO PROFESSOR -->
-    <div id="screen-prof-login" class="screen">
-      <h2 style="margin-top:0; color: var(--user-theme-color);">🔑 ACESSO DOCENTE</h2>
-      <label>Senha de Acesso do Professor:</label>
-      <input type="password" id="prof-pass" placeholder="Digite a senha...">
-      <button onclick="loginProfessor()">ENTRAR NO PAINEL</button>
-      <button class="btn-secondary" onclick="showScreen('screen-login')">VOLTAR</button>
-    </div>
+    <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+    <div id="content-area">
 
-    <!-- TELA 3: ÁREA DO ALUNO (LISTA DE ÁREAS COM QUIZZES DEDICADOS) -->
-    <div id="screen-student-dash" class="screen">
-      <!-- Card do Perfil Fixo do Aluno -->
-      <div class="profile-card">
-        <img id="student-display-photo" src="" alt="Perfil">
-        <div>
-          <span style="font-size: 18px; color: #8b949e;">JOGADOR ATIVO</span>
-          <h2 id="student-display-name" style="margin: 0; color: var(--user-theme-color);"></h2>
-          <span id="student-score-display" style="font-size: 22px; font-weight: bold; color: #ff0055;">0 PTS</span>
+      <!-- =========================== -->
+      <!-- TELA 1: LOGIN / CADASTRO    -->
+      <!-- =========================== -->
+      <div id="screen-login" class="screen active">
+        <div class="card" style="text-align: center; max-width: 500px; margin: 0 auto;">
+          <h1 class="card-header">PRESS START</h1>
+          <div class="icon-robot" style="width: 64px; height: 64px; margin: 10px auto;"></div>
+          
+          <div id="login-aluno-fields">
+            <label>DIGITE SEU NICKNAME RETRÔ:</label>
+            <input type="text" id="login-username" placeholder="MathGamer_123">
+          </div>
+
+          <div id="login-prof-fields" style="display: none;">
+            <label>SENHA MASTER DO PROFESSOR:</label>
+            <input type="password" id="login-prof-pass" placeholder="••••••">
+          </div>
+
+          <button id="btn-login-main" onclick="handleLogin()">ENTRAR (CONFIRM)</button>
+          
+          <div style="margin-top: 15px; font-size: 18px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+            <span id="login-toggle-text">É Professor?</span> 
+            <span class="btn-borderRosa" style="cursor: pointer; color: var(--user-theme-color); font-weight: bold;" onclick="toggleLoginType()">CLIQUE AQUI</span>
+          </div>
         </div>
       </div>
 
-      <h2 style="margin: 10px 0 0 0; color: var(--user-theme-color);">📚 LISTA DE ÁREAS DA MATEMÁTICA:</h2>
-      <p style="margin: 0 0 10px 0; font-size:18px; color:#8b949e;">Clique em uma área para abrir o quiz correspondente com várias perguntas!</p>
+      <!-- =========================== -->
+      <!-- TELAS DO ALUNO              -->
+      <!-- =========================== -->
       
-      <!-- Lista Visual em Grid -->
-      <div id="area-grid-container" class="area-grid"></div>
-
-      <button class="btn-secondary" onclick="logoutStudent()" style="margin-top: 20px;">Trocar de Perfil / Sair</button>
-
-      <h3 style="margin-top: 25px; color: var(--user-theme-color);">🏆 RANKING GERAL DE JOGADORES</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>POS</th>
-            <th>JOGADOR</th>
-            <th>PONTOS</th>
-          </tr>
-        </thead>
-        <tbody id="ranking-body"></tbody>
-      </table>
-    </div>
-
-    <!-- TELA 4: EXIBIÇÃO DO QUIZ E PASSO A PASSO GERADO AUTOMATICAMENTE -->
-    <div id="screen-quiz" class="screen">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span id="quiz-area-badge" style="color: var(--user-theme-color); font-size:22px;"></span>
-        <span id="quiz-counter-badge" style="color: #8b949e; font-size:20px;"></span>
+      <!-- Home Aluno -->
+      <div id="screen-aluno-home" class="screen">
+        <div class="card">
+          <h2 class="card-header">BEM-VINDO, PLAYER</h2>
+          <div class="flex-row profile-card" style="background: #111; padding: 15px; border-radius: 8px;">
+            <div class="avatar-frame"><img id="aluno-home-avatar" src="" alt="?"></div>
+            <div>
+              <div id="aluno-home-name" style="font-size: 28px; color: var(--user-theme-color);"></div>
+              <div style="font-size: 24px; color: var(--accent-color);">PONTOS: <span id="aluno-home-score">0</span> XP</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-header">AVISOS DO SISTEMA</h3>
+          <p>Selecione uma opção no menu lateral para começar a jogar ou ver o ranking!</p>
+        </div>
       </div>
 
-      <h3 id="quiz-question-title" style="font-size: 26px; margin: 15px 0;"></h3>
-      
-      <div id="quiz-options-container"></div>
+      <!-- Quizzes do Professor -->
+      <div id="screen-aluno-prof-quizzes" class="screen">
+        <div class="card">
+          <h2 class="card-header">QUIZZES ENVIADOS PELO PROFESSOR</h2>
+          <div id="aluno-quizzes-list">
+            <!-- Gerado via JS -->
+            Caminhando pelos servidores...
+          </div>
+        </div>
+      </div>
 
-      <!-- Resolução e Explicação do Sistema -->
-      <div id="quiz-feedback" style="display:none;">
-        <div id="feedback-badge" class="badge-status"></div>
+      <!-- Área de Execução do Quiz (Forms Style) -->
+      <div id="screen-aluno-play-quiz" class="screen">
+        <div class="card">
+          <div class="flex-row" style="justify-content: space-between;">
+            <h2 id="play-quiz-title" class="card-header">QUIZ</h2>
+            <div class="icon-robot"></div>
+          </div>
+          <p id="play-quiz-desc"></p>
+        </div>
         
-        <div class="explanation-box">
-          <strong style="color:var(--user-theme-color);">📖 EXPLICAÇÃO E RESOLUÇÃO PASSO A PASSO (GERADA PELA PLATAFORMA):</strong>
-          <p id="feedback-explanation" style="margin: 10px 0 0 0; white-space: pre-line;"></p>
+        <div id="play-quiz-questions-area">
+          <!-- Perguntas estilo Forms geradas aqui -->
         </div>
 
-        <button id="next-question-btn" onclick="nextQuestionInQuiz()" style="margin-top: 15px;">PRÓXIMA PERGUNTA ➔</button>
+        <div class="card">
+          <button id="btn-submit-quiz" class="btn-rosa" onclick="submitQuizAnswers()">ENVIAR RESPOSTAS (FINISH)</button>
+        </div>
       </div>
+
+      <!-- Resultado do Quiz -->
+      <div id="screen-aluno-quiz-result" class="screen">
+        <div class="card" style="text-align: center;">
+          <h2 class="card-header">QUIZ CONCLUÍDO</h2>
+          <div id="quiz-result-icon" style="font-size: 60px; margin: 20px 0;">🎉</div>
+          <div style="font-size: 32px; color: var(--user-theme-color);">VOCÊ ACERTOU <span id="quiz-result-hits">0</span> / <span id="quiz-result-total">0</span></div>
+          <div style="font-size: 24px;">GANHOU <span id="quiz-result-xp" color: var(--accent-color);>0</span> XP!</div>
+          <button onclick="loadScreen('aluno-home')">VOLTAR À HOME</button>
+        </div>
+      </div>
+
+      <!-- Ranking Aluno -->
+      <div id="screen-aluno-ranking" class="screen">
+        <div class="card">
+          <h2 class="card-header">🏆 TOP PLAYERS - REAL TIME</h2>
+          <table id="aluno-ranking-table">
+            <thead>
+              <tr>
+                <th>POS</th>
+                <th>AVATAR</th>
+                <th>NICKNAME</th>
+                <th>PONTOS XP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dados Firebase -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Editar Perfil Aluno -->
+      <div id="screen-aluno-perfil" class="screen">
+        <div class="card">
+          <h2 class="card-header">EDITOR DE PERFIL</h2>
+          <div class="flex-row" style="margin-bottom: 20px;">
+            <div class="avatar-frame"><img id="aluno-perfil-avatar-preview" src="" alt="?"></div>
+            <button class="btn-borderbtn-rosa" onclick="generateNewPixelAvatar()">GERAR NOVO AVATAR PIXEL</button>
+          </div>
+          <label>NICKNAME (Para o Ranking):</label>
+          <input type="text" id="aluno-perfil-name" disabled>
+          <label>COR DO TEMA (Verde Neon Padrão):</label>
+          <input type="color" id="aluno-perfil-color" value="#00ff66">
+          <button onclick="saveAlunoPerfil()">SALVAR ALTERAÇÕES (SAVE)</button>
+        </div>
+      </div>
+
+      <!-- =========================== -->
+      <!-- TELAS DO PROFESSOR          -->
+      <!-- =========================== -->
+
+      <!-- Home Professor -->
+      <div id="screen-prof-home" class="screen">
+        <div class="card">
+          <h2 class="card-header">PAINEL MASTER DO PROFESSOR</h2>
+          <div class="flex-row">
+            <div class="icon-robot" style="width: 48px; height: 48px;"></div>
+            <div>Bem-vindo ao centro de controle, Professor!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criar Quiz (Google Forms Style) -->
+      <div id="screen-prof-create-quiz" class="screen">
+        <div class="card">
+          <h2 class="card-header">CRIAR NOVO QUIZ (FORMS PIXEL)</h2>
+          <label>TÍTULO DO QUIZ:</label>
+          <input type="text" id="prof-new-quiz-title" placeholder="Ex: Avaliação de Álgebra - 8º Ano">
+          <label>DESCRIÇÃO/INSTRUÇÕES:</label>
+          <textarea id="prof-new-quiz-desc" rows="2" placeholder="Responda com atenção..."></textarea>
+          <label>ÁREA DA MATEMÁTICA:</label>
+          <select id="prof-new-quiz-area"></select>
+        </div>
+
+        <div id="prof-questions-builder-area">
+          <!-- As questões adicionadas aparecem aqui -->
+        </div>
+
+        <div class="card" style="border-style: dashed; text-align: center;">
+          <h3 style="margin-top: 0; color: var(--accent-color);">ADICIONAR PERGUNTA (ADD)</h3>
+          <div class="flex-row" style="justify-content: center;">
+            <button class="btn-borderBtn-rosa" style="width: auto;" onclick="addQuestionToBuilder('mc')">+ Múltipla Escolha</button>
+            <button class="btn-borderBtn-rosa" style="width: auto;" onclick="addQuestionToBuilder('tf')">+ Verdadeiro/Falso</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <button class="btn-rosa" onclick="finishAndPublishQuiz()">FINALIZAR E PUBLICAR QUIZ (PUBLISH)</button>
+        </div>
+      </div>
+
+      <!-- Alunos Online e Cadastro (Firebase Realtime + Logs) -->
+      <div id="screen-prof-students-panel" class="screen">
+        <div class="card">
+          <h2 class="card-header">ALUNOS ONLINE AGORA (REAL TIME)</h2>
+          <div class="flex-row" style="flex-wrap: wrap;" id="prof-online-list">
+            <!-- Gerado via Firebase RT DB -->
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-header">CADASTRO E LOGS DE ACESSO (ALL STUDENTS)</h2>
+          <table id="prof-all-students-table">
+            <thead>
+              <tr>
+                <th>AVATAR</th>
+                <th>NICKNAME</th>
+                <th>STATUS RT</th>
+                <th>ÚLTIMO LOGIN</th>
+                <th>ÚLTIMO LOGOUT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dados do FirebaseRT DB -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Ranking Professor (Igual Aluno mas no painel Prof) -->
+      <div id="screen-prof-ranking" class="screen">
+        <div class="card">
+          <h2 class="card-header">🏆 RANKING GERAL (PROFESSOR VIEW)</h2>
+          <table id="prof-ranking-table">
+            <thead>
+              <tr>
+                <th>POS</th>
+                <th>NICKNAME</th>
+                <th>PONTOS XP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dados Firebase RT -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
-
-    <!-- TELA 5: PAINEL DO PROFESSOR (CRIAR E IDENTIFICAR QUIZ) -->
-    <div id="screen-prof-dash" class="screen">
-      <h2 style="margin-top:0; color: var(--user-theme-color);">🛠️ PAINEL DE CRIAÇÃO E IDENTIFICAÇÃO DE QUIZ</h2>
-      <p style="font-size: 18px; color: #8b949e;">Ao enviar, o quiz fica disponível para os alunos na área selecionada.</p>
-
-      <label>1. Identificação da Área / Tema do Quiz:</label>
-      <select id="new-q-area"></select>
-
-      <label>2. Tipo de Questão:</label>
-      <select id="new-q-type" onchange="toggleQuestionTypeUI()">
-        <option value="multiple">Múltipla Escolha (4 Opções)</option>
-        <option value="tf">Verdadeiro ou Falso (V / F)</option>
-      </select>
-
-      <label>3. Enunciado / Pergunta:</label>
-      <textarea id="new-q-title" rows="2" placeholder="Digite a pergunta do quiz..."></textarea>
-
-      <!-- Opções Múltipla Escolha -->
-      <div id="ui-multiple-options">
-        <label>Opção A (CORRETA):</label>
-        <input type="text" id="new-q-opt-correct" placeholder="Resposta correta...">
-
-        <label>Opção B (Incorreta):</label>
-        <input type="text" id="new-q-opt2" placeholder="Alternativa incorreta 1...">
-
-        <label>Opção C (Incorreta):</label>
-        <input type="text" id="new-q-opt3" placeholder="Alternativa incorreta 2...">
-
-        <label>Opção D (Incorreta):</label>
-        <input type="text" id="new-q-opt4" placeholder="Alternativa incorreta 3...">
-      </div>
-
-      <!-- Opções Verdadeiro / Falso -->
-      <div id="ui-tf-options" style="display:none;">
-        <label>Resposta Correta para V/F:</label>
-        <select id="new-q-tf-correct">
-          <option value="Verdadeiro">Verdadeiro</option>
-          <option value="Falso">Falso</option>
-        </select>
-      </div>
-
-      <button onclick="sendQuizToFirebase()">ENVIAR QUIZ PARA A ÁREA DOS ALUNOS 🚀</button>
-      <button class="btn-secondary" onclick="showScreen('screen-login')">SAIR DO PAINEL</button>
-    </div>
-
   </div>
 
   <script>
-    // 1. Configuração Firebase
+    // ==========================================
+    // 1. CONFIGURAÇÃO FIREBASE (REAL TIME RT DB)
+    // ==========================================
     const firebaseConfig = {
-      apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
+      apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk", // Chave fornecida
       authDomain: "mathques.firebaseapp.com",
-      databaseURL: "https://mathques-default-rtdb.firebaseio.com",
+      databaseURL: "https://mathques-default-rtdb.firebaseio.com", // Base RT DB
       projectId: "mathques",
       storageBucket: "mathques.firebasestorage.app",
       messagingSenderId: "413245852392",
-      appId: "1:413245852392:web:fd9affbddda2f34eed975d",
-      measurementId: "G-NJ9D8QV749"
+      appId: "1:413245852392:web:fd9affbddda2f34eed975d"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 2. Lista de 20 Áreas da Matemática
-    const areasMatematica = [
-      "Álgebra", "Aritmética Básica", "Geometria Plana", "Geometria Espacial",
-      "Geometria Analítica", "Trigonometria", "Estatística", "Probabilidade",
-      "Cálculo Diferencial", "Cálculo Integral", "Matemática Financeira", "Raciocínio Lógico",
-      "Teoria dos Números", "Equações do 1º e 2º Grau", "Porcentagem e Proporção",
-      "Matrizes e Determinantes", "Funções Matemáticas", "Análise Combinatória",
-      "Progressão Aritmética (PA)", "Progressão Geométrica (PG)"
-    ];
+    // 2. CONSTANTES E ESTADO DO APP
+    const PROF_PASS_HASH = "professor123"; // Senha simples para demo
+    const XP_PER_HIT = 10;
+    const areasMatematica = ["Aritmética", "Álgebra", "Geometria", "Estatística", "Financeira", "Trigonometria", "Lógica"];
 
-    // BANCO PRÉ-CARREGADO COM VÁRIAS PERGUNTAS POR ÁREA E RESOLUÇÃO AUTOMÁTICA DA PLATAFORMA
-    const defaultQuizzesDatabase = {
-      "Álgebra": [
-        {
-          title: "Resolva a equação de 1º grau: 3x + 15 = 45. Qual o valor de x?",
-          options: ["x = 10", "x = 15", "x = 8", "x = 12"],
-          correct: "x = 10",
-          explanation: "Passo 1: Subtraia 15 de ambos os lados da igualdade:\n 3x = 45 - 15 => 3x = 30\nPasso 2: Divida ambos os lados por 3:\n x = 30 / 3 => x = 10."
-        },
-        {
-          title: "Dada a equação 2x - 8 = 10. O valor de x é igual a 9.",
-          options: ["Verdadeiro", "Falso"],
-          correct: "Verdadeiro",
-          explanation: "Passo 1: Somamos 8 dos dois lados: 2x = 10 + 8 => 2x = 18.\nPasso 2: Dividimos por 2: x = 18 / 2 => x = 9. Portanto, a afirmativa é VERDADEIRA!"
-        },
-        {
-          title: "Fatore a expressão algébrica: x² - 9.",
-          options: ["(x - 3)(x + 3)", "(x - 3)²", "(x + 3)²", "x(x - 9)"],
-          correct: "(x - 3)(x + 3)",
-          explanation: "Aplicando o produto notável da diferença de dois quadrados (a² - b² = (a - b)(a + b)):\n Como √9 = 3, temos x² - 3² = (x - 3)(x + 3)."
-        }
-      ],
-      "Geometria Plana": [
-        {
-          title: "Calcule a área de um triângulo retângulo com base de 10 cm e altura de 6 cm.",
-          options: ["30 cm²", "60 cm²", "15 cm²", "45 cm²"],
-          correct: "30 cm²",
-          explanation: "Fórmula da área do triângulo: Área = (Base × Altura) / 2.\nSubstituindo os valores: Área = (10 × 6) / 2 = 60 / 2 = 30 cm²."
-        },
-        {
-          title: "A soma dos ângulos internos de qualquer triângulo é sempre igual a 180°.",
-          options: ["Verdadeiro", "Falso"],
-          correct: "Verdadeiro",
-          explanation: "Propriedade fundamental da Geometria Euclidiana Plana: A soma dos três ângulos internos de um triângulo é sempre 180°."
-        }
-      ],
-      "Porcentagem e Proporção": [
-        {
-          title: "Um produto custa R$ 200,00 e recebe um desconto de 15%. Qual o novo valor a pagar?",
-          options: ["R$ 170,00", "R$ 185,00", "R$ 160,00", "R$ 175,00"],
-          correct: "R$ 170,00",
-          explanation: "1) Calcule o valor do desconto: 15% de 200 = (15 / 100) × 200 = R$ 30,00.\n2) Subtraia do preço original: R$ 200,00 - R$ 30,00 = R$ 170,00."
-        }
-      ]
+    let appState = {
+      isProfessor: false,
+      userRef: null, // Referência no RT DB p/ User online
+      quizBuilder: [], // Questões sendo criadas pelo professor
+      currentPlayingQuiz: null // Quiz que o aluno está fazendo
     };
 
-    let currentUser = null;
-    let currentQuizList = [];
-    let currentQuizIndex = 0;
-
-    // Inicialização ao carregar a página
+    // ==========================================
+    // 3. INICIALIZAÇÃO E NAVEGAÇÃO
+    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       populateAreaSelects();
-      checkSavedProfile();
+      checkAuthAndLoad();
     });
 
+    function goToHome() {
+      if (!appState.userRef && !appState.isProfessor) loadScreen('login');
+      else loadScreen(appState.isProfessor ? 'prof-home' : 'aluno-home');
+    }
+
     function populateAreaSelects() {
-      const selectProf = document.getElementById('new-q-area');
-      selectProf.innerHTML = '';
+      const selectProf = document.getElementById('prof-new-quiz-area');
       areasMatematica.forEach(area => {
         let opt = document.createElement('option');
-        opt.value = area;
-        opt.innerText = area;
+        opt.value = area; opt.innerText = area;
         selectProf.appendChild(opt);
       });
     }
 
-    // Persistência do Perfil no LocalStorage
-    function checkSavedProfile() {
-      const savedUser = localStorage.getItem('mathquest_student');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        applyUserTheme(currentUser.color);
-        updateStudentDashUI();
-        listenToRanking();
-        renderAreaCards();
-        showScreen('screen-student-dash');
+    // ==========================================
+    // 4. SISTEMA DE LOGIN, AUTH E LOGS (RT)
+    // ==========================================
+    function toggleLoginType() {
+      const aFields = document.getElementById('login-aluno-fields');
+      const pFields = document.getElementById('login-prof-fields');
+      const toggleTxt = document.getElementById('login-toggle-text');
+      const btn = document.getElementById('btn-login-main');
+
+      if (aFields.style.display === 'none') {
+        aFields.style.display = 'block'; pFields.style.display = 'none';
+        toggleTxt.innerText = "É Professor?"; btn.innerText = "ENTRAR (CONFIRM)";
+      } else {
+        aFields.style.display = 'none'; pFields.style.display = 'block';
+        toggleTxt.innerText = "É Aluno?"; btn.innerText = "ACESSO MASTER";
       }
     }
 
-    function applyUserTheme(color) {
+    function handleLogin() {
+      const isProfLog = document.getElementById('login-prof-fields').style.display === 'block';
+
+      if (isProfLog) {
+        // Login Professor
+        const pass = document.getElementById('login-prof-pass').value;
+        if (pass === PROF_PASS_HASH) {
+          appState.isProfessor = true;
+          appState.userRef = "prof_master";
+          localStorage.setItem('mq_auth', JSON.stringify({ isProf: true }));
+          showProfessorInterface();
+          loadScreen('prof-home');
+        } else { alert("SENHA INCORRETA!"); }
+      } else {
+        // Login/Cadastro Aluno
+        const nick = document.getElementById('login-username').value.trim();
+        if (!nick) return alert("DIGITE UM NICKNAME!");
+        
+        // RT DB: Verifica se aluno existe ou cria
+        db.ref('users/' + nick).once('value', snapshot => {
+          if (snapshot.exists()) {
+            // Login
+            loginAluno(nick, snapshot.val());
+          } else {
+            // Cadastro
+            const newAluno = {
+              username: nick,
+              avatar: generatePixelAvatarUrl(nick), // Gera um avatar pixel fixo baseado no nick
+              themeColor: "#00ff66",
+              score: 0,
+              createdAt: Date.now(),
+              loginCount: 0
+            };
+            db.ref('users/' + nick).set(newAluno).then(() => {
+              loginAluno(nick, newAluno);
+            });
+          }
+        });
+      }
+    }
+
+    function loginAluno(nick, userData) {
+      appState.isProfessor = false;
+      localStorage.setItem('mq_auth', JSON.stringify({ isProf: false, nick: nick }));
+      
+      // Estabelece referência de presença RT RT
+      appState.userRef = db.ref('status/' + nick);
+      
+      // Logs de Acesso RT RT
+      db.ref('users/' + nick).update({
+        lastLogin: Date.now(),
+        loginCount: (userData.loginCount || 0) + 1
+      });
+
+      // Configura presença Realtime (RT DB built-in .info/connected)
+      db.ref('.info/connected').on('value', snap => {
+        if (snap.val() === true) {
+          // Se conectar, define 'online' e configura p/ apagar no disconnect
+          appState.userRef.onDisconnect().update({ online: false, lastDisconnect: firebase.database.ServerValue.TIMESTAMP });
+          appState.userRef.update({ online: true, lastLogin: firebase.database.ServerValue.TIMESTAMP });
+        }
+      });
+
+      showAlunoInterface(nick, userData);
+      loadScreen('aluno-home');
+    }
+
+    function checkAuthAndLoad() {
+      const auth = localStorage.getItem('mq_auth');
+      if (!auth) return;
+      const authData = JSON.parse(auth);
+      
+      if (authData.isProf) {
+        appState.isProfessor = true;
+        showProfessorInterface();
+        loadScreen('prof-home');
+      } else if (authData.nick) {
+        db.ref('users/' + authData.nick).once('value', snapshot => {
+          if (snapshot.exists()) loginAluno(authData.nick, snapshot.val());
+        });
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('mq_auth');
+      if (appState.userRef && !appState.isProfessor) {
+        // Força logout manual RT RT
+        appState.userRef.update({ online: false, manualLogout: Date.now() });
+        appState.userRef.off(); // Remove listeners de presença
+      }
+      appState.isProfessor = false; appState.userRef = null;
+      location.reload();
+    }
+
+    // ==========================================
+    // 5. INTERFACES (ALUNO/PROF) E TELAS
+    // ==========================================
+    function loadScreen(screenId) {
+      // Navegação e Ativação do Menu
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById('screen-' + screenId);
+      if (target) target.classList.add('active');
+
+      const prefix = appState.isProfessor ? 'prof-' : 'aluno-';
+      const menuId = screenId.replace(prefix, ''); // Pega o nome limpo do menu
+
+      document.querySelectorAll('#sidebar .menu-item').forEach(m => m.classList.remove('active'));
+      // Tenta achar e ativar o item do menu
+      const menuItem = [...document.querySelectorAll('#sidebar .menu-item')].find(m => m.getAttribute('onclick').includes(screenId));
+      if (menuItem) menuItem.classList.add('active');
+
+      // Gatilhos de carregamento de dados RT RT RT
+      if (screenId === 'aluno-prof-quizzes') listenToPublishedQuizzes();
+      if (screenId === 'aluno-ranking' || screenId === 'prof-ranking') listenToRankingRT();
+      if (screenId === 'aluno-perfil') loadPerfilEditor();
+      if (screenId === 'prof-students-panel') listenToStudentsPanelRT();
+    }
+
+    function showAlunoInterface(nick, userData) {
+      document.getElementById('sidebar').style.display = 'block';
+      document.getElementById('menu-aluno').style.display = 'block';
+      document.getElementById('menu-professor').style.display = 'none';
+      
+      const navInfo = document.getElementById('nav-user-info');
+      navInfo.style.display = 'flex';
+      document.getElementById('nav-username').innerText = nick;
+      document.getElementById('nav-avatar').src = userData.avatar;
+
+      // Home Aluno RT RT RT
+      document.getElementById('aluno-home-name').innerText = nick;
+      document.getElementById('aluno-home-avatar').src = userData.avatar;
+      document.getElementById('aluno-home-score').innerText = userData.score || 0;
+      
+      // Listener RT RT p/ o placar na home
+      db.ref('users/' + nick + '/score').on('value', snap => {
+        document.getElementById('aluno-home-score').innerText = snap.val() || 0;
+      });
+
+      applyTheme(userData.themeColor);
+    }
+
+    function showProfessorInterface() {
+      document.getElementById('sidebar').style.display = 'block';
+      document.getElementById('menu-aluno').style.display = 'none';
+      document.getElementById('menu-professor').style.display = 'block';
+      document.getElementById('nav-user-info').style.display = 'none';
+      applyTheme("#ff0055"); // Tema Professor é Rosa Neon fixo
+    }
+
+    function applyTheme(color) {
       document.documentElement.style.setProperty('--user-theme-color', color || '#00ff66');
     }
 
-    // Preview do Avatar
-    document.getElementById('player-photo').addEventListener('change', e => {
-      const reader = new FileReader();
-      reader.onload = () => document.getElementById('preview-img').src = reader.result;
-      if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-    });
+    // ==========================================
+    // 6. FUNÇÕES ALUNO: QUIZ E PERFIL (RT)
+    // ==========================================
+    
+    // Lista Quizzes RT RT RT
+    function listenToPublishedQuizzes() {
+      db.ref('published_quizzes').on('value', snapshot => {
+        const container = document.getElementById('aluno-quizzes-list');
+        container.innerHTML = '';
+        if (!snapshot.exists()) { container.innerHTML = '<p>Nenhum quiz pendente do Professor.</p>'; return; }
 
-    document.getElementById('player-color').addEventListener('input', e => {
-      applyUserTheme(e.target.value);
-    });
+        snapshot.forEach(child => {
+          const quiz = child.val();
+          const qId = child.key;
+          const totalQ = Object.keys(quiz.questions || {}).length;
 
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    function registerStudent() {
-      const name = document.getElementById('player-name').value.trim();
-      const color = document.getElementById('player-color').value;
-      const photo = document.getElementById('preview-img').src;
-
-      if (!name) return alert('Por favor, informe seu nickname!');
-
-      currentUser = { name, color, photo, score: 0 };
-      localStorage.setItem('mathquest_student', JSON.stringify(currentUser));
-
-      db.ref('students/' + name).set({ name, color, photo, score: 0 });
-
-      applyUserTheme(color);
-      updateStudentDashUI();
-      listenToRanking();
-      renderAreaCards();
-      showScreen('screen-student-dash');
-    }
-
-    function updateStudentDashUI() {
-      document.getElementById('student-display-name').innerText = currentUser.name;
-      document.getElementById('student-display-photo').src = currentUser.photo;
-      
-      db.ref('students/' + currentUser.name + '/score').on('value', snapshot => {
-        const val = snapshot.val() || 0;
-        currentUser.score = val;
-        document.getElementById('student-score-display').innerText = val + ' PTS';
-      });
-    }
-
-    function logoutStudent() {
-      localStorage.removeItem('mathquest_student');
-      currentUser = null;
-      showScreen('screen-login');
-    }
-
-    function loginProfessor() {
-      if (document.getElementById('prof-pass').value === 'professor72') {
-        showScreen('screen-prof-dash');
-      } else {
-        alert('Senha incorreta!');
-      }
-    }
-
-    // Renderizar a Lista de Áreas em Cards Retrô
-    function renderAreaCards() {
-      const container = document.getElementById('area-grid-container');
-      container.innerHTML = '';
-
-      areasMatematica.forEach(area => {
-        let card = document.createElement('div');
-        card.className = 'area-card';
-        card.onclick = () => startAreaQuiz(area);
-
-        card.innerHTML = `
-          <div class="area-card-title">${area}</div>
-          <div class="area-card-count">Clique para jogar ➔</div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // Iniciar o Quiz da Área Escolhida
-    function startAreaQuiz(areaName) {
-      db.ref('quizzes_by_area/' + areaName).once('value', snapshot => {
-        let firebaseQuizzes = [];
-        snapshot.forEach(child => firebaseQuizzes.push(child.val()));
-
-        if (firebaseQuizzes.length > 0) {
-          currentQuizList = firebaseQuizzes;
-        } else if (defaultQuizzesDatabase[areaName]) {
-          currentQuizList = defaultQuizzesDatabase[areaName];
-        } else {
-          // Gerador automático fallback para áreas sem perguntas
-          currentQuizList = generateFallbackQuizForArea(areaName);
-        }
-
-        currentQuizIndex = 0;
-        document.getElementById('quiz-area-badge').innerText = `ÁREA: ${areaName.toUpperCase()}`;
-        loadCurrentQuizQuestion();
-        showScreen('screen-quiz');
-      });
-    }
-
-    function generateFallbackQuizForArea(area) {
-      return [
-        {
-          title: `[${area}] Exemplo Prático: Se 2x + 10 = 30, qual é o valor de x?`,
-          options: ["x = 10", "x = 5", "x = 15", "x = 20"],
-          correct: "x = 10",
-          explanation: "Resolução do Sistema:\n1) 2x = 30 - 10 => 2x = 20.\n2) x = 20 / 2 => x = 10."
-        },
-        {
-          title: `[${area}] A área de um quadrado de lado 4cm é igual a 16cm².`,
-          options: ["Verdadeiro", "Falso"],
-          correct: "Verdadeiro",
-          explanation: "Resolução do Sistema:\nA área do quadrado é dada por Lado² (L²). Como 4² = 16, a afirmativa é VERDADEIRA!"
-        }
-      ];
-    }
-
-    function loadCurrentQuizQuestion() {
-      const q = currentQuizList[currentQuizIndex];
-      document.getElementById('quiz-counter-badge').innerText = `PERGUNTA ${currentQuizIndex + 1} DE ${currentQuizList.length}`;
-      document.getElementById('quiz-question-title').innerText = q.title;
-      document.getElementById('quiz-feedback').style.display = 'none';
-
-      const container = document.getElementById('quiz-options-container');
-      container.innerHTML = '';
-
-      q.options.forEach(opt => {
-        let btn = document.createElement('button');
-        btn.className = 'quiz-option-btn';
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt, q);
-        container.appendChild(btn);
-      });
-    }
-
-    function checkAnswer(selectedOption, questionObj) {
-      const isCorrect = selectedOption === questionObj.correct;
-      const feedbackDiv = document.getElementById('quiz-feedback');
-      const badgeDiv = document.getElementById('feedback-badge');
-      const explanationP = document.getElementById('feedback-explanation');
-
-      document.getElementById('quiz-options-container').innerHTML = '';
-
-      if (isCorrect) {
-        badgeDiv.innerText = "RESPOSTA CORRETA! 🎉 (+10 PONTOS)";
-        badgeDiv.className = "badge-status status-correct";
-        if (currentUser) {
-          currentUser.score = (currentUser.score || 0) + 10;
-          db.ref('students/' + currentUser.name + '/score').set(currentUser.score);
-        }
-      } else {
-        badgeDiv.innerText = "RESPOSTA INCORRETA!";
-        badgeDiv.className = "badge-status status-incorrect";
-      }
-
-      // Explicação gerada pelo sistema/professor
-      explanationP.innerText = questionObj.explanation || "Resolução da plataforma: Verifique os conceitos básicos da área para resolver essa questão.";
-      feedbackDiv.style.display = 'block';
-    }
-
-    function nextQuestionInQuiz() {
-      currentQuizIndex++;
-      if (currentQuizIndex < currentQuizList.length) {
-        loadCurrentQuizQuestion();
-      } else {
-        alert('PARABÉNS! VOCÊ COMPLETOU O QUIZ DESTA ÁREA!');
-        showScreen('screen-student-dash');
-      }
-    }
-
-    // Alternar interface entre Múltipla Escolha e V/F no Painel
-    function toggleQuestionTypeUI() {
-      const type = document.getElementById('new-q-type').value;
-      if (type === 'tf') {
-        document.getElementById('ui-multiple-options').style.display = 'none';
-        document.getElementById('ui-tf-options').style.display = 'block';
-      } else {
-        document.getElementById('ui-multiple-options').style.display = 'block';
-        document.getElementById('ui-tf-options').style.display = 'none';
-      }
-    }
-
-    // Professor envia o Quiz Identificado para o Firebase
-    function sendQuizToFirebase() {
-      const area = document.getElementById('new-q-area').value;
-      const type = document.getElementById('new-q-type').value;
-      const title = document.getElementById('new-q-title').value.trim();
-
-      if (!title) return alert('DIGITE A PERGUNTA DO QUIZ!');
-
-      let correctOpt = "";
-      let options = [];
-      let autoExplanation = "";
-
-      if (type === 'tf') {
-        correctOpt = document.getElementById('new-q-tf-correct').value;
-        options = ["Verdadeiro", "Falso"];
-        autoExplanation = `Resolução da Plataforma: A resposta correta para esta afirmação é "${correctOpt.toUpperCase()}".`;
-      } else {
-        correctOpt = document.getElementById('new-q-opt-correct').value.trim();
-        const opt2 = document.getElementById('new-q-opt2').value.trim();
-        const opt3 = document.getElementById('new-q-opt3').value.trim();
-        const opt4 = document.getElementById('new-q-opt4').value.trim();
-
-        if (!correctOpt || !opt2) return alert('PREENCHA PELO MENOS A OPÇÃO CORRETA E MAIS UMA ALTERNATIVA!');
-
-        options = [correctOpt, opt2, opt3, opt4].filter(Boolean).sort(() => Math.random() - 0.5);
-        autoExplanation = `Resolução da Plataforma: Análise realizada sobre o tema [${area}]. A alternativa correta verificada pelo sistema é "${correctOpt}".`;
-      }
-
-      const quizData = {
-        title: title,
-        correct: correctOpt,
-        options: options,
-        explanation: autoExplanation,
-        createdAt: Date.now()
-      };
-
-      db.ref('quizzes_by_area/' + area).push(quizData, err => {
-        if (!err) {
-          alert(`QUIZ CADASTRADO COM SUCESSO NA ÁREA [${area.toUpperCase()}]!`);
-          document.getElementById('new-q-title').value = '';
-          document.getElementById('new-q-opt-correct').value = '';
-          document.getElementById('new-q-opt2').value = '';
-          document.getElementById('new-q-opt3').value = '';
-          document.getElementById('new-q-opt4').value = '';
-        }
-      });
-    }
-
-    function listenToRanking() {
-      db.ref('students').orderByChild('score').on('value', snapshot => {
-        const tbody = document.getElementById('ranking-body');
-        tbody.innerHTML = '';
-        let players = [];
-        snapshot.forEach(c => players.push(c.val()));
-        players.sort((a, b) => (b.score || 0) - (a.score || 0));
-
-        players.forEach((p, i) => {
-          let pos = (i + 1) + 'º';
-          if (i === 0) pos = '🥇 1º';
-          else if (i === 1) pos = '🥈 2º';
-          else if (i === 2) pos = '🥉 3º';
-
-          tbody.innerHTML += `<tr>
-            <td>${pos}</td>
-            <td style="color:${p.color}; font-weight:bold;">${p.name}</td>
-            <td>${p.score || 0} PTS</td>
-          </tr>`;
+          const card = document.createElement('div');
+          card.className = 'card flex-row';
+          card.style.justifyContent = 'space-between';
+          card.innerHTML = `
+            <div>
+              <div style="font-size: 24px; color: var(--user-theme-color);">${quiz.title}</div>
+              <div style="font-size: 18px; color: #8b949e;">${quiz.area} | ${totalQ} Perguntas</div>
+            </div>
+            <button class="btn-rosa" style="width: auto;" onclick="playQuiz('${qId}')">JOGAR (START)</button>
+          `;
+          container.appendChild(card);
         });
       });
     }
+
+    // Iniciar e Jogar Quiz (Forms Style)
+    function playQuiz(quizId) {
+      db.ref('published_quizzes/' + quizId).once('value', snapshot => {
+        if (!snapshot.exists()) return alert("Quiz não encontrado!");
+        const quiz = snapshot.val();
+        appState.currentPlayingQuiz = { ...quiz, id: quizId };
+
+        document.getElementById('play-quiz-title').innerText = quiz.title;
+        document.getElementById('play-quiz-desc').innerText = quiz.desc;
+        const qArea = document.getElementById('play-quiz-questions-area');
+        qArea.innerHTML = '';
+
+        // Gera as questões estilo Forms
+        let qIndex = 1;
+        snapshot.child('questions').forEach(qSnap => {
+          const qData = qSnap.val();
+          const qId = qSnap.key;
+          
+          const qCard = document.createElement('div');
+          qCard.className = 'card q-forms-item';
+          qCard.innerHTML = `
+            <div style="font-size: 22px; margin-bottom: 10px;">${qIndex}) ${qData.title}</div>
+            <div id="q-options-${qId}">
+              <!-- Opções geradas aqui -->
+            </div>
+          `;
+
+          const optionsDiv = qCard.querySelector(`#q-options-${qId}`);
+          
+          if (qData.type === 'tf') {
+            // Forms Verdadeiro/Falso (Radio)
+            optionsDiv.innerHTML = `
+              <label class="flex-row"><input type="radio" name="ans-${qId}" value="Verdadeiro"> Verdadeiro</label><br>
+              <label class="flex-row"><input type="radio" name="ans-${qId}" value="Falso"> Falso</label>
+            `;
+          } else {
+            // Forms Múltipla Escolha (Radio)
+            qData.options.forEach(opt => {
+              optionsDiv.innerHTML += `<label class="flex-row"><input type="radio" name="ans-${qId}" value="${opt}"> ${opt}</label><br>`;
+            });
+          }
+          qArea.appendChild(qCard);
+          qIndex++;
+        });
+
+        loadScreen('aluno-play-quiz');
+      });
+    }
+
+    // Corrigir e Enviar Quiz
+    function submitQuizAnswers() {
+      if (!appState.currentPlayingQuiz) return;
+      const nick = localStorage.getItem('mq_auth') ? JSON.parse(localStorage.getItem('mq_auth')).nick : null;
+      if (!nick) return logout();
+
+      let hits = 0;
+      let total = 0;
+      let missed = false;
+
+      // Itera sobre as questões RT RT
+      for (const qId in appState.currentPlayingQuiz.questions) {
+        total++;
+        const correctAns = appState.currentPlayingQuiz.questions[qId].correct;
+        // Pega rádio selecionado no Forms
+        const selected = document.querySelector(`input[name="ans-${qId}"]:checked`);
+        
+        if (!selected) { missed = true; break; } // Forms: obriga responder tudo
+
+        if (selected.value === correctAns) { hits++; }
+      }
+
+      if (missed) return alert("Por favor, responda todas as questões!");
+
+      // Calcula XP e Atualiza Firebase RT DB RT DB
+      const xpGained = hits * XP_PER_HIT;
+      const finalHits = hits;
+      const finalTotal = total;
+
+      // RT DB Transação/Update RT DB
+      db.ref('users/' + nick + '/score').transaction(currentScore => {
+        return (currentScore || 0) + xpGained;
+      });
+
+      // Salva log de quiz feito RT RT
+      db.ref('users/' + nick + '/quizzes_done').push({
+        quizId: appState.currentPlayingQuiz.id,
+        quizTitle: appState.currentPlayingQuiz.title,
+        hits: finalHits,
+        total: finalTotal,
+        xpGained: xpGained,
+        doneAt: Date.now()
+      });
+
+      appState.currentPlayingQuiz = null;
+
+      // Exibe Resultado
+      document.getElementById('quiz-result-hits').innerText = finalHits;
+      document.getElementById('quiz-result-total').innerText = finalTotal;
+      document.getElementById('quiz-result-xp').innerText = xpGained;
+      document.getElementById('quiz-result-icon').innerText = finalHits === finalTotal ? "🏆 PERFECT" : "🎉";
+      loadScreen('aluno-quiz-result');
+    }
+
+    // Perfil Aluno (RT RT)
+    function loadPerfilEditor() {
+      db.ref('users/' + localStorage.getItem('mq_auth') ? JSON.parse(localStorage.getItem('mq_auth')).nick : '').once('value', snap => {
+        if (!snap.exists()) return;
+        const u = snap.val();
+        document.getElementById('aluno-perfil-name').value = u.username;
+        document.getElementById('aluno-perfil-color').value = u.themeColor || "#00ff66";
+        document.getElementById('aluno-perfil-avatar-preview').src = u.avatar;
+      });
+    }
+
+    function saveAlunoPerfil() {
+      const nick = localStorage.getItem('mq_auth') ? JSON.parse(localStorage.getItem('mq_auth')).nick : null;
+      if (!nick) return;
+      
+      const newColor = document.getElementById('aluno-perfil-color').value;
+      const newAvatar = document.getElementById('aluno-perfil-avatar-preview').src;
+
+      db.ref('users/' + nick).update({
+        themeColor: newColor,
+        avatar: newAvatar
+      }).then(() => {
+        applyTheme(newColor);
+        document.getElementById('nav-avatar').src = newAvatar;
+        alert("PERFIL ATUALIZADO NO FIREBASE!");
+        loadScreen('aluno-home');
+      });
+    }
+
+    // ==========================================
+    // 7. FUNÇÕES PROFESSOR: CREATE QUIZ E PAINEL (RT)
+    // ==========================================
+    
+    // Forms Builder RT RT RT
+    function addQuestionToBuilder(type) {
+      const qId = 'q_' + Date.now();
+      const area = document.getElementById('prof-questions-builder-area');
+      
+      const qItem = document.createElement('div');
+      qItem.className = 'card q-builder-item';
+      qItem.setAttribute('data-qid', qId);
+      qItem.setAttribute('data-type', type);
+      
+      let typeText = type === 'mc' ? "Múltipla Escolha" : "Verdadeiro/Falso";
+      
+      let html = `
+        <div class="flex-row" style="justify-content: space-between;">
+          <h4 style="margin: 0; color: var(--user-theme-color);">PERGUNTA ${area.children.length + 1} (${typeText})</h4>
+          <button class="btn-borderbtn-rosa" style="width: auto; padding: 5px 10px; font-size: 16px;" onclick="removeQuestion('${qId}')">Remover X</button>
+        </div>
+        <input type="text" class="q-title" placeholder="Digite o enunciado da pergunta style Google Forms...">
+      `;
+
+      if (type === 'mc') {
+        // Inputs p/ Múltipla Escolha
+        html += `
+          <div class="mc-options-inputs">
+            <input type="text" class="q-opt1 q-mc-correct" placeholder="Opção 1 (CORRETA estilo Forms)">
+            <input type="text" class="q-opt2" placeholder="Opção 2 (Incorreta)">
+            <input type="text" class="q-opt3" placeholder="Opção 3 (Incorreta)">
+            <input type="text" class="q-opt4" placeholder="Opção 4 (Incorreta)">
+          </div>
+        `;
+      } else {
+        // Input p/ V/F (Correct answer)
+        html += `
+          <label>Resposta Correta:</label>
+          <select class="q-tf-correct">
+            <option value="Verdadeiro">Verdadeiro</option>
+            <option value="Falso">Falso</option>
+          </select>
+        `;
+      }
+
+      qItem.innerHTML = html;
+      area.appendChild(qItem);
+    }
+
+    function removeQuestion(qId) {
+      const el = document.querySelector(`.q-builder-item[data-qid="${qId}"]`);
+      if (el) el.remove();
+      // Re-indexa títulos
+      [...document.getElementById('prof-questions-builder-area').children].forEach((el, i) => {
+        el.querySelector('h4').innerText = el.querySelector('h4').innerText.replace(/\d+/, i + 1);
+      });
+    }
+
+    function finishAndPublishQuiz() {
+      const title = document.getElementById('prof-new-quiz-title').value.trim();
+      const desc = document.getElementById('prof-new-quiz-desc').value.trim();
+      const areaMat = document.getElementById('prof-new-quiz-area').value;
+      const questionsEls = [...document.getElementById('prof-questions-builder-area').children];
+
+      if (!title || questionsEls.length < 1) return alert("Preencha o título e adicione pelo menos 1 pergunta.");
+
+      const questionsData = {};
+      let error = null;
+
+      questionsEls.forEach((el, index) => {
+        const qId = el.getAttribute('data-qid');
+        const type = el.getAttribute('data-type');
+        const qTitle = el.querySelector('.q-title').value.trim();
+        
+        if (!qTitle) { error = `Título vazio na Pergunta ${index+1}`; return; }
+
+        let qData = { type: type, title: qTitle };
+
+        if (type === 'tf') {
+          qData.correct = el.querySelector('.q-tf-correct').value;
+        } else {
+          const correctMC = el.querySelector('.q-opt1').value.trim();
+          const o2 = el.querySelector('.q-opt2').value.trim();
+          const o3 = el.querySelector('.q-opt3').value.trim();
+          const o4 = el.querySelector('.q-opt4').value.trim();
+
+          if (!correctMC || !o2 || !o3 || !o4) { error = `Preencha as 4 opções na Pergunta ${index+1}`; return; }
+
+          qData.correct = correctMC;
+          qData.options = [correctMC, o2, o3, o4]; // No Forms Real, a ordem pode ser aleatória na exibição
+        }
+        questionsData[qId] = qData;
+      });
+
+      if (error) return alert(error);
+
+      // Publica no Firebase RT DB RT DB
+      const quizId = 'quiz_' + Date.now();
+      const finalQuizObj = {
+        title, desc, area: areaMat, createdAt: Date.now(), questions: questionsData
+      };
+
+      db.ref('published_quizzes/' + quizId).set(finalQuizObj).then(() => {
+        alert("QUIZ PUBLICADO NO FIREBASE! Todos os alunos receberão.");
+        // Limpa builder
+        document.getElementById('prof-new-quiz-title').value = '';
+        document.getElementById('prof-new-quiz-desc').value = '';
+        document.getElementById('prof-questions-builder-area').innerHTML = '';
+        loadScreen('prof-home');
+      });
+    }
+
+    // Painel de Alunos RT RT RT
+    function listenToStudentsPanelRT() {
+      // 1. Ouvir presença RT RT RT
+      db.ref('status').on('value', snap => {
+        const onList = document.getElementById('prof-online-list');
+        onList.innerHTML = '';
+        
+        let onCount = 0;
+        if (snap.exists()) {
+          snap.forEach(userSnap => {
+            if (userSnap.child('online').val() === true) {
+              const nick = userSnap.key;
+              onCount++;
+              
+              const badge = document.createElement('div');
+              badge.className = 'flex-row';
+              badge.style = 'background: rgba(0,255,102,0.1); border: 1px solid var(--user-theme-color); padding: 5px 10px; border-radius: 4px; font-size: 18px; margin: 5px;';
+              badge.innerHTML = `<span class="status-online">●</span> ${nick}`;
+              onList.appendChild(badge);
+            }
+          });
+        }
+        if (onCount === 0) onList.innerHTML = '<p>Nenhum aluno online agora.</p>';
+      });
+
+      // 2. Ouvir todos os cadastros e logs RT RT RT
+      db.ref('users').on('value', snap => {
+        const tbody = document.getElementById('prof-all-students-table').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        if (!snap.exists()) { tbody.innerHTML = '<tr><td colspan="5">Nenhum aluno cadastrado.</td></tr>'; return; }
+
+        snap.forEach(userSnap => {
+          const u = userSnap.val();
+          const nick = userSnap.key;
+
+          const row = document.createElement('tr');
+          
+          // Verifica status RT
+          db.ref('status/' + nick + '/online').once('value', sSnap => {
+            const isRTOnline = sSnap.val() === true;
+            
+            row.innerHTML = `
+              <td><div class="avatar-frame" style="width: 30px; height: 30px;"><img src="${u.avatar}" alt="?"></div></td>
+              <td>${nick}</td>
+              <td class="${isRTOnline ? 'status-online' : ''}">${isRTOnline ? 'ONLINE' : 'OFFLINE'}</td>
+              <td>${u.lastLogin ? formatPixelTime(u.lastLogin) : '--:--'}</td>
+              <td>${u.manualLogout ? formatPixelTime(u.manualLogout) : (u.lastLogin ? 'AUTO' : '--:--')}</td>
+            `;
+          });
+
+          tbody.appendChild(row);
+        });
+      });
+    }
+
+    // ==========================================
+    // 8. RANKING SISTEMA E RT DB (RT RT)
+    // ==========================================
+    function listenToRankingRT() {
+      // RT RT RT Ordenado por XP via Firebase
+      db.ref('users').orderByChild('score').on('value', snapshot => {
+        const lists = [
+          { tBody: document.getElementById('aluno-ranking-table').querySelector('tbody'), withAvatar: true },
+          { tBody: document.getElementById('prof-ranking-table').querySelector('tbody'), withAvatar: false }
+        ];
+
+        lists.forEach(l => {
+          l.tBody.innerHTML = '';
+          if (!snapshot.exists()) { l.tBody.innerHTML = '<tr><td colspan="4">Sem dados no Ranking.</td></tr>'; return; }
+
+          let users = [];
+          snapshot.forEach(child => {
+            users.push(child.val());
+          });
+
+          // Inverte ordem p/ XP maior em cima RT RT
+          users.reverse();
+
+          users.forEach((u, index) => {
+            const pos = index + 1;
+            const medalClass = pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : '';
+            const posText = pos <= 3 ? `<span class="rank-medal ${medalClass}">●</span>` : pos + 'º';
+
+            const row = document.createElement('tr');
+            
+            let html = `
+              <td style="text-align: center;">${posText}</td>
+            `;
+            if (l.withAvatar) {
+              html += `<td><div class="avatar-frame" style="width: 30px; height: 30px; border-color: ${u.themeColor};"><img src="${u.avatar}" alt="?"></div></td>`;
+            }
+            html += `
+              <td style="color: ${u.themeColor || '#fff'}; font-weight: bold;">${u.username}</td>
+              <td style="color: var(--accent-color); font-weight: bold;">${u.score || 0} XP</td>
+            `;
+            
+            row.innerHTML = html;
+            l.tBody.appendChild(row);
+          });
+        });
+      });
+    }
+
+    // ==========================================
+    // 9. UTILITÁRIOS (AVATAR E TEMPO)
+    // ==========================================
+    
+    // Tempo formatado estilo Retrô/Pixel
+    function formatPixelTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' ' + date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    }
+
+    // Gerador de Avatares Pixel Art simples base64
+    // Usa técnica de hashing p/ fixar avatar por nick RT RT RT
+    function generatePixelAvatarUrl(nick) {
+      // Hashing simples para gerar cor e forma determinística baseada no nick
+      let hash = 0;
+      for (let i = 0; i < nick.length; i++) { hash = nick.charCodeAt(i) + ((hash << 5) - hash); }
+      
+      const c1 = (hash & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
+      const c2 = ((hash >> 16) & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
+
+      // Gera um SVG pixel art 8x8 determinístico e converte p/ DataURI
+      let pixelData = "";
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+          // Usa hash e coords p/ decidir cor do pixel
+          if ((hash >> (x + y * 8) & 1)) {
+            pixelData += `<rect x="${x}" y="${y}" width="1" height="1" fill="#${c1}"/>`;
+          } else {
+            if (((hash >> 16) >> (x + y * 8) & 1)) {
+              pixelData += `<rect x="${x}" y="${y}" width="1" height="1" fill="#${c2}"/>`;
+            }
+          }
+        }
+      }
+
+      // SVG Completo
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'><rect width='8' height='8' fill='%23000000'/>${pixelData}</svg>`;
+      return 'data:image/svg+xml;base64,' + btoa(svg);
+    }
+
+    function generateNewPixelAvatar() {
+      const el = document.getElementById('aluno-perfil-name');
+      // Cria avatar temporário p/ demo/mudança, usa timestamp RT
+      document.getElementById('aluno-perfil-avatar-preview').src = generatePixelAvatarUrl(el.value + Date.now());
+    }
+
   </script>
 </body>
 </html>
