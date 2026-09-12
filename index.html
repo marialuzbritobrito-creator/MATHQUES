@@ -10,7 +10,6 @@
     <!-- SDKs DO FIREBASE (v9/v10 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
@@ -364,7 +363,6 @@
             gap: 10px;
         }
 
-        /* MODAL DE PERFIL DO COLEGUINHA */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -616,7 +614,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE VISUALIZAÇÃO DO PERFIL DO COLEGAS -->
+    <!-- MODAL DE VISUALIZAÇÃO DO PERFIL DO COLEGA -->
     <div id="peer-profile-modal" class="modal-overlay hidden">
         <div class="modal-card">
             <button class="close-modal-btn" onclick="closePeerProfile()">✕</button>
@@ -654,10 +652,11 @@
                 isFirebaseActive = true;
             }
         } catch (e) {
-            console.log("Firebase operando em modo local storage.");
+            console.log("Modo local estático ativo.");
         }
 
         let currentUser = null;
+        let globalUsers = {};
         let questionCount = 0;
         let currentGameQuizzes = [];
         let currentQuestionIndex = 0;
@@ -677,9 +676,34 @@
         window.onload = function() {
             renderAreaCards();
             populateAreaSelect();
+            syncUsersData();
             checkActiveSession();
             loadChatMessages();
         };
+
+        function syncUsersData() {
+            if (isFirebaseActive) {
+                firebase.database().ref('users').on('value', (snapshot) => {
+                    const data = snapshot.val() || {};
+                    globalUsers = data;
+                    localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+                    if (currentUser && globalUsers[currentUser.name]) {
+                        currentUser = { name: currentUser.name, ...globalUsers[currentUser.name] };
+                    }
+                    updateCurrentView();
+                });
+            } else {
+                globalUsers = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
+            }
+        }
+
+        function updateCurrentView() {
+            const activeScreen = document.querySelector('.screen.active');
+            if (!activeScreen) return;
+            const screenId = activeScreen.id;
+            if (screenId === 'screen-ranking') renderRanking();
+            if (screenId === 'screen-teacher-dash') loadTeacherDashboard();
+        }
 
         function renderAreaCards() {
             const container = document.getElementById('area-grid-container');
@@ -714,10 +738,8 @@
 
         function checkActiveSession() {
             const loggedUsername = localStorage.getItem('mathquest_logged_user');
-            const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-
-            if (loggedUsername && users[loggedUsername]) {
-                currentUser = { name: loggedUsername, ...users[loggedUsername] };
+            if (loggedUsername && globalUsers[loggedUsername]) {
+                currentUser = { name: loggedUsername, ...globalUsers[loggedUsername] };
                 document.getElementById('user-nav').style.display = 'flex';
                 document.getElementById('main-tabs').style.display = 'flex';
                 document.getElementById('nav-username').innerText = currentUser.name;
@@ -749,20 +771,26 @@
             const grade = document.getElementById('reg-grade').value.trim();
             const password = document.getElementById('reg-password').value;
 
-            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            users[name] = { 
+            const newUserObj = { 
                 password, 
                 role, 
                 grade, 
                 score: 0, 
                 answeredCount: 0,
-                status: "Aprendendo Matemática!", 
+                status: role === 'Professor' ? "Professor de Matemática" : "Estudando Matemática!", 
                 photo: "https://via.placeholder.com/100", 
                 themeColor: "#ff007f", 
                 medals: [] 
             };
-            localStorage.setItem('mathquest_users', JSON.stringify(users));
+
+            globalUsers[name] = newUserObj;
+            localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
             localStorage.setItem('mathquest_logged_user', name);
+
+            if (isFirebaseActive) {
+                firebase.database().ref('users/' + name).set(newUserObj);
+            }
+
             checkActiveSession();
         }
 
@@ -770,9 +798,8 @@
             e.preventDefault();
             const name = document.getElementById('login-name').value.trim();
             const password = document.getElementById('login-password').value;
-            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
 
-            if (!users[name] || users[name].password !== password) {
+            if (!globalUsers[name] || globalUsers[name].password !== password) {
                 alert("Usuário ou senha inválidos!");
                 return;
             }
@@ -960,32 +987,49 @@
                 });
             });
 
-            let teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
-            teacherQuizzes.push({
+            const quizObj = {
                 id: Date.now(),
                 title: title,
                 area: area,
                 author: currentUser.name,
                 questions: questions
-            });
+            };
 
-            localStorage.setItem('mathquest_teacher_quizzes', JSON.stringify(teacherQuizzes));
-            alert("Quiz cadastrado e enviado com sucesso!");
+            if (isFirebaseActive) {
+                firebase.database().ref('teacher_quizzes').push(quizObj);
+            } else {
+                let teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+                teacherQuizzes.push(quizObj);
+                localStorage.setItem('mathquest_teacher_quizzes', JSON.stringify(teacherQuizzes));
+            }
+
+            alert("Quiz cadastrado e publicado com sucesso!");
             document.getElementById('questions-builder-container').innerHTML = '';
             questionCount = 0;
             switchTab('screen-quizzes');
         }
 
         function renderTeacherQuizzesList() {
-            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
-            const container = document.getElementById('teacher-quizzes-container');
+            if (isFirebaseActive) {
+                firebase.database().ref('teacher_quizzes').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const quizzes = data ? Object.values(data) : [];
+                    displayQuizzes(quizzes);
+                });
+            } else {
+                const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
+                displayQuizzes(teacherQuizzes);
+            }
+        }
 
-            if (teacherQuizzes.length === 0) {
+        function displayQuizzes(quizzes) {
+            const container = document.getElementById('teacher-quizzes-container');
+            if (quizzes.length === 0) {
                 container.innerHTML = `<p style="color:#aaa; font-size:0.85rem;">Nenhum quiz publicado pelos professores até o momento.</p>`;
                 return;
             }
 
-            container.innerHTML = teacherQuizzes.map(q => `
+            container.innerHTML = quizzes.map(q => `
                 <div class="teacher-quiz-card" onclick="startTeacherCustomQuiz(${q.id})">
                     <h4 style="color:#fff;">${q.title}</h4>
                     <p style="font-size:0.85rem; color:#ccc; margin-top:4px;">
@@ -1005,25 +1049,35 @@
         }
 
         function startTeacherCustomQuiz(quizId) {
-            const teacherQuizzes = JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]');
-            const quiz = teacherQuizzes.find(q => q.id === quizId);
-            if (!quiz) return;
+            const getQuiz = (quizzes) => {
+                const quiz = quizzes.find(q => q.id === quizId);
+                if (!quiz) return;
 
-            currentGameQuizzes = quiz.questions.map(q => ({
-                area: quiz.area,
-                author: quiz.author,
-                title: quiz.title,
-                question: q.q,
-                shuffledOptions: shuffleArray(q.opts),
-                correctAnswer: q.ans,
-                explanation: q.exp
-            }));
+                currentGameQuizzes = quiz.questions.map(q => ({
+                    area: quiz.area,
+                    author: quiz.author,
+                    title: quiz.title,
+                    question: q.q,
+                    shuffledOptions: shuffleArray(q.opts),
+                    correctAnswer: q.ans,
+                    explanation: q.exp
+                }));
 
-            currentQuestionIndex = 0;
-            userScore = 0;
-            totalQuestionsAnsweredInQuiz = 0;
-            showScreen('screen-game');
-            loadQuestion();
+                currentQuestionIndex = 0;
+                userScore = 0;
+                totalQuestionsAnsweredInQuiz = 0;
+                showScreen('screen-game');
+                loadQuestion();
+            };
+
+            if (isFirebaseActive) {
+                firebase.database().ref('teacher_quizzes').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    getQuiz(data ? Object.values(data) : []);
+                });
+            } else {
+                getQuiz(JSON.parse(localStorage.getItem('mathquest_teacher_quizzes') || '[]'));
+            }
         }
 
         function generateQuestionsForArea(area) {
@@ -1199,28 +1253,33 @@
         }
 
         function saveUserScore(pts, questionsTotal) {
-            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            if (users[currentUser.name]) {
-                const currentScore = users[currentUser.name].score || 0;
-                const currentAnsCount = users[currentUser.name].answeredCount || 0;
+            if (!currentUser || !globalUsers[currentUser.name]) return;
 
-                const newScore = currentScore + pts;
-                const newAnsCount = currentAnsCount + questionsTotal;
+            const currentScore = globalUsers[currentUser.name].score || 0;
+            const currentAnsCount = globalUsers[currentUser.name].answeredCount || 0;
 
-                users[currentUser.name].score = newScore;
-                users[currentUser.name].answeredCount = newAnsCount;
+            const newScore = currentScore + pts;
+            const newAnsCount = currentAnsCount + questionsTotal;
 
-                localStorage.setItem('mathquest_users', JSON.stringify(users));
+            globalUsers[currentUser.name].score = newScore;
+            globalUsers[currentUser.name].answeredCount = newAnsCount;
 
-                currentUser.score = newScore;
-                currentUser.answeredCount = newAnsCount;
+            localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+
+            if (isFirebaseActive) {
+                firebase.database().ref('users/' + currentUser.name).update({
+                    score: newScore,
+                    answeredCount: newAnsCount
+                });
             }
+
+            currentUser.score = newScore;
+            currentUser.answeredCount = newAnsCount;
         }
 
         function renderRanking() {
-            const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            const students = Object.keys(users)
-                .map(u => ({ name: u, ...users[u] }))
+            const students = Object.keys(globalUsers)
+                .map(u => ({ name: u, ...globalUsers[u] }))
                 .filter(u => u.role === 'Aluno')
                 .sort((a, b) => (b.score || 0) - (a.score || 0));
 
@@ -1248,10 +1307,8 @@
             `).join('');
         }
 
-        /* FUNÇÕES DE VISUALIZAÇÃO DO PERFIL DO COLEGA */
         function viewPeerProfile(username) {
-            const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            const peer = users[username];
+            const peer = globalUsers[username];
             if (!peer) return;
 
             document.getElementById('modal-peer-photo').src = peer.photo || 'https://via.placeholder.com/100';
@@ -1314,13 +1371,21 @@
             const newStatus = document.getElementById('profile-status-input').value.trim();
             const newColor = document.getElementById('profile-color-input').value;
 
-            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            if (users[currentUser.name]) {
-                users[currentUser.name].photo = newPhoto;
-                users[currentUser.name].status = newStatus;
-                users[currentUser.name].themeColor = newColor;
+            if (globalUsers[currentUser.name]) {
+                globalUsers[currentUser.name].photo = newPhoto;
+                globalUsers[currentUser.name].status = newStatus;
+                globalUsers[currentUser.name].themeColor = newColor;
 
-                localStorage.setItem('mathquest_users', JSON.stringify(users));
+                localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+
+                if (isFirebaseActive) {
+                    firebase.database().ref('users/' + currentUser.name).update({
+                        photo: newPhoto,
+                        status: newStatus,
+                        themeColor: newColor
+                    });
+                }
+
                 currentUser.photo = newPhoto;
                 currentUser.status = newStatus;
                 currentUser.themeColor = newColor;
@@ -1332,13 +1397,16 @@
         }
 
         function loadTeacherDashboard() {
-            const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            const students = Object.keys(users)
-                .map(u => ({ name: u, ...users[u] }))
+            const students = Object.keys(globalUsers)
+                .map(u => ({ name: u, ...globalUsers[u] }))
                 .filter(u => u.role === 'Aluno');
 
             const select = document.getElementById('medal-student-select');
-            select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score || 0} pts)</option>`).join('');
+            if (students.length === 0) {
+                select.innerHTML = `<option value="">Nenhum aluno cadastrado ainda</option>`;
+            } else {
+                select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score || 0} pts)</option>`).join('');
+            }
 
             const scores = students.map(s => s.score || 0);
             const totalAvg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
@@ -1355,10 +1423,10 @@
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: students.map(s => s.name),
+                    labels: students.length ? students.map(s => s.name) : ['Sem alunos'],
                     datasets: [{
                         label: 'Pontuação de Desempenho dos Alunos',
-                        data: students.map(s => s.score || 0),
+                        data: students.length ? students.map(s => s.score || 0) : [0],
                         backgroundColor: '#00f0ff',
                         borderColor: '#ff007f',
                         borderWidth: 1
@@ -1379,18 +1447,28 @@
             const medalType = document.getElementById('medal-type-select').value;
             const msg = document.getElementById('medal-msg-input').value.trim();
 
-            let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            if (users[studentName]) {
-                if (!users[studentName].medals) users[studentName].medals = [];
-                users[studentName].medals.push({
-                    type: medalType,
-                    msg: msg,
-                    from: currentUser.name
-                });
-                localStorage.setItem('mathquest_users', JSON.stringify(users));
-                alert(`Medalha enviada para o aluno ${studentName}!`);
-                document.getElementById('medal-msg-input').value = '';
+            if (!studentName || !globalUsers[studentName]) {
+                alert("Selecione um aluno válido!");
+                return;
             }
+
+            if (!globalUsers[studentName].medals) globalUsers[studentName].medals = [];
+            
+            const newMedal = {
+                type: medalType,
+                msg: msg,
+                from: currentUser.name
+            };
+
+            globalUsers[studentName].medals.push(newMedal);
+            localStorage.setItem('mathquest_users', JSON.stringify(globalUsers));
+
+            if (isFirebaseActive) {
+                firebase.database().ref('users/' + studentName + '/medals').set(globalUsers[studentName].medals);
+            }
+
+            alert(`Medalha enviada com sucesso para o aluno ${studentName}!`);
+            document.getElementById('medal-msg-input').value = '';
         }
     </script>
 </body>
