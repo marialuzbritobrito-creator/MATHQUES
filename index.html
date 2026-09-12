@@ -378,7 +378,7 @@
             <button class="btn" style="width:auto; padding:6px 12px; background:transparent; border:1px solid #ff3366; color:#ff3366;" onclick="logout()">Sair</button>
         </div>
 
-        <!-- MENU DE ABAS (COM A NOVA ABA DE INTERAÇÃO IMPLEMENTADA) -->
+        <!-- MENU DE ABAS -->
         <div id="main-tabs" class="main-tabs" style="display: none;">
             <button id="tab-btn-quizzes" class="tab-btn active" onclick="switchTab('screen-quizzes')">📚 QUIZZES</button>
             <button id="tab-btn-interaction" class="tab-btn" onclick="switchTab('screen-interaction')">💬 INTERAÇÃO</button>
@@ -444,7 +444,7 @@
             <div id="area-grid-container" class="area-grid"></div>
         </div>
 
-        <!-- TELA NOVA: INTERAÇÃO / MURAL DO CONHECIMENTO -->
+        <!-- TELA DE INTERAÇÃO / MURAL DO CONHECIMENTO -->
         <div id="screen-interaction" class="screen">
             <h2 class="screen-title">💬 Mural de Interação e Dúvidas</h2>
             <div id="chat-messages-container" class="chat-box"></div>
@@ -483,11 +483,10 @@
             <div id="my-medals-container" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
         </div>
 
-        <!-- TELA 6: ÁREA DO PROFESSOR (CONSTRUTOR FORMS + GRÁFICOS + MEDALHAS) -->
+        <!-- TELA 6: ÁREA DO PROFESSOR -->
         <div id="screen-teacher-dash" class="screen">
             <h2 class="screen-title">🎓 Painel de Controle do Professor</h2>
 
-            <!-- GRÁFICOS DE NÍVEL E DESEMPENHO DA TURMA -->
             <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📊 Nível de Desempenho dos Alunos</h3>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -508,7 +507,6 @@
                 <canvas id="performanceChart" height="140"></canvas>
             </div>
 
-            <!-- ENVIO DE MEDALHAS PARA OS ALUNOS -->
             <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-top:25px; margin-bottom:12px;">🏅 Premiar Aluno com Medalha</h3>
             <form onsubmit="handleSendMedal(event)" style="background:#1c1f30; padding:15px; border-radius:12px; margin-bottom:25px;">
                 <div class="form-group">
@@ -531,7 +529,6 @@
                 <button type="submit" class="btn btn-secondary">ENVIAR MEDALHA DA CONQUISTA</button>
             </form>
 
-            <!-- CONSTRUTOR DE QUIZ ESTILO FORMS -->
             <h3 style="color:var(--secondary-color); font-family:var(--font-pixel); font-size:0.75rem; margin-bottom:12px;">📝 Construtor de Quizzes (Estilo Google Forms)</h3>
             <form onsubmit="saveCustomQuiz(event)">
                 <div class="form-group">
@@ -546,7 +543,6 @@
 
                 <div id="questions-builder-container"></div>
 
-                <!-- MAISÃO PARA NOVA PERGUNTA -->
                 <button type="button" class="btn-add-question" onclick="addQuestionCard()">➕ ADICIONAR NOVA PERGUNTA</button>
 
                 <button type="submit" class="btn btn-primary">PUBLICAR QUIZ PARA A TURMA 🚀</button>
@@ -574,7 +570,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO FIREBASE COM SUAS CREDENCIAIS
         const firebaseConfig = {
             apiKey: "AIzaSyATKw8PTw2zH4qGn1OyFNmtBdCbt_ofSvk",
             authDomain: "mathques.firebaseapp.com",
@@ -586,7 +581,6 @@
             measurementId: "G-NJ9D8QV749"
         };
 
-        // Inicializar o Firebase caso a chave esteja presente ou fallback local seguro
         let isFirebaseActive = false;
         try {
             if (firebaseConfig.apiKey !== "SUA_API_KEY") {
@@ -602,10 +596,10 @@
         let currentGameQuizzes = [];
         let currentQuestionIndex = 0;
         let userScore = 0;
+        let totalQuestionsAnsweredInQuiz = 0;
         let answeredCurrent = false;
         let chartInstance = null;
 
-        // 20 ÁREAS TEMÁTICAS COMPLETAS
         const allAreas = [
             "Álgebra", "Geometria Plana", "Geometria Espacial", "Raciocínio Lógico", "Trigonometria",
             "Aritmética", "Estatística", "Probabilidade", "Funções", "Matemática Financeira",
@@ -690,7 +684,17 @@
             const password = document.getElementById('reg-password').value;
 
             let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
-            users[name] = { password, role, grade, score: 0, status: "Aprendendo Matemática!", photo: "https://via.placeholder.com/100", themeColor: "#ff007f", medals: [] };
+            users[name] = { 
+                password, 
+                role, 
+                grade, 
+                score: 0, 
+                answeredCount: 0,
+                status: "Aprendendo Matemática!", 
+                photo: "https://via.placeholder.com/100", 
+                themeColor: "#ff007f", 
+                medals: [] 
+            };
             localStorage.setItem('mathquest_users', JSON.stringify(users));
             localStorage.setItem('mathquest_logged_user', name);
             checkActiveSession();
@@ -809,7 +813,6 @@
                 <label style="display:block; margin-bottom:8px; font-weight:bold;">Alternativas (Marque a bolinha ao lado da correta):</label>
                 <div class="options-list-container" id="opts-container-${qId}"></div>
                 
-                <!-- MAISINHO PEQUENO PARA ADICIONAR ALTERNATIVA -->
                 <button type="button" class="btn-add-opt" id="add-opt-btn-${qId}" onclick="addOptionRow(${qId})">+ Adicionar Alternativa</button>
 
                 <div class="form-group" style="margin-top:15px;">
@@ -955,6 +958,7 @@
 
             currentQuestionIndex = 0;
             userScore = 0;
+            totalQuestionsAnsweredInQuiz = currentGameQuizzes.length;
             showScreen('screen-game');
             loadQuestion();
         }
@@ -980,6 +984,7 @@
 
             currentQuestionIndex = 0;
             userScore = 0;
+            totalQuestionsAnsweredInQuiz = currentGameQuizzes.length;
             showScreen('screen-game');
             loadQuestion();
         }
@@ -1047,29 +1052,45 @@
                 loadQuestion();
             } else {
                 alert(`Quiz concluído! Você somou ${userScore} pontos!`);
-                saveUserScore(userScore);
+                saveUserScore(userScore, totalQuestionsAnsweredInQuiz);
                 switchTab('screen-quizzes');
             }
         }
 
-        function saveUserScore(pts) {
+        /* CORREÇÃO DA LIBERAÇÃO DE PONTOS E ATUALIZAÇÃO DO BANCO DE DADOS */
+        function saveUserScore(pts, questionsTotal) {
             let users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             if (users[currentUser.name]) {
-                users[currentUser.name].score = (users[currentUser.name].score || 0) + pts;
+                const currentScore = users[currentUser.name].score || 0;
+                const currentAnsCount = users[currentUser.name].answeredCount || 0;
+
+                const newScore = currentScore + pts;
+                const newAnsCount = currentAnsCount + questionsTotal;
+
+                users[currentUser.name].score = newScore;
+                users[currentUser.name].answeredCount = newAnsCount;
+
                 localStorage.setItem('mathquest_users', JSON.stringify(users));
-                currentUser.score = users[currentUser.name].score;
+
+                currentUser.score = newScore;
+                currentUser.answeredCount = newAnsCount;
             }
         }
 
-        /* RANKING E MEU PERFIL */
+        /* RANKING ATUALIZADO EXIBINDO PERGUNTAS E PONTOS */
         function renderRanking() {
             const users = JSON.parse(localStorage.getItem('mathquest_users') || '{}');
             const students = Object.keys(users)
                 .map(u => ({ name: u, ...users[u] }))
                 .filter(u => u.role === 'Aluno')
-                .sort((a, b) => b.score - a.score);
+                .sort((a, b) => (b.score || 0) - (a.score || 0));
 
             const container = document.getElementById('ranking-list-container');
+            if (students.length === 0) {
+                container.innerHTML = `<p style="color:#aaa; text-align:center;">Nenhum aluno cadastrado no ranking.</p>`;
+                return;
+            }
+
             container.innerHTML = students.map((s, idx) => `
                 <div style="display:flex; align-items:center; justify-content:space-between; background:#202436; padding:12px; border-radius:8px; margin-bottom:8px;">
                     <div style="display:flex; align-items:center; gap:12px;">
@@ -1080,7 +1101,10 @@
                             <div style="font-size:0.8rem; color:#aaa;">"${s.status || ''}"</div>
                         </div>
                     </div>
-                    <span style="color:var(--secondary-color); font-weight:bold;">${s.score} pts</span>
+                    <div style="text-align:right;">
+                        <span style="color:var(--secondary-color); font-weight:bold; font-size:1.05rem; display:block;">${s.score || 0} pts</span>
+                        <small style="color:#aaa; font-size:0.75rem;">${s.answeredCount || 0} Pergunta(s)</small>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1144,7 +1168,7 @@
                 .filter(u => u.role === 'Aluno');
 
             const select = document.getElementById('medal-student-select');
-            select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score} pts)</option>`).join('');
+            select.innerHTML = students.map(s => `<option value="${s.name}">${s.name} (${s.score || 0} pts)</option>`).join('');
 
             const scores = students.map(s => s.score || 0);
             const totalAvg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
