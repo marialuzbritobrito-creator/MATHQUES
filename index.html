@@ -2305,5 +2305,41 @@
             }
         }
     </script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+  @media (max-width: 768px) {
+    div, section, main, header, footer, article, sidebar {
+      width: 100% !important;
+      max-width: 100% !important;
+      display: block !important;
+      float: none !important;
+    }
+
+    img, video, iframe, canvas {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    table {
+      display: block !important;
+      overflow-x: auto !important;
+      width: 100% !important;
+    }
+  }
+</style>
+
 </body>
 </html>
